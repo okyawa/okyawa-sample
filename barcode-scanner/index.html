@@ -148,6 +148,11 @@
         // 選択された幅高さ
         w = video.videoWidth;
         h = video.videoHeight;
+        if (w === 0 || h === 0) {
+          // 幅と高さを取得できなかった場合
+          w = 640;
+          h = 480;
+        }
         // 画面上の表示サイズ
         prev.style.width = (w / 2) + "px";
         prev.style.height = (h / 2) + "px";
