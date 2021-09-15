@@ -8,11 +8,12 @@
     "firebase-tools": "^9.18.0"
   },
   "scripts": {
-    "deploy": "firebase deploy",
+    "build": "sh ./build.sh",
+    "deploy": "npm run build && firebase deploy",
     "login": "firebase login",
     "logout": "firebase logout",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "okyawa",
   "license": "ISC"
 }
