@@ -1,0 +1,18 @@
+{
+  "name": "okyawa-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "firebase-tools": "^9.18.0"
+  },
+  "scripts": {
+    "deploy": "firebase deploy",
+    "login": "firebase login",
+    "logout": "firebase logout",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
