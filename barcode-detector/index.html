@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>Shape Detection APIのBarcodeDetectorを使ったバーコードリーダーSample</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="author" content="okyawa">
+    <meta name="robots" content="noindex">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    
+      .container {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+    
+      h1,
+      h2 {
+        margin: 0;
+      }
+    
+      h2 {
+        font-size: 1.4rem;
+      }
+    
+      .fit_content {
+        display: inline-block;
+      }
+    
+      h3 {
+        margin: 16px 0 0 0;
+        font-weight: normal;
+        font-size: 1.1rem;
+      }
+    
+      header {
+        padding: 8px;
+      }
+    
+      .button_box {
+        margin: 24px 0 16px 0;
+      }
+    
+      #preview {
+        background-color: #f5f5f5;
+      }
+    
+      .result_box {
+        max-width: 320px;
+        margin: 16px auto 0 auto;
+        padding: 0 16px;
+      }
+    
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        border: solid 1px #ccc;
+      }
+
+      td, th {
+        padding: 4px 8px;
+        border: solid 1px #ccc;
+        text-align: left;
+      }
+
+      th {
+        width: 100px;
+        max-width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <h1>BarcodeDetector</h1>
+        <h2>
+          <span class="fit_content">Shape Detection API</span>
+          <span class="fit_content">バーコードリーダーSample</span>
+        </h2>
+      </header>
+
+      <div class="button_box">
+        <button type="button" id="start_button">Start</button>
+        <button type="button" id="stop_button" style="display: none;">Stop</button>
+      </div>
+
+      <div class="message" id="message"></div>
+
+      <div>
+        <div class="canvas_area">
+          <canvas id="preview" width="320" height="240"></canvas>
+        </div>
+      </div>
+
+      <div class="result_box">
+        <table class="">
+          <tbody>
+            <tr>
+              <th>フォーマット</th>
+              <td id="format"></td>
+            </tr>
+            <tr>
+              <th>値</th>
+              <td id="raw_value"></td>
+            </tr>
+            <tr>
+              <th>幅</th>
+              <td id="width"></td>
+            </tr>
+            <tr>
+              <th>高さ</th>
+              <td id="height"></td>
+            </tr>
+            <tr>
+              <th>左上x座標</th>
+              <td id="top_left_x"></td>
+            </tr>
+            <tr>
+              <th>左上y座標</th>
+              <td id="top_left_y"></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+
+    </div>
+    <!-- <script src="barcode-detector.js"></script> -->
+    <script>
+      (function () {
+        const scriptUrl = `${location.protocol}//${location.host}/barcode-detector/barcode-detector.js`;
+        var script = document.createElement('script');
+        script.src = scriptUrl;
+        document.body.appendChild(script);
+      })();
+    </script>
+  </body>
+</html>
