@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>CSS scroll snap を使った垂直方向のスクロールSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+    h1 {
+      margin: 1em;
+      font-size: 1.2rem;
+      line-height: 1.4;
+    }
+  </style>
+
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      --bar-height: 100px;
+      /* --extra-space: 60px; */
+      --extra-space: 10px;
+    }
+
+    article {
+      overflow: scroll;
+
+      /* scroll-snap-type: y proximity; */
+      scroll-snap-type: y mandatory;
+
+      /* Reserve space for header and additional space so above page are visible a bit*/ 
+      scroll-padding-top:  calc(var(--bar-height) + var(--extra-space));
+
+      position: absolute;
+
+      top:0;
+      bottom:0;
+      left: 0;
+      right: 0;
+      padding: var(--bar-height) 0 0 0;
+
+      /* Enable Safari touch scrolling physics which is needed for scroll snap */
+      -webkit-overflow-scrolling: touch; 
+    }
+
+    section {
+      scroll-snap-align: start; /* snap align start */
+
+      /* scroll-snap-stop: normal; */
+      scroll-snap-stop: always; /* スクロールコンテナーが可能なスナップ位置を「通り過ぎる」ことを許可しない */
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      border-top: 2px black solid;
+      font-size: 36px;
+    }
+
+    section.large {
+      height: 100vh;
+    }
+    section.medium {
+      height: 60vh;
+    }
+    section.small {
+      height: 30vh;
+    }
+
+    article > section:nth-of-type(1) {
+      background-color: #DCEDC8;
+    }
+    article > section:nth-of-type(2) {
+      background-color: #2196f3;
+    }
+    article >  section:nth-of-type(3) {
+      background-color: #26a69a;
+    }
+    article >  section:nth-of-type(4) {
+      background-color: #cddc39;
+    }
+    article > section:nth-of-type(5) {
+      background-color: #ff9800;
+    }
+
+    header {
+      position: fixed;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      height: var(--bar-height);
+      width: 100%;
+      top: 0;
+      padding: 0;
+
+      /* background: #8BC34A; */
+      background: rgba(200, 200, 0, 0.8);
+      color: #212121;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+      backdrop-filter: blur(3px);
+    }
+  </style>
+
+</head>
+<body>
+  <article>
+    <header> 
+      <h1>CSS scroll snap を使った垂直方向のスクロールSample</h1>
+    </header>
+  
+    <section class="medium"> Section One </section>
+    <section class="large"> Section Two </section>
+    <section class="large"> 
+      Section Three 
+      
+      <p style="font-size: 18px; padding: 10px;">
+        
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p>
+      <section class="small">
+        Sub section 
+      </section>
+      <section class="small">
+        Sub section 
+      </section>
+    </section>
+    <section class="medium"> Section Four </section>
+    <section class="large"> Section Five </section>
+  </article> 
+</body>
+</html>
