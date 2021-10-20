@@ -1,5 +1,10 @@
 # quagga2を使ったJavaScript実装のバーコードリーダーの検証
 
+
+## デモ
+
+- [quagga2 JavaScript実装 バーコードリーダーSample](https://okyawa-sample.web.app/barcode-scanner)
+
 ## 参照
 
 - [ericblade/quagga2 - GitHub (メンテされなくなった公式のフォーク版)](https://github.com/ericblade/quagga2)

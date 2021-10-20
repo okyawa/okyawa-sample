@@ -4,6 +4,11 @@
 - Chromeはブラウザの標準APIのBarcodeDetectorを使うことで、canvasに変換せずにvideoのまま渡すことができ、記述量が少なくなる
 
 
+## デモ
+
+- [BarcodeDetector Shape Detection API バーコードリーダーSample](https://okyawa-sample.web.app/barcode-detector)
+
+
 ## 参照
 
 - [BarcodeDetector - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector)
