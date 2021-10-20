@@ -5,11 +5,13 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
-    "firebase-tools": "^9.18.0"
+    "firebase-tools": "^9.18.0",
+    "http-server": "^14.0.0"
   },
   "scripts": {
     "build": "sh ./build.sh",
     "deploy": "npm run build && firebase deploy",
+    "http-server": "http-server ./ -o",
     "serve": "firebase serve",
     "login": "firebase login",
     "logout": "firebase logout",
