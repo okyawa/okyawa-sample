@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>CSS scroll snap を使った中央揃えカルーセルSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+      header {
+        margin-bottom: 16px;
+      }
+      h1,
+      h2 {
+        margin: 0;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+  </style>
+
+  <style>
+    #carousel {
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      margin: 0 auto;
+      position: relative;
+    }  
+    .slide-indicators {
+      display: flex;
+      justify-content: center;
+    }
+    .slide-indicator {
+      height: 44px;
+      width: 50px;
+      display: flex;
+      justify-items: center;
+      cursor: pointer;
+    }
+    .slide-indicator:after {
+      content: "";
+      background-color: #878787;
+      height: 10px;
+      margin-top: 10px;
+      width: 40px;
+    }
+    .slide-indicator.active:after,
+    .slide-indicator:hover:after {
+      background-color: #000000;
+    }
+    .slide-banner {
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      position: absolute;
+      left: 0;
+      bottom: 20px;
+      padding: 15px;
+      font-size: 2.5vw;
+      z-index: 10;
+    }
+    .slide-banner a {
+      color: #ffffff;
+    }
+    #slide-container {
+      scroll-snap-type: x mandatory;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      gap: 10px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .slide {
+      scroll-snap-align: center;
+      /* scroll-snap-stop: normal; */
+      scroll-snap-stop: always; /* スクロールコンテナーが可能なスナップ位置を「通り過ぎる」ことを許可しない */
+      position: relative;
+      min-width: 60%;
+      padding-top: 40%;
+    }
+    .slide img {
+      height: 100%;
+      width: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .arrow {
+      color: #ffffff;
+      height: 20px;
+      width: 20px;
+      background-color: #000000;
+      position: absolute;
+      padding: 10px;
+      opacity: .3;
+      cursor: pointer;
+    }
+    .arrow.back {
+      left: 10px;
+      top: 10px;
+    }
+    .arrow.forward {
+      right: 10px;
+      top: 10px;
+    }
+    .arrow:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>CSS scroll snap</h1>
+    <h2>
+      <span class="fit_content">中央揃えカルーセルSample</span>
+    </h2>
+  </header>
+
+  <div id="carousel">
+    <div id="slide-container">
+      <div class="slide" data-slideindex="0">
+        <div class="slide-banner">Car 01 <a href="">Link 1</a></div>
+        <img width="1200" height="800" src="../images/car_01.jpg">
+      </div>
+      <div class="slide" data-slideindex="1">
+        <div class="slide-banner">Car 02 <a href="">Link 2</a></div>
+        <img width="1200" height="800" src="../images/car_02.jpg">
+      </div>
+      <div class="slide" data-slideindex="2">
+        <div class="slide-banner">Car 03 <a href="">Link 3</a></div>
+        <img width="1200" height="800" src="../images/car_03.jpg">
+      </div>
+      <div class="slide" data-slideindex="3">
+        <div class="slide-banner">Car 04 <a href="">Link 4</a></div>
+        <img width="1200" height="800" src="../images/car_04.jpg">
+      </div>
+      <div class="slide" data-slideindex="4">
+        <div class="slide-banner">Car 05 <a href="">Link 5</a></div>
+        <img width="1200" height="800" src="../images/car_05.jpg">
+      </div>
+    </div>
+    <div id="back-button" class="arrow back">←</div>
+    <div id="forward-button" class="arrow forward">→</div>
+    <div class="slide-indicators">
+      <div class="slide-indicator active"></div>
+      <div class="slide-indicator"></div>
+      <div class="slide-indicator"></div>
+      <div class="slide-indicator"></div>
+      <div class="slide-indicator"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function autoplayCarousel() {
+    const carouselEl = document.getElementById("carousel");
+    const slideContainerEl = carouselEl.querySelector("#slide-container");
+    const slideEl = carouselEl.querySelector(".slide");
+    let slideWidth = slideEl.offsetWidth;
+    // Add click handlers
+    document.querySelector("#back-button")
+      .addEventListener("click", () => navigate("backward"));
+    document.querySelector("#forward-button")
+      .addEventListener("click", () => navigate("forward"));
+    document.querySelectorAll(".slide-indicator")
+      .forEach((dot, index) => {
+        dot.addEventListener("click", () => navigate(index));
+        dot.addEventListener("mouseenter", () => clearInterval(autoplay));
+      });
+    // Add keyboard handlers
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft') {
+        clearInterval(autoplay);
+        navigate("backward");
+      } else if (e.code === 'ArrowRight') {
+        clearInterval(autoplay);
+        navigate("forward");
+      }
+    });
+    // Add resize handler
+    window.addEventListener('resize', () => {
+      slideWidth = slideEl.offsetWidth;
+    });
+    // Autoplay
+    const autoplay = setInterval(() => navigate("forward"), 3000);
+    slideContainerEl.addEventListener("mouseenter", () => clearInterval(autoplay));
+    // Slide transition
+    const getNewScrollPosition = (arg) => {
+      const gap = 10;
+      const maxScrollLeft = slideContainerEl.scrollWidth - slideWidth;
+      if (arg === "forward") {
+        const x = slideContainerEl.scrollLeft + slideWidth + gap;
+        return x <= maxScrollLeft ? x : 0;
+      } else if (arg === "backward") {
+        const x = slideContainerEl.scrollLeft - slideWidth - gap;
+        return x >= 0 ? x : maxScrollLeft;
+      } else if (typeof arg === "number") {
+        const x = arg * (slideWidth + gap);
+        return x;
+      }
+    }
+    const navigate = (arg) => {
+      slideContainerEl.scrollLeft = getNewScrollPosition(arg);
+    }
+    // Slide indicators
+    const slideObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const slideIndex = entry.target.dataset.slideindex;
+          carouselEl.querySelector('.slide-indicator.active').classList.remove('active');
+          carouselEl.querySelectorAll('.slide-indicator')[slideIndex].classList.add('active');
+        }
+      });
+    }, { root: slideContainerEl, threshold: .7 });
+    document.querySelectorAll('.slide').forEach((slide) => {
+      slideObserver.observe(slide);
+    });
+  }
+  autoplayCarousel();
+</script>
+</body>
+</html>
