@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>CSS scroll snap を使ったCSSのみで実装したカルーセルSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+      header {
+        margin-bottom: 16px;
+      }
+      h1,
+      h2 {
+        margin: 0;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+  </style>
+
+  <style>
+    .slides {
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      gap: 8px;
+      overflow-x: scroll;
+      overflow-y: hidden;
+    }
+    .slide {
+      scroll-snap-align: center;
+      /* scroll-snap-stop: normal; */
+      scroll-snap-stop: always; /* スクロールコンテナーが可能なスナップ位置を「通り過ぎる」ことを許可しない */
+      min-width: 60vw;
+      height: 40vw;
+      background-repeat: no-repeat;
+    }
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>CSS scroll snap</h1>
+    <h2>
+      <span class="fit_content">CSSのみで実装したカルーセルSample</span>
+    </h2>
+  </header>
+
+  <main class="slides">
+    <section class="section-1 slide">
+      <img width="1200" height="800" src="../images/car_01.jpg">
+    </section>
+    <section class="section-2 slide">
+      <img width="1200" height="800" src="../images/car_02.jpg">
+    </section>
+    <section class="section-3 slide">
+      <img width="1200" height="800" src="../images/car_03.jpg">
+    </section>
+    <section class="section-4 slide">
+      <img width="1200" height="800" src="../images/car_04.jpg">
+    </section>
+    <section class="section-5 slide">
+      <img width="1200" height="800" src="../images/car_05.jpg">
+    </section>
+  </main>
+
+</div>
+
+</body> 
+</html>
