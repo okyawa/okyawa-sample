@@ -12,7 +12,7 @@
     "build": "sh ./build.sh",
     "deploy": "npm run build && firebase deploy",
     "http-server": "http-server ./ -o",
-    "serve": "firebase serve",
+    "serve": "firebase serve --only hosting --host 0.0.0.0 ",
     "login": "firebase login",
     "logout": "firebase logout",
     "test": "echo \"Error: no test specified\" && exit 1"
