@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>文字スクロール Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .scroll_frame {
+      margin: auto;
+      font-size: 140%;
+      line-height: 1.5em;
+      text-align: center;
+      color: #000000;
+      background: url(../img/text-scroll/sisters.jpg) #fff no-repeat;
+      background-size: cover;
+      background-position: center center;
+      overflow: hidden;
+    }
+    .scroll_frame .scroll_text {
+      margin: 0 16px;
+      padding: 8px 16px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display : inline-block;
+      line-height : 1em;
+      animation : scrollAnimation 32s linear infinite;
+    }
+    @keyframes scrollAnimation {
+        0% { transform: translateY(100vh)}
+      100% { transform: translateY(-100vh)}
+    }
+    </style>
+
+</head>
+<body>
+  <div class="container">
+
+    <div class="scroll_frame" style="min-height: 100vh">
+      <div class="scroll_text">
+        <p>スクロールするテキスト1</p>
+        <p>スクロールするテキスト2</p>
+        <p>スクロールするテキスト3</p>
+        <p>スクロールするテキスト4</p>
+        <p>スクロールするテキスト5</p>
+        <p>スクロールするテキスト6</p>
+        <p>スクロールするテキスト7</p>
+        <p>スクロールするテキスト8</p>
+        <p>スクロールするテキスト9</p>
+        <p>スクロールする長いテキスト10 スクロールする長いテキスト10</p>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
