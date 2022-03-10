@@ -1,0 +1,13 @@
+{
+  "name": "squoosh",
+  "version": "1.0.0",
+  "scripts": {
+    "optimise": "node optimise.mjs",
+    "resize": "node resize.mjs",
+    "reduce": "node reduce.mjs",
+    "convert": "node convert.mjs"
+  },
+  "devDependencies": {
+    "@squoosh/lib": "^0.4.0"
+  }
+}
