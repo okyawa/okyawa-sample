@@ -21,10 +21,14 @@ cp -r ./barcode-detector/ ./public/barcode-detector/
 mkdir -p ./public/teachable-machine
 cp -r ./teachable-machine/ ./public/teachable-machine/
 
-# scroll-snap
+# scroll-snaptext-scroll
 mkdir -p ./public/scroll-snap
 cp -r ./scroll-snap/ ./public/scroll-snap/
 
 # text-scroll
 mkdir -p ./public/text-scroll
 cp -r ./text-scroll/ ./public/text-scroll/
+
+# css-tips
+mkdir -p ./public/css-tips
+cp -r ./css-tips/ ./public/css-tips/
