@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>CSS Tooltip</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="author" content="okyawa">
+    <meta name="robots" content="noindex">
+
+    <style>
+      .tooltip {
+        --tooltip-bg-color: #3588D1;
+        --tooltip-text-color: #fff;
+        --tooltip-max-width: 200px;
+        --tooltip-padding-size: 16px;
+        --tooltip-side-margin: -60px;
+        position: relative;
+        border-bottom: 1px dotted black;
+        cursor: default;
+      }
+
+      .tooltip:before {
+        max-width: var(--tooltip-max-width);
+        width: max-content;
+        padding: var(--tooltip-padding-size);
+        content: attr(data-tooltip); 
+        position: absolute;
+        background-color: var(--tooltip-bg-color);
+        color: var(--tooltip-text-color);
+        text-align: center;
+        line-height: 1.4;
+        font-size: 0.70em;
+        border-radius: 5px;
+        z-index: 1;
+        transition: opacity .5s;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .tooltip:after {
+        content: "";
+        position: absolute;
+        border-width: 5px;
+        border-style: solid;
+        transition: opacity .5s;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .tooltip:hover:before, 
+      .tooltip:hover:after {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .tooltip:before,
+      .tooltip[data-position="top-left"]:before {
+        bottom: 125%;
+        left: 50%;
+        margin-left: var(--tooltip-side-margin);
+      }
+
+      .tooltip[data-position="top-right"]:before {
+        bottom: 125%;
+        left: auto;
+        right: 0;
+        margin-left: 0;
+        margin-right: calc(var(--tooltip-side-margin) / 2);
+      }
+
+      .tooltip[data-position="bottom-left"]:before {
+        bottom: auto;
+        top: 125%;
+        left: 50%;
+        margin-left: var(--tooltip-side-margin);
+      }
+
+      .tooltip[data-position="bottom-right"]:before {
+        bottom: auto;
+        top: 125%;
+        left: auto;
+        right: 0;
+        margin-left: 0;
+        margin-right: calc(var(--tooltip-side-margin) / 2);
+      }
+
+      .tooltip:after,
+      .tooltip[data-position="top-left"]:after,
+      .tooltip[data-position="top-right"]:after {
+        bottom: 75%;
+        left: 50%;
+        margin-left: -5px;
+        border-color: var(--tooltip-bg-color) transparent transparent transparent;
+      }
+
+      .tooltip[data-position="bottom-left"]:after,
+      .tooltip[data-position="bottom-right"]:after {
+        bottom: -35%;
+        left: 50%;
+        margin-left: -5px;
+        border-color: transparent transparent var(--tooltip-bg-color) transparent;
+      }
+    </style>
+
+</head>
+<body>
+
+  <h1>
+    HTML/CSS tooltip
+  </h1>
+
+  <section>
+    <h1>default</h1>
+    <p>
+      Hover <span class="tooltip" data-tooltip="Tooltip Content">Here</span> to see the tooltip.
+    </p>
+  </section>
+
+  <section>
+    <h2>top-left tooltip</h2>
+    <p>
+      You can hover <span class="tooltip" data-tooltip="This is top-left Tooltip Content" data-position="top-left">here</span> to see top-left example.
+    </p>
+  </section>
+
+  <section>
+    <h2>top-right tooltip</h2>
+    <p>
+      You can hover <span class="tooltip" data-tooltip="This is top-right Tooltip Content" data-position="top-right">here</span> to see top-right example.
+    </p>
+  </section>
+
+  <section>
+    <h2>bottom-left tooltip</h2>
+    <p>
+      You can hover <span class="tooltip" data-tooltip="This is bottom-left Tooltip Content" data-position="bottom-left">here</span> to see top-left example.
+    </p>
+  </section>
+
+  <section>
+    <h2>bottom-right tooltip</h2>
+    <p>
+      You can hover <span class="tooltip" data-tooltip="This is bottom-right Tooltip Content" data-position="bottom-right">here</span> to see top-right example.
+    </p>
+  </section>
+
+</body>
+</html>
