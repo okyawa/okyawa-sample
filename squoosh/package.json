@@ -2,7 +2,7 @@
   "name": "squoosh",
   "version": "1.0.0",
   "scripts": {
-    "optimise": "node optimise.mjs",
+    "optimize": "node optimize.mjs",
     "resize": "node resize.mjs",
     "reduce": "node reduce.mjs",
     "convert": "node convert.mjs"

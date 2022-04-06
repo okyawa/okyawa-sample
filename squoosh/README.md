@@ -12,7 +12,7 @@
 ### ファイル形式はそのままで画像圧縮
 
 ```sh
-npm run optimise
+npm run optimize
 ```
 
 ### リサイズして画像圧縮
