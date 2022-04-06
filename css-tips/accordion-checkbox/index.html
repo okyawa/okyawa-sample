@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>Accordion using checkbox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="author" content="okyawa">
+    <meta name="robots" content="noindex">
+
+    <style>
+      main {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .acd-check{
+        display: none;
+      }
+      .acd-label{
+        background: #0068b7;
+        color: #fff;
+        display: block;
+        margin-bottom: 1px;
+        padding: 10px;
+        position: relative;
+      }
+      .acd-label:after{
+        content: '+';
+        padding: 10px 20px;
+        display: block;
+        box-sizing: border-box;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      .acd-content{
+        border: 1px solid #333;
+        display: block;
+        height: 0;
+        opacity: 0;
+        padding: 0 10px;
+        transition: .5s;
+        visibility: hidden;
+      }
+      .acd-check:checked + .acd-label:after{
+        content: '-';
+      }
+      .acd-check:checked + .acd-label + .acd-content{
+        height: 50px;
+        opacity: 1;
+        padding: 10px;
+        visibility: visible;
+      }
+    </style>
+
+</head>
+<body>
+
+  <main>
+
+    <h1>CSS only Accordion using checkbox</h1>
+
+    <input id="acd-check1" class="acd-check" type="checkbox">
+    <label class="acd-label" for="acd-check1">クリックで開く1</label>
+    <div class="acd-content">
+      <p>hello.world!</p>
+    </div>
+    <input id="acd-check2" class="acd-check" type="checkbox">
+    <label class="acd-label" for="acd-check2">クリックで開く2</label>
+    <div class="acd-content">
+      <p>hello.world2!</p>
+    </div>
+
+  </main>
+
+</body>
+</html>
