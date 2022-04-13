@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Form Autocomplete Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+
+<h1>Form Autocomplete Sample</h1>
+
+<form method="post" action="">
+  <fieldset>
+    <legend>Sign up (autocomplete="new-password")</legend>
+    <dl>
+      <dt><label for="username">username</label></dt>
+      <dd><input type="text" name="username" value="" id="username" autocomplete="username" /></dd>
+    </dl>
+    <dl>
+      <dt><label for="new_password">password</label></dt>
+      <dd><input type="password" name="password" value="" id="new_password" autocomplete="new-password" /></dd>
+    </dl>
+    <div>
+      <button>Sign up</button>
+    </div>
+  </fieldset>
+</form>
+
+<br />
+
+<form method="post" action="">
+  <fieldset>
+    <legend>Sign in (autocomplete="current-password")</legend>
+    <dl>
+      <dt><label for="username">username</label></dt>
+      <dd><input type="text" name="username" value="" id="username" autocomplete="username" /></dd>
+    </dl>
+    <dl>
+      <dt><label for="new_password">password</label></dt>
+      <dd><input type="password" name="password" value="" id="new_password" autocomplete="current-password" /></dd>
+    </dl>
+    <div>
+      <button>Sign in</button>
+    </div>
+  </fieldset>
+</form>
+
+</body>
+</html>
