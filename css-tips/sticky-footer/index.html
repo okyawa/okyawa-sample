@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Sticky Header Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="author" content="okyawa">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .main-container *{
+      padding: 10px;
+      background: #aaa;
+      border: dashed 3px #000;
+    }
+    .main-container * + *{
+      margin-top: 4px;
+    }
+    .main-header {
+      height: 50px;
+      background: pink; border-color: red;
+    }
+    .main-footer {
+      background: yellow; border-color: green;
+    }
+    .main-content {
+      min-height: 1000px;
+    }
+
+    .main-header{
+      position: sticky;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="main-container">
+    <header class="main-header">HEADER</header>
+    <div class="main-content">MAIN CONTENT</div>
+    <footer class="main-footer">FOOTER</footer>
+  </main>
+</body>
+</html>
