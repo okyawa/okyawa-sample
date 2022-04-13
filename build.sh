@@ -32,3 +32,7 @@ cp -r ./text-scroll/ ./public/text-scroll/
 # css-tips
 mkdir -p ./public/css-tips
 cp -r ./css-tips/ ./public/css-tips/
+
+# html-tips
+mkdir -p ./public/html-tips
+cp -r ./html-tips/ ./public/html-tips/

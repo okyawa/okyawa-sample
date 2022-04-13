@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>HTML tips Sample一覧</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .inner_container {
+      max-width: 1200px;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    a:link,
+    a:active,
+    a:hover,
+    a:visited {
+      color: #666;
+    }
+    @media (hover: hover) {
+      a:hover {
+        color: #444;
+      }
+    }
+    header {
+      margin-bottom: 32px;
+    }
+    nav {
+      margin: 32px 0;
+    }
+    nav li {
+      padding: 4px 0;
+    }
+    .breadcrumb ol {
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+    }
+    .breadcrumb li {
+      padding: 4px;
+      font-size: 0.7rem;
+    }
+    .breadcrumb li:not(:last-child):after {
+      padding-left: 4px;
+      content: "›";
+      vertical-align: .1em;
+    }
+    footer {
+      padding: 8px 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="inner_container">
+
+    <header>
+      <h1>HTML tips Sample一覧</h1>
+      <h2>
+        <span class="fit_content">HTMLの検証サンプル</span>
+      </h2>
+    </header>
+
+    <p>
+      <a href="/">Home</a>
+    </p>
+    <nav>
+      <ul>
+        <li><a href="/html-tips/autocomplete-password/">パスワード入力欄のautocompleteサンプル</a></li>
+      </ul>
+    </nav>
+
+    <p>
+      <a href="https://github.com/okyawa/okyawa-sample" ref="nofollow noreferrer noopener" target="_blank">[okyawa/okyawa-sample - GitHub]</a>
+    </p>
+
+  </div>
+
+  <footer>
+    <small>
+      &copy; 2020 <a href="https://twitter.com/okyawa" ref="nofollow noreferrer noopener" target="_blank">okyawa</a>
+    </small>
+  </footer>
+</div>
+</body>
+</html>
