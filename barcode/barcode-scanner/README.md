@@ -3,7 +3,7 @@
 
 ## デモ
 
-- [quagga2 JavaScript実装 バーコードリーダーSample](https://okyawa-sample.web.app/barcode-scanner)
+- [quagga2 JavaScript実装 バーコードリーダーSample](https://okyawa-sample.web.app/barcode/barcode-scanner)
 
 ## 参照
 

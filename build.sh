@@ -9,13 +9,9 @@ cp -r ./home/ ./public/
 mkdir -p ./public/img
 cp -r ./img/ ./public/img/
 
-# barcode-scanner
-mkdir -p ./public/barcode-scanner
-cp -r ./barcode-scanner/ ./public/barcode-scanner/
-
-# barcode-detector
-mkdir -p ./public/barcode-detector
-cp -r ./barcode-detector/ ./public/barcode-detector/
+# barcode
+mkdir -p ./public/barcode
+cp -r ./barcode/ ./public/barcode/
 
 # teachable-machine
 mkdir -p ./public/teachable-machine

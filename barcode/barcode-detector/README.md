@@ -6,7 +6,7 @@
 
 ## デモ
 
-- [BarcodeDetector Shape Detection API バーコードリーダーSample](https://okyawa-sample.web.app/barcode-detector)
+- [BarcodeDetector Shape Detection API バーコードリーダーSample](https://okyawa-sample.web.app/barcode/barcode-detector)
 
 
 ## 参照
