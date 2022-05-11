@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>CSS scroll snap を使った1枚毎のカルーセルSample</title>
+  <title>CSS scroll snap を使った中央揃えカルーセルSample</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
@@ -87,8 +87,8 @@
       /* scroll-snap-stop: normal; */
       scroll-snap-stop: always; /* スクロールコンテナーが可能なスナップ位置を「通り過ぎる」ことを許可しない */
       position: relative;
-      min-width: 100%;
-      padding-top: 70%;
+      min-width: 60%;
+      padding-top: 40%;
     }
     .slide img {
       height: 100%;
@@ -126,7 +126,7 @@
   <header>
     <h1>CSS scroll snap</h1>
     <h2>
-      <span class="fit_content">1枚毎のカルーセルSample</span>
+      <span class="fit_content">中央揃えカルーセルSample</span>
     </h2>
   </header>
 
@@ -134,23 +134,23 @@
     <div id="slide-container">
       <div class="slide" data-slideindex="0">
         <div class="slide-banner">Car 01 <a href="">Link 1</a></div>
-        <img width="1200" height="800" src="/scroll-snap/images/car_01.jpg">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_01.jpg">
       </div>
       <div class="slide" data-slideindex="1">
         <div class="slide-banner">Car 02 <a href="">Link 2</a></div>
-        <img width="1200" height="800" src="/scroll-snap/images/car_02.jpg">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_02.jpg">
       </div>
       <div class="slide" data-slideindex="2">
         <div class="slide-banner">Car 03 <a href="">Link 3</a></div>
-        <img width="1200" height="800" src="/scroll-snap/images/car_03.jpg">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_03.jpg">
       </div>
       <div class="slide" data-slideindex="3">
         <div class="slide-banner">Car 04 <a href="">Link 4</a></div>
-        <img width="1200" height="800" src="/scroll-snap/images/car_04.jpg">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_04.jpg">
       </div>
       <div class="slide" data-slideindex="4">
         <div class="slide-banner">Car 05 <a href="">Link 5</a></div>
-        <img width="1200" height="800" src="/scroll-snap/images/car_05.jpg">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_05.jpg">
       </div>
     </div>
     <div id="back-button" class="arrow back">←</div>
@@ -226,7 +226,7 @@
           carouselEl.querySelectorAll('.slide-indicator')[slideIndex].classList.add('active');
         }
       });
-    }, { root: slideContainerEl, threshold: .1 });
+    }, { root: slideContainerEl, threshold: .7 });
     document.querySelectorAll('.slide').forEach((slide) => {
       slideObserver.observe(slide);
     });
