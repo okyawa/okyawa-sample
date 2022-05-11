@@ -52,15 +52,14 @@ const loadVideo = async (event) => {
     // カメラを取得
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
+        width: { ideal: 320 },
+        height: { ideal: 240 },
         facingMode: {
-          audio: false,
-          video: {
-            facingMode: { exact: "environment" },
-            width: { ideal: 320 },
-            height: { ideal: 240 },
-          },
+          exact: "environment", // リアカメラを利用
         },
+        // facingMode: "user", // フロントカメラを利用
       },
+      audio: false,
     });
 
     // オブジェクトと関連付ける
