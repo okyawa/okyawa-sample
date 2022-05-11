@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>quagga2を使ったJavaScript実装のバーコードリーダーSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    h1, h2 {
+      margin: 0;
+    }
+    h2 {
+      font-size: 1.4rem;
+    }
+    .fit_content {
+      display: inline-block;
+    }
+    h3 {
+      margin: 16px 0 0 0;
+      font-weight: normal;
+      font-size: 1.1rem;
+    }
+    header {
+      padding: 8px;
+    }
+    .button_box {
+      margin: 24px 0 16px 0;
+    }
+    #preview {
+      background-color: #f5f5f5;
+    }
+    .result_box {
+      padding: 0 16px;
+    }
+    textarea {
+      max-width: 300px;
+      font-size: 16px;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>quagga2</h1>
+      <h2>
+        <span class="fit_content">JavaScript実装</span>
+        <span class="fit_content">バーコードリーダーSample</span>
+      </h2>
+    </header>
+
+    <div class="button_box">
+      <button type="button" id="start_button">Start</button>
+      <button type="button" id="stop_button" style="display: none;">Stop</button>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div><canvas id="preview"></canvas></div>
+
+    <h3>スキャン結果</h3>
+    <div class="result_box">
+      <textarea id="jan" rows="8" cols="40"></textarea>
+    </div>
+
+  </div>
+
+<script>
+  var DetectedCount = 0, DetectedCode = "";
+  var video, tmp, tmp_ctx, prev, prev_ctx, w, h, mw, mh, x1, y1;
+
+  const startButtonElem = document.getElementById('start_button');
+  const stopButtonElem = document.getElementById('stop_button');
+  const messageElem = document.getElementById('message');
+  const jan = document.getElementById("jan");
+
+  startButtonElem.addEventListener('click', function (event) {
+
+    // 開始ボタンを非表示
+    event.currentTarget.style.display = 'none';
+    // 停止ボタンを表示
+    stopButtonElem.style.display = '';
+    // メッセージを削除
+    messageElem.textContent = '';
+    // スキャン結果をクリア
+    jan.value = '';
+
+    // カメラ使用の許可ダイアログが表示される
+    navigator.mediaDevices.getUserMedia(
+      // マイクはオフ, カメラの設定   背面カメラを希望する 640×480を希望する
+      {
+        "audio": false,
+        "video": {
+          "facingMode": "environment",
+          "width": { "ideal": 640 },
+          "height": { "ideal": 480 },
+        },
+      }
+    ).then( // 許可された場合
+      function (stream) {
+        video = document.createElement('video');
+        video.setAttribute("autoplay", "");
+        video.setAttribute("muted", "");
+        video.setAttribute("playsinline", "");
+        video.onloadedmetadata = function (e) { video.play(); };
+        prev = document.getElementById("preview");
+        prev_ctx = prev.getContext("2d");
+        tmp = document.createElement('canvas');
+        tmp_ctx = tmp.getContext("2d");
+
+        // 注意書きを表示
+        messageElem.textContent = '赤枠の中にバーコードを収めてください。';
+
+        video.srcObject = stream;
+        // 0.5秒毎にスキャンする
+        setTimeout(Scan, 500, true);
+      }
+    ).catch(
+      // 許可されなかった場合
+      function (err) {
+        // 開始ボタンを表示
+        startButtonElem.style.display = '';
+        // 停止ボタンを非表示
+        stopButtonElem.style.display = 'none';
+        // エラーメッセージを表示
+        messageElem.textContent = '利用するには、カメラの使用を許可する必要があります。';
+
+        jan.value += err + '\n';
+
+      }
+    );
+
+    function Scan(first) {
+      if (first) {
+        // 選択された幅高さ
+        w = video.videoWidth;
+        h = video.videoHeight;
+        if (w === 0 || h === 0) {
+          // 幅と高さを取得できなかった場合
+          w = 640;
+          h = 480;
+        }
+        // 画面上の表示サイズ
+        prev.style.width = (w / 2) + "px";
+        prev.style.height = (h / 2) + "px";
+        // 内部のサイズ
+        prev.setAttribute("width", w);
+        prev.setAttribute("height", h);
+        mw = w * 0.5;
+        mh = w * 0.2;
+        x1 = (w - mw) / 2;
+        y1 = (h - mh) / 2;
+      }
+      prev_ctx.drawImage(video, 0, 0, w, h);
+      prev_ctx.beginPath();
+      prev_ctx.strokeStyle = "rgb(255,0,0)";
+      prev_ctx.lineWidth = 2;
+      prev_ctx.rect(x1, y1, mw, mh);
+      prev_ctx.stroke();
+      tmp.setAttribute("width", mw);
+      tmp.setAttribute("height", mh);
+      tmp_ctx.drawImage(prev, x1, y1, mw, mh, 0, 0, mw, mh);
+
+      tmp.toBlob(function (blob) {
+        let reader = new FileReader();
+        reader.onload = function () {
+          let config = {
+            decoder: {
+              readers: ["ean_reader", "ean_8_reader"],
+              multiple: false, // 同時に複数のバーコードを解析しない
+            },
+            locator: { patchSize: "large", halfSample: false },
+            locate: false,
+            src: reader.result,
+          };
+          Quagga.decodeSingle(config, function () { });
+        }
+        reader.readAsDataURL(blob);
+      });
+      setTimeout(Scan, 50, false);
+    }
+
+    Quagga.onDetected(function (result) {
+      // 読み取り誤差が多いため、3回連続で同じ値だった場合に成功とする
+      if (DetectedCode == result.codeResult.code) {
+        DetectedCount++;
+      } else {
+        DetectedCount = 0;
+        DetectedCode = result.codeResult.code;
+      }
+      if (DetectedCount >= 3) {
+        console.log(result.codeResult.code);
+        jan.value += result.codeResult.code + '\n';
+        jan.scrollTop = jan.scrollHeight;
+        DetectedCode = '';
+        DetectedCount = 0;
+      }
+    });
+  });
+
+  stopButtonElem.addEventListener('click', function (event) {
+    // Quaggaを停止
+    Quagga.stop();
+    
+    // MediaStreamTrackを停止
+    let stream = video.srcObject;
+    let tracks = stream.getTracks();
+    tracks.forEach(function(track) {
+      track.stop();
+    });
+    video.srcObject = null;
+
+    // Canvasの描画をクリア
+    prev_ctx.clearRect(0, 0, w, h);
+
+    // 開始ボタンを表示
+    startButtonElem.style.display = '';
+    // 停止ボタンを非表示
+    stopButtonElem.style.display = 'none';
+    // メッセージを表示
+    messageElem.textContent = 'カメラの使用を停止しました。';
+  });
+</script>
+
+</body>
+</html>

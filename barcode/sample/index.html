@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>バーコードリーダーのSample集</title>
+  <title>バーコードリーダーで読み込むバーコードSample</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
@@ -62,6 +62,12 @@
       padding: 8px 16px;
       text-align: center;
     }
+    main {
+      text-align: center;
+    }
+    figure {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -70,27 +76,40 @@
   <div class="inner_container">
 
     <header>
-      <h1>バーコードリーダー</h1>
+      <h1>バーコードのSample</h1>
       <h2>
-        <span class="fit_content">Sample一覧</span>
+        <span class="fit_content">バーコードリーダーで読み込むサンプル</span>
       </h2>
     </header>
 
     <div class="breadcrumb">
       <ol>
         <li><a href="/">HOME</a></li>
-        <li>バーコードリーダーのSample一覧</li>
+        <li><a href="/barcode/">バーコードリーダーのSample一覧</a></li>
+        <li>>バーコードリーダーで読み込むバーコードのSample</li>
       </ol>
     </div>
 
-    <nav>
-      <ul>
-        <li><a href="/barcode/barcode-detector/">Shape Detection APIのBarcodeDetectorを使ったバーコードリーダーSample</a></li>
-        <li><a href="/barcode/barcode-scanner/">quagga2を使ったJavaScript実装のバーコードリーダーSample v1</a></li>
-        <li><a href="/barcode/barcode-scanner2/">quagga2を使ったJavaScript実装のバーコードリーダーSample v2</a></li>
-        <li><a href="/barcode/sample/">バーコードリーダーで読み込むバーコードのSample</a></li>
-      </ul>
-    </nav>
+    <main>
+      <p>
+        <figure>
+          <img src="/barcode/sample/images/barcode_sample_01.jpg" height="320" alt="barcode sample 01" />
+          <figcaption>バーコード1</figcaption>
+        </figure>
+      </p>
+      <p>
+        <figure>
+          <img src="/barcode/sample/images/barcode_sample_02.jpg" height="320" alt="barcode sample 02" />
+          <figcaption>バーコード2</figcaption>
+        </figure>
+      </p>
+      <p>
+        <figure>
+          <img src="/barcode/sample/images/barcode_sample_03.jpg" height="320" alt="barcode sample 03" />
+          <figcaption>バーコード2</figcaption>
+        </figure>
+      </p>
+    </main>
 
     <p>
       <a href="https://github.com/okyawa/okyawa-sample/tree/main/barcode" ref="nofollow noreferrer noopener" target="_blank">[Teachable Machineを試してみたサンプル - okyawa/okyawa-sample/scroll-snap - GitHub]</a>
