@@ -9,7 +9,7 @@
 ## 初期設定
 
 ```sh
-npm install
+npm run setup
 ```
 
 

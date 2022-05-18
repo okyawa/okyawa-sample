@@ -9,6 +9,7 @@
     "http-server": "^14.0.0"
   },
   "scripts": {
+    "setup": "sh ./setup.sh",
     "build": "sh ./build.sh",
     "deploy": "npm run build && firebase deploy",
     "http-server": "http-server ./ -o",
