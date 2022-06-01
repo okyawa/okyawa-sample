@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>スクロールの連動を防ぐoverscroll-behavior-yのSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style type="text/css">
+
+    /* ↓ここから */
+    nav {
+      overscroll-behavior-y: contain;
+    }
+    /* ↑ここまで */
+
+    nav {
+      width: 120px;
+      height: 100vh;
+      overflow: auto;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background-color: pink;
+    }
+
+    main {
+      margin-left: 120px;
+      padding: 16px;
+    }
+
+    h2 {
+      padding: 8px;
+    }
+
+    .menu {
+      height: 150vh;
+      margin: 0 8px 32px 8px;
+      padding: 16px 8px;
+      text-align: center;
+      background-color: #cccccc99;
+    }
+
+    .contents {
+      height: 200vh;
+      background-color: green;
+      text-align: center;
+      color: #fff;
+    }
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+
+    <nav>
+      <h2>nav</h2>
+      <div class="menu">
+        menu
+      </div>
+    </nav>
+
+    <main>
+      <h1>スクロールの連動を防ぐoverscroll-behavior-yのSample</h1>
+
+      <p>
+        左側のナビゲーションが <code>position: fixed;</code> で固定されている場合、最下部以上にスクロールするとメイン要素も一緒にスクロールしてしまう。
+      </p>
+      <p>
+        固定しているナビゲーション部分でoverflow指定を入れている要素に <code>overscroll-behavior-y: contain;</code> を指定することで、ナビゲーションを最下部以上にスクロールしても、メイン要素はスクロールされずにそのままの状態をキープできる。
+      </p>
+
+      <div class="contents"><h2>コンテンツ</h2></div>
+    </main>
+
+  </div>
+</body>
+</html>
