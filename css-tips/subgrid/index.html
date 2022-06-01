@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>カードデザインで行ごとに要素の高さを揃える - Gridのsubgridを使ったSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style type="text/css">
+
+    /* ↓ここから ================================ */
+
+    /* 親グリッド */
+    .items {
+      display: grid;
+      grid-template:
+        "areaA areaB areaC" 1fr
+        "areaD areaE areaF" 1fr
+        "areaG areaH areaI" 1fr
+        "areaJ areaK areaL" 1fr
+        / 1fr 1fr 1fr;
+    }
+
+    /* サブグリッド */
+    .items .card {
+      display: grid;
+      grid-template-rows: subgrid; /* ←サブグリッドの行のテンプレートは、親の行テンプレートを使う */
+      grid-row: span 4; /* ←親の4行分を使う指定 */
+    }
+
+    /* ↑ここまで ================================ */
+
+    body {
+      background-color: #f5f5f5;
+    }
+
+    .items {
+      gap: 16px;
+    }
+
+    .items .card {
+      padding: 16px;
+      gap: 8px;
+      background-color: #fff;
+      border-radius: 8px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .card img {
+      max-width: 100%;
+      object-fit: contain;
+      aspect-ratio: 1 / 1;
+    }
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+
+    <h1>カードデザインで行ごとに要素の高さを揃えるSample</h1>
+    <h2>Gridの <code>subgrid</code> を利用</h2>
+
+    <p>各ブラウザのサポート状況: <a href="https://caniuse.com/?search=subgrid" rel="nofollow noopener" target="_blank">Can I use subgrid?</a></p>
+
+    <div class="items">
+      <div class="card">
+        <h3>タイトル01</h3>
+        <img src="../../img/cocktails/w640/absinthe_cola.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル02</h3>
+        <img src="../../img/cocktails/w640/fantasia_02.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。注意書きが入ります。注意書きが入ります。注意書きが入ります。注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル03</h3>
+        <img src="../../img/cocktails/w640/fantasia_01.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル04</h3>
+        <img src="../../img/cocktails/w640/irish_flag_shooter.jpeg" alt="" />
+        <div class="desc">説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル05</h3>
+        <img src="../../img/cocktails/w640/marie_amour.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル05</h3>
+        <img src="../../img/cocktails/w640/piti_81.jpeg" alt="" />
+        <div class="desc">説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル07</h3>
+        <img src="../../img/cocktails/w640/port_flip.jpeg" alt="" />
+        <div class="desc">説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル08</h3>
+        <img src="../../img/cocktails/w640/port_splash.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル09</h3>
+        <img src="../../img/cocktails/w640/sol_cubano.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル10</h3>
+        <img src="../../img/cocktails/w640/monkey_mix.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。注意書きが入ります。注意書きが入ります。注意書きが入ります。</div>
+      </div>
+      <div class="card">
+        <h3>タイトル11</h3>
+        <img src="../../img/cocktails/w640/strawberry_field.jpeg" alt="" />
+        <div class="desc">説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。説明文が入ります。</div>
+        <div class="note">注意書きが入ります。注意書きが入ります。</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
