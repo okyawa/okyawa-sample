@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>CSSだけでヘッダー固定ありのSmooth ScrollするSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style type="text/css">
+
+    :root {
+      --header-height: 80px;
+    }
+
+    /* ↓ここから */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .link_target {
+      scroll-margin-top: var(--header-height)
+    }
+    /* ↑ここまで */
+
+    header {
+      width: 100%;
+      height: var(--header-height);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      justify-content: space-between;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background-color: #dddddd99;
+      backdrop-filter: blur(10px);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav a {
+      padding: 8px 4px;;
+      display: inline-block;
+    }
+
+    .container {
+      padding-top: var(--header-height);
+    }
+
+    h1 {
+      font-size: 1.2rem;
+    }
+
+    h2 {
+      font-size: 1rem;
+    }
+
+    h3 {
+      padding: 16px;
+    }
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+
+    <h1>CSSだけでヘッダー固定ありのSmooth ScrollするSample</h1>
+
+    <header>
+      <h2>固定されたヘッダー</h2>
+      <nav>
+        <a href="#block01">Link 01</a>
+        <a href="#block02">Link 02</a>
+        <a href="#block03">Link 03</a>
+      </nav>
+    </header>
+
+  <p><code>scroll-behavior: smooth;</code> でスムーズスクロール、<code>scroll-margin-top</code> でヘッダー分のサイズを指定することで、浮かして固定したヘッダー分を加味し、CSSのみでスムーズスクロールができる。</p>
+
+    <div id="block01" class="link_target" style="height: 300px; background-color: green;"><h3>Block 01</h3></div>
+    <div id="block02" class="link_target" style="height: 500px; background-color: yellow;"><h3>Block 02</h3></div>
+    <div id="block03" class="link_target" style="height: 800px; background-color: pink;"><h3>Block 02</h3></div>
+
+  </div>
+</body>
+</html>
