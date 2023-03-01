@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>CSS Container Query</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+  <h1>CSS Container Queryを使ったSample</h1>
+
+  <section>
+    <style>
+      /* リサイズによるコンテナクエリ適用 */
+      .container {
+        container-type: inline-size;
+        /* 要素をリサイズ可能にする設定 */
+        resize: horizontal;
+        overflow: auto;
+        max-width: 600px;
+        min-width: 240px;
+        width: 240px;
+        border: 1px solid #ccc;
+      }
+      @container (min-width: 300px) {
+        .container p {
+          color: green;
+          font-size: 30px;
+          font-weight: bold;
+        }
+      }
+    </style>
+
+    <h2>リサイズによるコンテナクエリ適用</h2>
+    <div class="container">
+      <p>枠をリサイズすると文字拡大</p>
+    </div>
+  </section>
+
+  <section>
+    <style>
+      /* リアクションバー */
+      .reaction-bar {
+        container-type: inline-size;
+        /* コンテナの名前 */
+        container-name: reaction-container;
+        /* typeとnameをまとめて記述 */
+        /* container: reaction-container / inline-size; */
+      }
+      @container reaction-container (max-width: 560px) {
+        .text {
+          display: none;
+        }
+      }
+    </style>
+
+    <h2>リアクションバー</h2>
+    <p>画面幅が小さいと、ラベルのテキストが非表示</p>
+    <div class="reaction-bar">
+      <div class="reaction">
+        <button type="button">◎</button>
+        <span class="text">返信する</span>
+        <span class="count">60</span>
+      </div>
+      <div class="reaction">
+        <button type="button">☆</button>
+        <span class="text">いいね</span>
+        <span class="count">120</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <style>
+      .size-container {
+        container: size-container / inline-size;
+        /* 要素をリサイズ可能にする設定 */
+        resize: horizontal;
+        overflow: auto;
+        max-width: 800px;
+        min-width: 240px;
+        width: 500px;
+        border: 1px solid #ccc;
+      }
+      .size-box {
+        width: 50cqw;
+        background-color: #f5f5f5;
+      }
+    </style>
+
+    <h2>コンテナクエリに応じた単位</h2>
+    <div class="size-container">
+      <div class="size-box">
+        <p>コンテナ横幅の50% (<code>width: 50cqw</code>)</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
