@@ -9,7 +9,7 @@
 
   <script>
     const CACHE_NAME = 'my-cache';
-    const JSON_PATH = './sample.json';
+    const JSON_PATH = '/js-tips/cache-api/sample.json';
     /**
      * キャッシュ作成/開く
      */
@@ -25,7 +25,8 @@
     async function addCacheItem(resultElement) {
       const cache = await caches.open(CACHE_NAME);
       await cache.add(new Request(JSON_PATH));
-      await showCacheItem(resultElement);
+      resultElement.textContent = `Request object is Cached - URL: '${JSON_PATH}'`;
+      // await showCacheItem(resultElement);
     }
     /**
      * キャッシュのアイテムを取得して表示
@@ -39,7 +40,7 @@
       }
       // ResponseオブジェクトからJSONデータを取得
       const jsonData = await cachedResponse.json();
-      resultElement.textContent = `Cached Response: ${JSON.stringify(jsonData)}`;
+      resultElement.textContent = `Cached Response - JSON data: ${JSON.stringify(jsonData)} / URL: '${cachedResponse.url}'`;
     }
     /**
      * キャッシュのアイテムを削除
@@ -83,6 +84,7 @@
       namesButton.addEventListener('click', async () => await showCacheNames(resultElement));
     });
   </script>
+
 </head>
 <body>
 
@@ -90,7 +92,7 @@
 
 <section>
   <h2>Demo</h2>
-  <p><code>'my-cache'</code>の名前でcacheを生成し、<code>'./sample.json'</code> へリクエストした際に返ってくる<code>Response</code>オブジェクトをキャッシュするデモ</p>
+  <p><code>'my-cache'</code>の名前でcacheを生成し、<code>'sample.json'</code> へリクエストした際に返ってくる<code>Response</code>オブジェクトをキャッシュするデモ</p>
   <div>
     <button type="button" id="cache_create_button">キャッシュ作成/開く</button>
     <button type="button" id="cache_add_button">キャッシュにアイテム追加</button>
@@ -150,10 +152,10 @@
     <pre>
       <code>
         // Retreive sample.json from the server and store the response.
-        cache.add(new Request('./sample.json'));
+        cache.add(new Request('sample.json'));
 
         // Retreive sample.json from the server and store the response.
-        cache.add('./sample.json');
+        cache.add('sample.json');
       </code>
     </pre>
   </section>
@@ -164,7 +166,7 @@
     <p>キャッシュされないリクエストが1つでもあれば、<code>Promise</code>は拒否される。</p>
     <pre>
       <code>
-        const urls = ['./sample.json', './data.json'];
+        const urls = ['sample.json', './data.json'];
         cache.addAll(urls);
       </code>
     </pre>
@@ -179,10 +181,10 @@
     <pre>
       <code>
         // Retrieve sample.json from the server and store the response.
-        cache.put('./sample.json');
+        cache.put('sample.json');
 
         // Create a new entry for sample.json and store the newly created response.
-        cache.put('./sample.json', new Response('{"foo": "bar"}'));
+        cache.put('sample.json', new Response('{"foo": "bar"}'));
 
         // Retrieve sample.json from the 3rd party site and store the response.
         cache.put('https://example.com/sample.json');
@@ -247,7 +249,7 @@
   <p>第2引数に指定する<code>options</code>オブジェクトで、同じURLに対して複数のRequest/Responseペアを削除することが可能。</p>
   <pre>
     <code>
-      cache.delete('./sample.json', {ignoreVary: true, ignoreSearch: true});
+      cache.delete('sample.json', {ignoreVary: true, ignoreSearch: true});
     </code>
   </pre>
 </section>

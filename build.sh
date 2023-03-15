@@ -19,7 +19,7 @@ cp -r ./teachable-machine/ ./public/teachable-machine/
 
 # js-tips
 mkdir -p ./public/js-tips
-cp -r ./css-tips/ ./public/js-tips/
+cp -r ./js-tips/ ./public/js-tips/
 
 # css-tips
 mkdir -p ./public/css-tips
