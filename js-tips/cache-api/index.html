@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Cache API Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <!-- <link href="./mvp.css" rel="stylesheet" /> -->
+</head>
+<body>
+
+<h1>Cache API Sample</h1>
+
+<section>
+  <h2>Cache APIとは</h2>
+  <p>リクエストした際のレスポンスを保存、取得するためのもの。ブラウザに組み込まれているAPI。</p>
+  <p>最新の全モダンブラウザで利用可能。</p>
+  <p>Service Workerからもアクセス可能。</p>
+</section>
+
+<section>
+  <h2>Cache APIが利用可能かの判定</h2>
+  <pre>
+    <code>
+      const cacheAvailable = 'caches' in self;
+    </code>
+  </pre>
+</section>
+
+<section>
+  <h2>保存可能なもの</h2>
+  <p><code>Request</code>オブジェクトと<code>Response</code>オブジェクトのペアだけが格納される。</p>
+  <p>保存可能な容量は、ブラウザによって様々で、少なくとも数百MB、場合によっては数百GB以上を保存可能。</p>
+</section>
+
+<section>
+  <h2>使い方</h2>
+
+  <section>
+    <h3>キャッシュの作成</h3>
+    <pre>
+      <code>
+        const cache = await caches.open('my-cache');
+      </code>
+    </pre>
+  </section>
+
+  <section>
+    <h3>キャッシュ追加: <code>cache.add</code></h3>
+    <p><code>cache.add()</code>の受け取るパラメータは、<code>Request</code>か
+    stringのURLかのみ。</p>
+    <p>リクエスト時のfetchが失敗したり、レスポンスのステータスコードが200系以外の場合は保存されず、<code>Promise</code>は拒否される。</p>
+    <p>CORSモードになっていないクロスオリジンリクエストは、<code>status</code> <code>0</code> を返すため、保存できない。</p>
+    <pre>
+      <code>
+        // Retreive sample.json from the server and store the response.
+        cache.add(new Request('./sample.json'));
+
+        // Retreive sample.json from the server and store the response.
+        cache.add('./sample.json');
+      </code>
+    </pre>
+  </section>
+
+  <section>
+    <h3>キャッシュの追加: <code>cache.addAll</code></h3>
+    <p><code>cache.add()</code>との違いは、<code>Request</code>オブジェクト、またはstring型のURLの配列を受け取る点。</p>
+    <p>キャッシュされないリクエストが1つでもあれば、<code>Promise</code>は拒否される。</p>
+    <pre>
+      <code>
+        const urls = ['./sample.json', './data.json'];
+        cache.addAll(urls);
+      </code>
+    </pre>
+  </section>
+
+  <section>
+    <h3>キャッシュの追加: <code>cache.put</code></h3>
+    <p>レスポンスを保存するか、独自の<code>Response</code>を作成して保存可能。</p>
+    <p>パラメータの1つ目は、<code>Request</code>オブジェクトかstring型のURL。</p>
+    <p>パラメータの2つ目は、ネットワーク上から受け取った<code>Response</code>か、コードによって生成されたレスポンス。</p>
+    <p><code>cache.put()</code>は<code>cache.add()</code>や<code>cache.addAll()</code>よりも許容度が高い。CORS以外のレスポンス、またはレスポンスのステータスコードが200系以外のレスポンスも保存することが可能。</p>
+    <pre>
+      <code>
+        // Retrieve sample.json from the server and store the response.
+        cache.put('./sample.json');
+
+        // Create a new entry for sample.json and store the newly created response.
+        cache.put('./sample.json', new Response('{"foo": "bar"}'));
+
+        // Retrieve sample.json from the 3rd party site and store the response.
+        cache.put('https://example.com/sample.json');
+      </code>
+    </pre>
+  </section>
+
+</section>
+
+<section>
+  <h2>キャッシュからの取得</h2>
+  <p><code>cache.match()</code>メソッドを使用。</p>
+  <p>キャッシュされたリクエストのうち、一致するものが複数ある場合は、最初に作成されたリクエストが返される。</p>
+  <p>一致するすべてのレスポンスを取得する場合は、<code>cache.matchAll()</code>を使用</p>
+  <pre>
+    <code>
+      const response = await cache.match(request);
+    </code>
+  </pre>
+</section>
+
+<section>
+  <h2>キャッシュからの検索</h2>
+  <p>全てのキャッシュのエントリをループし、必要なエントリに絞り込む。</p>
+  <pre>
+    <code>
+      // .png で終わる URL を持つすべてのアイテムを検索する場合
+      async function findImages() {
+        // Get a list of all of the caches for this origin
+        const cacheNames = await caches.keys();
+        const result = [];
+      
+        for (const name of cacheNames) {
+          // Open the cache
+          const cache = await caches.open(name);
+      
+          // Get a list of entries. Each item is a Request object
+          for (const request of await cache.keys()) {
+            // If the request URL matches, add the response to the result
+            if (request.url.endsWith('.png')) {
+              result.push(await cache.match(request));
+            }
+          }
+        }
+      
+        return result;
+      }
+    </code>
+    <p>上記の形式の場合、大量のデータセットを検索する場合は、処理速度が遅くなるので注意。</p>
+    <p>検索可能なエントリのインデックスを、IndexedDBに格納して検索する手段もあり。<code>Request</code>のURLを検索可能なプロパティと一緒に保存すると、検索後に正しいキャッシュエントリを簡単に取得可能。</p>
+  </pre>
+</section>
+
+<section>
+  <h2>キャッシュからアイテムを削除</h2>
+  <p><code>cache.delete()</code>の第1引数は、<code>Request</code>オブジェクト、またはstring型のURL。</p>
+  <pre>
+    <code>
+      cache.delete(request);
+    </code>
+  </pre>
+  <p>第2引数に指定する<code>options</code>オブジェクトで、同じURLに対して複数のRequest/Responseペアを削除することが可能。</p>
+  <pre>
+    <code>
+      cache.delete('./sample.json', {ignoreVary: true, ignoreSearch: true});
+    </code>
+  </pre>
+</section>
+
+<section>
+  <h2>キャッシュの削除</h2>
+  <p>キャッシュが存在して削除された場合は、<code>true</code>で<code>Promise</code>が解決される。</p>
+  <pre>
+    <code>
+      await caches.delete('my-cache')
+    </code>
+  </pre>
+</section>
+
+</body>
+</html>
