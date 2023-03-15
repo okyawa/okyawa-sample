@@ -6,11 +6,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
-  <!-- <link href="./mvp.css" rel="stylesheet" /> -->
+
+  <script>
+    const CACHE_NAME = 'my-cache';
+    const JSON_PATH = './sample.json';
+    /**
+     * キャッシュ作成/開く
+     */
+    async function createCache(resultElement) {
+      const cache = await caches.open(CACHE_NAME);
+      const cacheKeys = await cache.keys();
+      const cachesKeys = await caches.keys();
+      resultElement.textContent = `cache.keys() - Request Object length: ${cacheKeys.length} / caches.keys(): ${cachesKeys.join(', ')}`;
+    }
+    /**
+     * キャッシュのアイテム追加
+     */
+    async function addCacheItem(resultElement) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.add(new Request(JSON_PATH));
+      await showCacheItem(resultElement);
+    }
+    /**
+     * キャッシュのアイテムを取得して表示
+     */
+    async function showCacheItem(resultElement) {
+      const cache = await caches.open(CACHE_NAME);
+      const cachedResponse = await cache.match(new Request(JSON_PATH))
+      if (cachedResponse === undefined) {
+        resultElement.textContent = 'Cached Response: undefined';
+        return;
+      }
+      // ResponseオブジェクトからJSONデータを取得
+      const jsonData = await cachedResponse.json();
+      resultElement.textContent = `Cached Response: ${JSON.stringify(jsonData)}`;
+    }
+    /**
+     * キャッシュのアイテムを削除
+     */
+    async function deleteCacheItem(resultElement) {
+      const cache = await caches.open(CACHE_NAME);
+      const result = await cache.delete(new Request(JSON_PATH));
+      resultElement.textContent = `${result ? 'success' : 'failed'}: cache.delete()`;
+    }
+    /**
+     * キャッシュを削除
+     */
+    async function deleteCache(resultElement) {
+      const result = caches.delete(CACHE_NAME);
+      const cachesKeys = await caches.keys();
+      resultElement.textContent = `${result ? 'success' : 'failed'}: caches.delete() / caches.keys(): ${cachesKeys.length > 0 ? cachesKeys.join(', ') : '[]'}`;
+    }
+    /**
+     * 保存されているキャッシュ名一覧を表示
+     */
+    async function showCacheNames(resultElement) {
+      const cachesKeys = await caches.keys();
+      resultElement.textContent = `caches.keys(): ${cachesKeys.length > 0 ? cachesKeys.join(', ') : '[]'}`;
+    }
+    /**
+     * 各ボタンにclickイベントを登録
+     */
+    window.addEventListener('DOMContentLoaded', () => {
+      const createButton = document.getElementById('cache_create_button');
+      const addButton = document.getElementById('cache_add_button');
+      const getButton = document.getElementById('cache_get_button');
+      const removeButton = document.getElementById('cache_remove_button');
+      const deleteButton = document.getElementById('cache_delete_button');
+      const namesButton = document.getElementById('cache_names_button');
+      const resultElement = document.getElementById('result');
+      createButton.addEventListener('click', async () => await createCache(resultElement));
+      addButton.addEventListener('click', async () => await addCacheItem(resultElement));
+      getButton.addEventListener('click', async () => await showCacheItem(resultElement));
+      removeButton.addEventListener('click', async () => await deleteCacheItem(resultElement));
+      deleteButton.addEventListener('click', async () => await deleteCache(resultElement));
+      namesButton.addEventListener('click', async () => await showCacheNames(resultElement));
+    });
+  </script>
 </head>
 <body>
 
 <h1>Cache API Sample</h1>
+
+<section>
+  <h2>Demo</h2>
+  <p><code>'my-cache'</code>の名前でcacheを生成し、<code>'./sample.json'</code> へリクエストした際に返ってくる<code>Response</code>オブジェクトをキャッシュするデモ</p>
+  <div>
+    <button type="button" id="cache_create_button">キャッシュ作成/開く</button>
+    <button type="button" id="cache_add_button">キャッシュにアイテム追加</button>
+    <button type="button" id="cache_get_button">キャッシュアイテムの取得</button>
+    <button type="button" id="cache_remove_button">キャッシュのアイテム削除</button>
+    <button type="button" id="cache_delete_button">キャッシュ削除</button>
+    <button type="button" id="cache_names_button">キャッシュされているcache名を表示</button>
+  </div>
+
+  <pre>
+    <code id="result"></code>
+  </pre>
+</section>
+
+<hr />
 
 <section>
   <h2>Cache APIとは</h2>
@@ -38,7 +133,7 @@
   <h2>使い方</h2>
 
   <section>
-    <h3>キャッシュの作成</h3>
+    <h3>キャッシュの作成/開く</h3>
     <pre>
       <code>
         const cache = await caches.open('my-cache');
@@ -136,9 +231,9 @@
         return result;
       }
     </code>
-    <p>上記の形式の場合、大量のデータセットを検索する場合は、処理速度が遅くなるので注意。</p>
-    <p>検索可能なエントリのインデックスを、IndexedDBに格納して検索する手段もあり。<code>Request</code>のURLを検索可能なプロパティと一緒に保存すると、検索後に正しいキャッシュエントリを簡単に取得可能。</p>
   </pre>
+  <p>上記の形式の場合、大量のデータセットを検索する場合は、処理速度が遅くなるので注意。</p>
+  <p>検索可能なエントリのインデックスを、IndexedDBに格納して検索する手段もあり。<code>Request</code>のURLを検索可能なプロパティと一緒に保存すると、検索後に正しいキャッシュエントリを簡単に取得可能。</p>
 </section>
 
 <section>
