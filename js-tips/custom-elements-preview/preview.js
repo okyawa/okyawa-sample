@@ -38,7 +38,7 @@ class ContentPreview extends HTMLElement {
     if (name === 'value' && oldValue !== newValue) {
       // 更新された Web Components の属性値を反映
       const rootElement = this.shadowRoot.querySelector('div');
-      rootElement.innerHTML = value;
+      rootElement.innerHTML = newValue;
     }
   }
 

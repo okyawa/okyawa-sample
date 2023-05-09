@@ -7,7 +7,8 @@
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
   <style>
-    h2 {
+    /* Custom Elements内のp要素にstyleが適用されない点の確認用 */
+    p {
       color: red;
     }
   </style>
@@ -15,20 +16,29 @@
 </head>
 <body>
 
-<h1>Custom Elements Preview Sample</h1>
+  <div style="max-width: 800px; margin: 0 auto;">
 
-<content-preview></content-preview>
+    <h1>Custom Elements Preview Sample</h1>
 
-<script>
-  const contentPreviewElement = document.querySelector('content-preview');
-  const value = `
-    <h2>Custom Elements Preview Sample</h2>
-    <p>Custom Elements Preview Sample</p>
-  `; 
-  contentPreviewElement.setAttribute('value', value);
-</script>
+    <content-preview></content-preview>
 
+<textarea id="content-preview-value" style="margin: 32px 0; width: 100%; height: 200px;">
+<h2>Custom Elements Preview Sample</h2>
+<p>Custom Elements Preview Sample</p>
+</textarea>
 
+  </div>
+
+  <script>
+    const contentPreviewElement = document.querySelector('content-preview');
+    const textareaElement = document.querySelector('#content-preview-value');
+    const value = textareaElement.value;
+    contentPreviewElement.setAttribute('value', value);
+    textareaElement.addEventListener('input', (event) => {
+      const targetElement = event.currentTarget;
+      contentPreviewElement.setAttribute('value', targetElement.value);
+    })
+  </script>
 
 </body>
 </html>
