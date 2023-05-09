@@ -15,7 +15,7 @@ class ContentPreview extends HTMLElement {
     this.shadowRoot.appendChild(mountPoint);
 
     // 外部CSSファイルを読み込み
-    this.#appendCSSFile('preview.css')
+    this.#appendCSSFile('/js-tips/custom-elements-preview/preview.css')
 
     // Web Components の属性値を取得し、Reactコンポーネントをマウント
     const value = this.getAttribute('value') || '';
