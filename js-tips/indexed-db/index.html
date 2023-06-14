@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>IndexedDB Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/res/css/neat.css">
+  <script src="/js-tips/indexed-db/indexed-db.js"></script>
+</head>
+<body>
+
+  <h1>IndexedDB Sample</h1>
+
+  <form>
+    <fieldset>
+      <legend>IndexDBにデータを追加</legend>
+      <div>
+        <label for="name">タスク:</label>
+        <input type="text" id="name" name="name" />
+      </div>
+      <div>
+        <label for="age">優先度:</label>
+        <input type="number" id="priority" name="priority" inputmode="" min="1" max="5" />
+      </div>
+      <button type="button" id="add_button">追加</button>
+    </fieldset>
+  </form>
+
+  <br />
+
+  <p id="message"></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>タスク</th>
+        <th>優先度</th>
+      </tr>
+    </thead>
+    <tbody id="task_list">
+    </tbody>
+  </table>
+
+</body>
+</html>
