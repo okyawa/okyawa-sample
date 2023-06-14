@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>popover属性 Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/res/css/neat.css">
+
+  <style>
+    .close-btn {
+      border: none;
+      background: none;
+      position: absolute;
+      right: 0.25rem;
+      top: 0.5rem;
+      filter: grayscale() brightness(10);
+    }
+    .popover_box {
+      background: #333;
+      color: white;
+      font-weight: 400;
+      padding: 1rem;
+      max-width: 300px;
+      line-height: 1.4;
+      inset: 0;
+      margin: auto;
+      padding-top: 2rem;
+    }
+    .sr-only:not(:focus):not(:active) {
+      clip: rect(0 0 0 0); 
+      clip-path: inset(50%);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap; 
+      width: 1px;
+    }
+    #popover_02::backdrop {
+      background: rgb(190 190 190 / 50%);
+    }
+  </style>
+
+</head>
+<body>
+
+  <h1>popover属性 Sample</h1>
+
+  <ul>
+    <li>Chrome 114以降で、popover属性が利用可能。</li>
+    <li>popover属性を使うことで、JavaScriptを使わずにポップオーバーの開閉動作を実装することができる。</li>
+  </ul>
+
+  <hr />
+
+  <h2>自動ポップオーバー</h2>
+
+  <ul>
+    <li>popover属性のdefault値は "auto" の自動ポップオーバー。</li>
+    <li>ポップオーバーの領域外をクリックすると、ポップオーバーが閉じてフォーカスが戻るライトディスミスに対応。</li>
+    <li>escキーを推すと、ポップオーバーを閉じてフォーカスが戻る。</li>
+    <li><code>popovertargetaction="show"</code>: ポップオーバーを表示</li>
+    <li><code>popovertargetaction="hide"</code>: ポップオーバーを非表示</li>
+  </ul>
+
+  <button popovertarget="popover_01"> Open Popover </button>
+
+  <div id="popover_01" class="popover_box" popover="auto">
+    <button class="close-btn" popovertarget="popover_01" popovertargetaction="hide">
+      <span aria-hidden="true">❌</span>
+      <span class="sr-only">Close</span>
+    </button>
+    <p>ポップオーバーの中身<p>
+  </div>
+
+  <hr />
+
+  <h2>自動ポップオーバー + backdrop指定</h2>
+
+  <ul>
+    <li><code>::backdrop</code> を使うことで、ポップオーバーを半透明の上に表示するようなCSS指定が可能。</li>
+  </ul>
+
+  <button popovertarget="popover_02"> Open Popover </button>
+
+  <div id="popover_02" class="popover_box" popover="auto">
+    <button class="close-btn" popovertarget="popover_02" popovertargetaction="hide">
+      <span aria-hidden="true">❌</span>
+      <span class="sr-only">Close</span>
+    </button>
+    <p>バックドロップ付きの自動ポップオーバー中身<p>
+  </div>
+
+  <hr />
+
+  <h2>popover="manual" でライトディスミス無効化＆複数のポップオーバー表示を許可</h2>
+
+  <ul>
+    <li><code>popover="manual"</code> にすると、他のポップオーバーを閉じない。</li>
+    <li><code>popover="manual"</code> にすると、ライトディスミスが無効化されるため、トグルやクローズのアクションで閉じる必要がある。</li>
+  </ul>
+
+  <button popovertarget="popover_03"> Open Popover </button>
+  <div popover="manual" id="popover_03" class="popover_box">
+    <button class="close-btn" popovertarget="popover_03" popovertargetaction="hide">
+      <span aria-hidden="true">❌</span>
+      <p class="sr-only">Close</p>
+    </button>
+    <div class="product-preview-container">
+      マニュアル動作のポップオーバー
+    </div>
+  </div>
+
+  <button popovertarget="popover_04"> Open Popover </button>
+  <div popover="manual" id="popover_04" class="popover_box">
+    <button class="close-btn" popovertarget="popover_04" popovertargetaction="hide">
+      <span aria-hidden="true">❌</span>
+      <p class="sr-only">Close</p>
+    </button>
+    <div class="product-preview-container">
+      マニュアル動作<br>
+      のポップオーバー
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>ポップオーバーのJS操作 (popover="manual")</h2>
+
+  <ul>
+    <li>JavaScriptからは、<code>element.showPopover()</code> <code>element.hidePopover()</code> <code>element.togglePopover()</code> の形式で、ポップオーバーを操作することが可能。</li>
+  </ul>
+
+  <button popovertarget="popover_05"> Open Popover </button>
+
+  <div id="popover_05" class="popover_box" popover="manual">
+    <button class="close-btn" popovertarget="popover_05" popovertargetaction="hide">
+      <span aria-hidden="true">❌</span>
+      <span class="sr-only">Close</span>
+    </button>
+    <p>ポップオーバーの中身<p>
+  </div>
+
+  <p>
+    外部からの操作
+    <button type="button" id="open_button">Open</button>
+    <button type="button" id="close_button">Close</button>
+    <button type="button" id="toggle_button">Toggle</button>
+  </p>
+
+  <script>
+    const openButton = document.getElementById('open_button');
+    const closeButton = document.getElementById('close_button');
+    const toggleButton = document.getElementById('toggle_button');
+    const popoverElement = document.getElementById('popover_05');
+    openButton.addEventListener('click', () => {
+      popoverElement.showPopover();
+    })
+    closeButton.addEventListener('click', () => {
+      popoverElement.hidePopover();
+    })
+    toggleButton.addEventListener('click', () => {
+      popoverElement.togglePopover();
+    })
+
+  </script>
+
+</body>
+</html>
