@@ -9,6 +9,10 @@ cp -r ./home/ ./public/
 mkdir -p ./public/img
 cp -r ./img/ ./public/img/
 
+# res (css)
+mkdir -p ./public/res
+cp -r ./res/ ./public/res/
+
 # barcode
 mkdir -p ./public/barcode
 cp -r ./barcode/ ./public/barcode/
