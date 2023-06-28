@@ -4,23 +4,36 @@
 export class IDB {
   /**
    * コンストラクタ
-   * @param {string} dbName 
-   * @param {number} dbVersion 
-   * @param {string} storeName 
-   * @param {function(IDBDatabase | null):void} onUpgradeNeededCallback 
-   * @param {function(string):void} messageCallback 
-   * @param {function(object):void} insertRowCallback 
+   * @param {string} dbName DB名
+   * @param {number} dbVersion DBバージョン
+   * @param {string} storeName オブジェクトストア名
+   * @param {function(IDBDatabase | null):void} onUpgradeNeededCallback 新しいバージョンのデータベースを作成時のコールバック関数
+   * @param {function(string):void} messageCallback メッセージを表示するコールバック関数
+   * @param {function(object, this):void} insertRowCallback 表示データの行追加時のコールバック関数
+   * @param {function():void} clearTaskTable 表示データをクリアするコールバック関数
+   * @param {function():void} clearInputFields 入力欄をクリアするコールバック関数
    */
-  constructor(dbName, dbVersion, storeName, onUpgradeNeededCallback, messageCallback, insertRowCallback) {
+  constructor(
+    dbName,
+    dbVersion,
+    storeName,
+    onUpgradeNeededCallback,
+    messageCallback,
+    insertRowCallback,
+    clearCallback,
+    clearInputFields,
+  ) {
     this.storeName = storeName;
     this.messageCallback = messageCallback ?? ((_) => {});
     this.insertRowCallback = insertRowCallback ?? ((_) => {});
     this.onUpgradeNeededCallback = onUpgradeNeededCallback ?? ((_) => {});
+    this.clearCallback = clearCallback ?? ((_) => {});
+    this.clearInputFields = clearInputFields ?? ((_) => {});
     /** @type IDBDatabase | null */
     this.db = null;
 
-    if (!this.enabledIndexedDB()) {
-      throw new Error('ERROR :: IndexedDB is not available.')
+    if (!IDB.enabledIndexedDB()) {
+      throw new Error('ERROR :: IndexedDB is not available.');
     }
 
     // データベースを開く
@@ -31,26 +44,28 @@ export class IDB {
 
   /**
    * データベースの初期化
-   * @param {IDBOpenDBRequest} dbOpenRequest 
+   * @param {IDBOpenDBRequest} dbOpenRequest
    */
   initDB(dbOpenRequest) {
     dbOpenRequest.onsuccess = (event) => {
-      this.messageCallback(`データベースを初期化しました。`)
-      this.db= dbOpenRequest.result;
+      this.messageCallback(`データベースを初期化しました。`);
+      this.db = dbOpenRequest.result;
       this.fetchAll();
     };
 
     // データベースがまだ作成されていないか、新しいバージョン番号が指定されか、の場合に
     // 新しいバージョンのデータベースを作成する必要がある場合に必要な処理を指定
     dbOpenRequest.onupgradeneeded = (event) => {
-      const db= event.target.result;
+      const db = event.target.result;
 
       db.onerror = (e) => {
-        this.messageCallback(`データベースの読み込み中にエラーが発生しました。`)
+        this.messageCallback(
+          `データベースの読み込み中にエラーが発生しました。`
+        );
       };
 
-      this.onUpgradeNeededCallback(db)
-/*
+      this.onUpgradeNeededCallback(db);
+      /*
       // オブジェクトストアを作成
       const objectStore = db.createObjectStore(this.storeName, {
         keyPath: 'id',
@@ -72,12 +87,12 @@ export class IDB {
    * @returns {boolean}
    */
   static enabledIndexedDB() {
-    return 'indexedDB' in window
+    return 'indexedDB' in window;
   }
 
   /**
    * DBのオブジェクトストアにアイテムを追加
-   * @param {object} newItem 
+   * @param {object} newItem
    */
   insertOne(newItem) {
     // 読み書き用のトランザクションを開き、データを追加する準備
@@ -98,7 +113,7 @@ export class IDB {
     objectStoreRequest.onsuccess = (event) => {
       this.messageCallback(`データを追加の要求は成功しました。`);
       this.fetchAll();
-      clearInputFields();
+      this.clearInputFields();
     };
   }
 
@@ -106,28 +121,28 @@ export class IDB {
    * DBのオブジェクトストアからアイテムを取得して表示
    */
   fetchAll() {
-    const transaction = this.db.transaction([this.storeName], 'readonly')
-    const objectStore = transaction.objectStore(this.storeName)
+    const transaction = this.db.transaction([this.storeName], 'readonly');
+    const objectStore = transaction.objectStore(this.storeName);
     objectStore.getAll().onsuccess = (event) => {
       /** @type Array<object> */
-      const rows = event.target.result
-      console.log(rows)
+      const rows = event.target.result;
+      console.log(rows);
       // 表示の更新
-      clearTaskTable()
-      rows.forEach(row => {
-        this.insertRowCallback(row)
+      this.clearCallback();
+      rows.forEach((row) => {
+        this.insertRowCallback(row);
       });
-    }
+    };
   }
 
   /**
    * DBのオブジェクトストアからアイテムを削除
-   * @param {string} id 
+   * @param {string} id
    */
   deleteOne(id) {
     // 読み書き用のトランザクションを開き、データを削除する準備
-    const transaction = this.db.transaction([this.storeName], 'readwrite')
-    const objectStore = transaction.objectStore(this.storeName)
+    const transaction = this.db.transaction([this.storeName], 'readwrite');
+    const objectStore = transaction.objectStore(this.storeName);
 
     // トランザクションでオブジェクトストアから対象のキーの項目を削除
     const request = objectStore.delete(Number(id));
@@ -137,7 +152,7 @@ export class IDB {
     };
     request.onerror = (event) => {
       this.messageCallback(`データの削除に失敗しました。`);
-    }
+    };
   }
 
   /**
@@ -145,8 +160,8 @@ export class IDB {
    */
   deleteAll() {
     // 読み書き用のトランザクションを開き、データを削除する準備
-    const transaction = this.db.transaction([this.storeName], 'readwrite')
-    const objectStore = transaction.objectStore(this.storeName)
+    const transaction = this.db.transaction([this.storeName], 'readwrite');
+    const objectStore = transaction.objectStore(this.storeName);
 
     // トランザクションでオブジェクトストアの中身を全て削除
     const request = objectStore.clear();
@@ -156,6 +171,6 @@ export class IDB {
     };
     request.onerror = (event) => {
       this.messageCallback(`全てのデータ削除に失敗しました。`);
-    }
+    };
   }
 }

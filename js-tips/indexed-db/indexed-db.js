@@ -1,3 +1,5 @@
+import { IDB } from './idb.js'
+
 /**
  * IndexDBが利用可能なブラウザかどうか
  * @returns {boolean}
@@ -12,6 +14,23 @@ const OBJECT_STORE_TASKS = 'tasks'
 
 /** @type {IDBDatabase} */
 let db
+
+/**
+ * 新しいバージョンのデータベースを作成時のコールバック関数
+ * @param {IDBDatabase} db 
+ */
+function onUpgradeNeededCallback(db) {
+  // オブジェクトストアを作成
+  const objectStore = db.createObjectStore(this.storeName, {
+    keyPath: 'id',
+    autoIncrement: true,
+  });
+
+  // オブジェクトストアに格納するデータアイテムを定義
+  objectStore.createIndex('name', 'name', { unique: false });
+  objectStore.createIndex('priority', 'priority', { unique: false });
+  objectStore.createIndex('completed', 'completed', { unique: false });
+}
 
 /**
  * データベースの初期化
@@ -45,6 +64,27 @@ function setupDB() {
     updateMessage('オブジェクトストアを作成しました。')
   }
 }
+
+/**
+ * DBのオブジェクトストアにアイテムを追加
+ * @param {IDB} idb 
+ */
+/* 
+function setupAddItemButton(idb) {
+  const buttonElement = document.getElementById('add_button')
+  buttonElement.addEventListener('click', () => {
+    const nameInputElement = document.getElementById('name')
+    const priorityInputElement = document.getElementById('priority')
+    const newItem = {
+      name: nameInputElement.value,
+      priority: priorityInputElement.value,
+      completed: false,
+    }
+
+    idb.insertOne(newItem)
+  })
+}
+*/
 
 /**
  * DBのオブジェクトストアにアイテムを追加
@@ -172,6 +212,19 @@ function deleteItem(event) {
 
 /**
  * 全てクリアするボタンのイベントを登録
+ * @param {IDB} idb 
+ */
+/*
+function setupAllClearButton(idb) {
+  const buttonElement = document.getElementById('clear_all_button')
+  buttonElement.addEventListener('click', () => {
+    idb.deleteAll();
+  });
+}
+*/
+
+/**
+ * 全てクリアするボタンのイベントを登録
  */
 function setupAllClearButton() {
   const buttonElement = document.getElementById('clear_all_button')
@@ -179,6 +232,40 @@ function setupAllClearButton() {
     deleteAll();
   });
 }
+
+/**
+ * テーブルに行を追加
+ * @param {object} data 
+ * @param {IDB} idb
+ */
+/* 
+function insertTaskTableRow(data, idb) {
+  const tbodyElement = document.getElementById('task_list')
+  const trElement = document.createElement('tr')
+  const idTdElement = document.createElement('td')
+  const taskTdElement = document.createElement('td')
+  const priorityTdElement = document.createElement('td')
+  const deleteTdElement = document.createElement('td')
+  const deleteButtonElement = document.createElement('button')
+  idTdElement.textContent = data.id
+  taskTdElement.textContent = data.name
+  priorityTdElement.textContent = data.priority
+  deleteButtonElement.textContent = '削除';
+  deleteButtonElement.dataset.id = data.id;
+  deleteButtonElement.setAttribute('type', 'button');
+  // deleteButtonElement.addEventListener('click', deleteItem);
+  // FIXME: 削除ボタンをクリック時に `idb.deleteOne` が無い旨のエラーになる
+  deleteButtonElement.addEventListener('click', () => {
+    idb.deleteOne(data.id);
+  });
+  deleteTdElement.appendChild(deleteButtonElement);
+  trElement.appendChild(idTdElement)
+  trElement.appendChild(taskTdElement)
+  trElement.appendChild(priorityTdElement)
+  trElement.appendChild(deleteTdElement)
+  tbodyElement.appendChild(trElement)
+}
+ */
 
 /**
  * テーブルに行を追加
@@ -230,9 +317,27 @@ function init() {
     document.getElementById('message').textContent = `[Note]: This browser doesn't support IndexedDB.`
     return
   }
+/* 
+  // TODO: IDBをインスタンス化し、処理を置き換える
+  const idb = new IDB(
+    DB_NAME,
+    DB_VERSION,
+    OBJECT_STORE_TASKS,
+    onUpgradeNeededCallback,
+    updateMessage,
+    (row) => {
+      insertTaskTableRow(row, idb)
+    },
+    clearTaskTable,
+    clearInputFields,
+  )
+  setupAddItemButton(idb)
+  setupAllClearButton(idb)
+*/
+
   setupDB()
   setupAddItemButton()
-  setupAllClearButton();
+  setupAllClearButton()
 }
 
 window.addEventListener('DOMContentLoaded', () => {
