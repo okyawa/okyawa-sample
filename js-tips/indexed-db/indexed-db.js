@@ -127,6 +127,25 @@ function deleteItem(event) {
 }
 
 /**
+ * DBのオブジェクトストアの中身を全て削除
+ */
+function deleteAll() {
+  // 読み書き用のトランザクションを開き、データを削除する準備
+  const transaction = db.transaction([OBJECT_STORE_TASKS], 'readwrite')
+  const objectStore = transaction.objectStore(OBJECT_STORE_TASKS)
+
+  // トランザクションでオブジェクトストアの中身を全て削除
+  const request = objectStore.clear();
+  request.onsuccess = (event) => {
+    updateMessage(`全てのデータ削除に成功しました。`);
+    fetchAll();
+  };
+  request.onerror = (event) => {
+    updateMessage(`全てのデータ削除に失敗しました。`);
+  }
+}
+
+/**
  * 入力欄をクリア
  */
 function clearInputFields() {
@@ -142,6 +161,16 @@ function clearInputFields() {
 function clearTaskTable() {
   const tbodyElement = document.getElementById('task_list')
   tbodyElement.innerHTML = ''
+}
+
+/**
+ * 全てクリアするボタンのイベントを登録
+ */
+function setupAllClearButton() {
+  const buttonElement = document.getElementById('clear_all_button')
+  buttonElement.addEventListener('click', () => {
+    deleteAll();
+  });
 }
 
 /**
@@ -196,6 +225,7 @@ function init() {
   }
   setupDB()
   setupAddItemButton()
+  setupAllClearButton();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
