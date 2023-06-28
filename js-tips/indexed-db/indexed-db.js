@@ -104,6 +104,29 @@ function fetchAll() {
 }
 
 /**
+ * DBのオブジェクトストアからアイテムを削除
+ * @param {Event} event 
+ */
+function deleteItem(event) {
+  const targetElement = event.currentTarget;
+  const id = targetElement.dataset.id;
+
+  // 読み書き用のトランザクションを開き、データを削除する準備
+  const transaction = db.transaction([OBJECT_STORE_TASKS], 'readwrite')
+  const objectStore = transaction.objectStore(OBJECT_STORE_TASKS)
+
+  // トランザクションでオブジェクトストアから対象のキーの項目を削除
+  const request = objectStore.delete(Number(id));
+  request.onsuccess = (event) => {
+    updateMessage(`データの削除に成功しました。`);
+    fetchAll();
+  };
+  request.onerror = (event) => {
+    updateMessage(`データの削除に失敗しました。`);
+  }
+}
+
+/**
  * 入力欄をクリア
  */
 function clearInputFields() {
@@ -131,12 +154,20 @@ function insertTaskTableRow(data) {
   const idTdElement = document.createElement('td')
   const taskTdElement = document.createElement('td')
   const priorityTdElement = document.createElement('td')
+  const deleteTdElement = document.createElement('td')
+  const deleteButtonElement = document.createElement('button')
   idTdElement.textContent = data.id
   taskTdElement.textContent = data.name
   priorityTdElement.textContent = data.priority
+  deleteButtonElement.textContent = '削除';
+  deleteButtonElement.dataset.id = data.id;
+  deleteButtonElement.setAttribute('type', 'button');
+  deleteButtonElement.addEventListener('click', deleteItem);
+  deleteTdElement.appendChild(deleteButtonElement);
   trElement.appendChild(idTdElement)
   trElement.appendChild(taskTdElement)
   trElement.appendChild(priorityTdElement)
+  trElement.appendChild(deleteTdElement)
   tbodyElement.appendChild(trElement)
 }
 
