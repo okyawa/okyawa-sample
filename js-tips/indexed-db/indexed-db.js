@@ -105,12 +105,9 @@ function fetchAll() {
 
 /**
  * DBのオブジェクトストアからアイテムを削除
- * @param {Event} event 
+ * @param {string} id 
  */
-function deleteItem(event) {
-  const targetElement = event.currentTarget;
-  const id = targetElement.dataset.id;
-
+function deleteOne(id) {
   // 読み書き用のトランザクションを開き、データを削除する準備
   const transaction = db.transaction([OBJECT_STORE_TASKS], 'readwrite')
   const objectStore = transaction.objectStore(OBJECT_STORE_TASKS)
@@ -161,6 +158,16 @@ function clearInputFields() {
 function clearTaskTable() {
   const tbodyElement = document.getElementById('task_list')
   tbodyElement.innerHTML = ''
+}
+
+/**
+ * 対象のアイテムを削除
+ * @param {Event} event 
+ */
+function deleteItem(event) {
+  const targetElement = event.currentTarget;
+  const id = targetElement.dataset.id;
+  deleteOne(id);
 }
 
 /**
