@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <title>input type="date"のカレンダー表示検証</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover" />
+    <meta name="author" content="okyawa">
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- 
+        [TODO]
+        - input type="date" の検証
+        - 入力欄をクリックすると、カレンダー選択を表示
+        - カレンダーを表示するアイコンボタンを別途追加
+        - 各ブラウザでの挙動確認
+        [参照]
+        https://b-risk.jp/blog/2019/09/input-date-form/
+    -->
+
+    <!--
+        [純粋に input type="date" を使う場合の懸念事項]
+        - input type="date"は、iOSで "dd/mm/yy" の形式で表示される点
+        - input type="date"は、Firefoxで標準で入るカレンダーアイコンを消せない点
+        - input type="date"は、Firefoxでカレンダーをポップアップするクリック領域をCSSで広げれない点
+    -->
+
+    <style>
+        .date_edit {
+            position: relative;
+            top: -1px;
+            display: inline-block;
+        }
+
+        .date_edit input[type="date"] {
+            text-align: center;
+        }
+
+        .date_edit input[type="date"]::-webkit-inner-spin-button{
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .date_edit input[type="date"]::-webkit-clear-button{
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .date_edit .fa {
+            font-size: 20px;
+            vertical-align: middle;
+        }
+
+        .date_current_label {
+            vertical-align: middle;
+        }
+
+        #sample .date_edit input[type="date"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(1px, 1px, 1px, 1px);
+        }
+
+        #sample02 .date_edit input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            padding: 0;
+            background: transparent;
+            color: transparent;
+            cursor: pointer;
+            height: 50px;
+            width: 180px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>input type="date"のカレンダー表示検証</h1>
+    <fom>
+        <fieldset>
+            <h2>標準機能のみ</h2>
+            お届け日:
+            <input type="date" name="delivery_date01" value="" />
+        </fieldset>
+        <br />
+        <fieldset id="sample02">
+            <h2>CSSでカスタマイズ</h2>
+            お届け日:
+            <label class="date_edit">
+                <input type="date" name="delivery_date02" value="" min="2023-07-10" max="2023-08-20" />
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+            </label>
+        </fieldset>
+        <br />
+        <fieldset id="sample">
+            <h2>CSSとJavaScriptでカスタマイズ</h2>
+            お届け日:
+            <label class="date_edit">
+                <span class="date_current_label">未指定</span>
+                <input type="date" name="delivery_date02" value="" min="2023-07-10" max="2023-08-20" />
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+            </label>
+        </fieldset>
+    </fom>
+
+    <script>
+        const dateElem = document.querySelector('#sample input[type="date"]');
+        function updateDummyDateLabel(event) {
+            const dateValue = event.currentTarget.value;
+            const dummyLabelElem = document.querySelector('#sample .date_current_label');
+            if (dateValue === undefined || dateValue === '') {
+                dummyLabelElem.textContent = '未指定';
+                return;
+            }
+            dummyLabelElem.textContent = dateValue;
+        }
+        dateElem.addEventListener('input', updateDummyDateLabel);
+        window.addEventListener('DOMContentLoaded', updateDummyDateLabel);
+        dateElem.addEventListener('click', (event) => {
+            const targetElem = event.currentTarget;
+            targetElem.showPicker();
+        })
+    </script>
+</body>
+
+</html>
