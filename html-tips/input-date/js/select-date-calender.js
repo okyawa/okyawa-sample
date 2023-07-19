@@ -3,6 +3,9 @@
  * @typedef {object} SelectDateCalendarOptionsType
  * @property {string} namePrefix 生成するlabel要素に付与するクラス名
  * @property {string} labelClassName 生成する input type="date" 要素のname属性値のプレフィックス
+ * @property {string} errorClassName エラー文の要素に付与するクラス名
+ * @property {string} rangeErrorClassName 範囲外の日付を選択した場合に付与するクラス名
+ * @property {string} rangeErrorMessage 範囲外の日付を選択した場合のエラー文
  */
 
 /**
@@ -31,6 +34,9 @@ class SelectDateCalendar {
   static defaults = {
     namePrefix: 'calendar_',
     labelClassName: 'date_edit_label',
+    errorClassName: 'error_status',
+    rangeErrorClassName: 'date_range_error',
+    rangeErrorMessage: '指定できない日付です',
   }
 
   /**
@@ -85,6 +91,7 @@ class SelectDateCalendar {
     this.inputDateElement.addEventListener('click', this.clickCalendarHandler.bind(this));
     this.inputDateElement.addEventListener('input', this.syncSelectElem.bind(this));
     this.selectElement.addEventListener('input', this.selectBoxInputHandler.bind(this));
+    this.selectElement.addEventListener('click', this.removeRangeError.bind(this));
   }
 
   /**
@@ -93,6 +100,7 @@ class SelectDateCalendar {
    * @private
    */
   clickCalendarHandler(event) {
+    this.removeRangeError();
     /** @type HTMLInputElement | null */
     const targetElem = event.currentTarget;
     if (targetElem === null) {
@@ -125,6 +133,7 @@ class SelectDateCalendar {
    * @private
    */
   syncInputDateElem(dateValue) {
+    this.removeRangeError();
     if (dateValue === undefined) {
       this.inputDateElement.value = '';
       return;
@@ -142,6 +151,7 @@ class SelectDateCalendar {
    * @private
    */
   syncSelectElem(event) {
+    this.removeRangeError();
     /** @type {HTMLInputElement | null} */
     const targetElem = event.currentTarget;
     if (targetElem === null) {
@@ -153,6 +163,52 @@ class SelectDateCalendar {
       return;
     }
     this.selectElement.value = dateValue;
+    if (dateValue && this.selectElement.value === '') {
+      // カレンダーから範囲外の値を選択
+      this.showRangeError();
+      // セレクトボックスが未選択ラベルの状態 ("") となるようにする
+      this.selectElement.value = '';
+    }
+  }
+
+  /**
+   * 範囲外の日付をカレンダーから選択した場合にエラー文を表示
+   */
+  showRangeError() {
+    // エラー文の要素を生成
+    const spanElement = document.createElement('span');
+    spanElement.classList.add(this.options.rangeErrorClassName, this.options.errorClassName);
+    spanElement.textContent = this.options.rangeErrorMessage;
+    // label要素
+    const labelElement = this.inputDateElement.closest('label');
+    if (labelElement === null) {
+      return;
+    }
+    // DOM二追加
+    labelElement.parentNode.insertBefore(
+      spanElement,
+      labelElement.nextSibling
+    );
+  }
+
+
+  /**
+   * 範囲外の日付をカレンダーから選択した場合にエラー文を削除
+   */
+  removeRangeError() {
+    // label要素
+    const labelElement = this.inputDateElement.closest('label');
+    if (labelElement === null) {
+      return;
+    }
+    // エラー文の要素
+    const errorElement = labelElement.parentNode.querySelector('.' + this.options.rangeErrorClassName);
+    if (errorElement === null) {
+      // エラー表示なし
+      return;
+    }
+    // エラー文の要素を削除
+    errorElement.parentNode.removeChild(errorElement);
   }
 }
 
@@ -181,8 +237,6 @@ function setupSelectDateCalendarAll(selector, params) {
     setupSelectDateCalendar(selectElement, params);
   });
 }
-
-// TODO: input type="date" のmixとmaxが効かないブラウザ(safari)の場合、範囲外の日付を選択した場合にエラー文を表示
 
 window.SelectDateCalendar = SelectDateCalendar;
 window.setupSelectDateCalendar = setupSelectDateCalendar;
