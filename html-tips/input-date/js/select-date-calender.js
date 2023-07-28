@@ -235,25 +235,23 @@ class SelectDateCalendar {
    */
   showRangeError() {
     // エラー文の要素を生成
-    const spanWrapElement = document.createElement('span');
-    spanWrapElement.classList.add(this.options.rangeErrorClassName, this.options.errorClassName);
-    const spanTextElement = document.createElement('span');
-    spanTextElement.textContent = this.options.rangeErrorMessage;
+    const spanElement = document.createElement('span');
+    spanElement.classList.add(this.options.rangeErrorClassName, this.options.errorClassName);
+    let errorMessageHtml = '';
     // エラーアイコン
     if (this.options.errorIconHtml !== '') {
-      const spanIconElement = document.createElement('span');
-      spanIconElement.innerHTML = this.options.errorIconHtml;
-      spanWrapElement.appendChild(spanIconElement);
+      errorMessageHtml += this.options.errorIconHtml;
     }
-    spanWrapElement.appendChild(spanTextElement);
+    errorMessageHtml += this.options.rangeErrorMessage;
+    spanElement.innerHTML = errorMessageHtml;
     // label要素
     const labelElement = this.inputDateElement.closest('label');
     if (labelElement === null) {
       return;
     }
-    // DOM二追加
+    // DOMに追加
     labelElement.parentNode.insertBefore(
-      spanWrapElement,
+      spanElement,
       labelElement.nextSibling
     );
   }
@@ -263,13 +261,8 @@ class SelectDateCalendar {
    * 範囲外の日付をカレンダーから選択した場合にエラー文を削除
    */
   removeRangeError() {
-    // label要素
-    const labelElement = this.inputDateElement.closest('label');
-    if (labelElement === null) {
-      return;
-    }
     // エラー文の要素
-    const errorElement = labelElement.parentNode.querySelector('.' + this.options.rangeErrorClassName);
+    const errorElement = this.wrapElement.querySelector('.' + this.options.rangeErrorClassName);
     if (errorElement === null) {
       // エラー表示なし
       return;
@@ -280,8 +273,8 @@ class SelectDateCalendar {
 }
 
 /**
- * SelectDateCalendarの初期化
- * @param {string} selector 対象の日付選択セレクトボックスのセレクター
+ * 対象の日付選択セレクトボックスの要素からSelectDateCalendarの初期化
+ * @param {HTMLSelectElement} selectElement 対象の日付選択セレクトボックスの要素
  * @param {object} params オプション指定のオブジェクト
  */
 function setupSelectDateCalendar(selectElement, params) {
