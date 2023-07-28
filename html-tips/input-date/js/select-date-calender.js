@@ -93,18 +93,7 @@ class SelectDateCalendar {
     if (this.options.disabledMinMax === true) {
       return inputDateElement;
     }
-    // セレクトボックスの選択肢から最小値と最大値を取得
-    const optionElements = this.selectElement.querySelectorAll('option:not([value=""])');
-    const minDate = optionElements.length > 0 ? optionElements[0].value : null;
-    const maxDate = optionElements.length > 0 ? optionElements[optionElements.length - 1].value : null;
-    // input[type="date"] の要素に min と max の属性を指定
-    if (minDate !== null) {
-      inputDateElement.setAttribute('min', minDate);
-    }
-    if (maxDate !== null) {
-      inputDateElement.setAttribute('max', maxDate);
-    }
-    return inputDateElement;
+    return this.setupInputDateMinMaxAttribute(inputDateElement);
   }
 
   /**
