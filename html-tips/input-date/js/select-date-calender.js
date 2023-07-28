@@ -1,6 +1,7 @@
 /**
  * SelectDateCalendarのオプションobjectの型
  * @typedef {object} SelectDateCalendarOptionsType
+ * @property {string} wrapSelector 日付選択欄を囲う要素のセレクター
  * @property {string} namePrefix 生成するlabel要素に付与するクラス名
  * @property {string} labelClassName 生成する input type="date" 要素のname属性値のプレフィックス
  * @property {string} errorClassName エラー文の要素に付与するクラス名
@@ -22,9 +23,16 @@ class SelectDateCalendar {
     this.selectElement = selectElement;
     /** @type {SelectDateCalendarOptionsType} */
     this.options = { ...SelectDateCalendar.defaults, ...params };
+    /** @type {HTMLElement} */
+    this.wrapElement = this.findWrapElement();
+    // input type="date" と label の要素が既にある場合はあるものを使い、無い場合は生成
+    /** @type {HTMLLabelElement | null} */
+    const labelElement = this.wrapElement.querySelector('.' + this.options.labelClassName);
+    /** @type {HTMLInputElement | null} */
+    const inputDateElement = this.wrapElement.querySelector('input[type="date"]');
     /** @type {HTMLInputElement} */
-    this.inputDateElement = this.createInputDateElement();
-    this.appendInputDateElement();
+    this.inputDateElement = this.createInputDateElement(inputDateElement);
+    this.appendInputDateElement(labelElement);
   }
 
   /**
@@ -32,11 +40,14 @@ class SelectDateCalendar {
    * @type {SelectDateCalendarOptionsType}
    */
   static defaults = {
+    wrapSelector: '',
     namePrefix: 'calendar_',
     labelClassName: 'date_edit_label',
     errorClassName: 'error_status',
     rangeErrorClassName: 'date_range_error',
     rangeErrorMessage: '指定できない日付です',
+    errorIconHtml: '',
+    disabledMinMax: false, // デバッグ用
   }
 
   /**
@@ -48,25 +59,84 @@ class SelectDateCalendar {
   }
 
   /**
+   * 日付選択欄を囲う要素を取得
+   * @returns {HTMLElement} 日付選択欄を囲う要素
+   * @private
+   */
+  findWrapElement() {
+    let wrapElement;
+    if (this.options.wrapSelector === '') {
+      wrapElement = this.selectElement.parentElement;
+    } else {
+      wrapElement = this.selectElement.closest(this.options.wrapSelector);
+    }
+    if (wrapElement === null) {
+      throw new Error(`Error - SelectDateCalendar::findWrapElement() - wrapSelector: "${this.options.wrapSelector}" is not found.`);
+    }
+    return wrapElement;
+  }
+
+  /**
    * input type="date"の要素を生成
+   * @param {HTMLInputElement | null} inputDateExistsElement 既にDOM上にあるinput type="date"の要素
    * @return {HTMLInputElement} input type="date"の要素
    * @private
    */
-  createInputDateElement() {
-    const inputDateElement = document.createElement('input');
+  createInputDateElement(inputDateExistsElement) {
+    // input type="date"の要素を生成
+    const inputDateElement = inputDateExistsElement === null 
+      ? document.createElement('input')
+      : inputDateExistsElement;
     inputDateElement.setAttribute('type', 'date');
-    const name =
-      this.options.namePrefix + this.selectElement.getAttribute('name');
+    const name = this.options.namePrefix + this.selectElement.getAttribute('name');
     inputDateElement.setAttribute('name', name);
-    // TODO: セレクトボックスのoptionの最初と最後を取得し、min と max の属性を指定
+    if (this.options.disabledMinMax === true) {
+      return inputDateElement;
+    }
+    // セレクトボックスの選択肢から最小値と最大値を取得
+    const optionElements = this.selectElement.querySelectorAll('option:not([value=""])');
+    const minDate = optionElements.length > 0 ? optionElements[0].value : null;
+    const maxDate = optionElements.length > 0 ? optionElements[optionElements.length - 1].value : null;
+    // input[type="date"] の要素に min と max の属性を指定
+    if (minDate !== null) {
+      inputDateElement.setAttribute('min', minDate);
+    }
+    if (maxDate !== null) {
+      inputDateElement.setAttribute('max', maxDate);
+    }
     return inputDateElement;
   }
 
   /**
+   * input type="date" の要素にセレクトボックスの値からminとmax値をセット
+   * @param {HTMLInputElement} inputDateExistsElement 既にDOM上にあるinput type="date"の要素
+   * @return {HTMLInputElement} input type="date"の要素
+   */
+  setupInputDateMinMaxAttribute(inputDateElement) {
+      // セレクトボックスの選択肢から最小値と最大値を取得
+      const optionElements = this.selectElement.querySelectorAll('option:not([value=""])');
+      const minDate = optionElements.length > 0 ? optionElements[0].value : null;
+      const maxDate = optionElements.length > 0 ? optionElements[optionElements.length - 1].value : null;
+      // input[type="date"] の要素に min と max の属性を指定
+      if (minDate !== null) {
+        inputDateElement.setAttribute('min', minDate);
+      }
+      if (maxDate !== null) {
+        inputDateElement.setAttribute('max', maxDate);
+      }
+      return inputDateElement;
+  }
+
+  /**
    * セレクトボックスの後ろに input type="date" の要素を追加
+   * @param {HTMLLabelElement | null} labelExistsElement 既にDOM上にあるlabel要素
    * @private
    */
-  appendInputDateElement() {
+  appendInputDateElement(labelExistsElement) {
+    if (labelExistsElement !== null) {
+      // 既にある場合は生成しない
+      return;
+    }
     // ラベル要素
     const labelElement = document.createElement('label');
     labelElement.classList.add(this.options.labelClassName);
@@ -176,9 +246,17 @@ class SelectDateCalendar {
    */
   showRangeError() {
     // エラー文の要素を生成
-    const spanElement = document.createElement('span');
-    spanElement.classList.add(this.options.rangeErrorClassName, this.options.errorClassName);
-    spanElement.textContent = this.options.rangeErrorMessage;
+    const spanWrapElement = document.createElement('span');
+    spanWrapElement.classList.add(this.options.rangeErrorClassName, this.options.errorClassName);
+    const spanTextElement = document.createElement('span');
+    spanTextElement.textContent = this.options.rangeErrorMessage;
+    // エラーアイコン
+    if (this.options.errorIconHtml !== '') {
+      const spanIconElement = document.createElement('span');
+      spanIconElement.innerHTML = this.options.errorIconHtml;
+      spanWrapElement.appendChild(spanIconElement);
+    }
+    spanWrapElement.appendChild(spanTextElement);
     // label要素
     const labelElement = this.inputDateElement.closest('label');
     if (labelElement === null) {
@@ -186,7 +264,7 @@ class SelectDateCalendar {
     }
     // DOM二追加
     labelElement.parentNode.insertBefore(
-      spanElement,
+      spanWrapElement,
       labelElement.nextSibling
     );
   }
