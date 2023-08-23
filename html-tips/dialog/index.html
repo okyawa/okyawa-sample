@@ -291,6 +291,34 @@
       <legend>
         <h2>ダイアログ表示時のアニメーション</h2>
       </legend>
+      <ul>
+        <li>ブラウザの初期スタイルでは、 <code>dialog</code> 要素の <code>open</code> 属性の有無に応じて、<code>display: none;</code> と <code>display: block;</code> を切り替え流刑式でダイアログの表示/非表示を制御しているため、単純にCSSアニメーションを当てることはできない</li>
+        <li>
+          <code>dialog</code> 要素の <code>display</code> 指定を明示的に行い、アニメーションに影響が出ないようにする
+          <ul>
+            <li>CSSで、 <code>open</code> 属性が付いていない <code>dialog</code> 要素に <code>display: block;</code> を指定</li>
+            <li><code>dialog</code> 要素に <code>display: none;</code> のstyle属性を付与</li>
+            <li>ダイアログを開く処理の最初で、<code>dialog</code> 要素の <code>display</code> のstyle指定を削除し、CSSアニメーションが動くようにする</li>
+            <li>ダイアログを閉じる際、閉じるCSSアニメーションが全て終わってから、<code>dialog</code> 要素に <code>display: none;</code> のstyle属性をJavaScriptで付与</li>
+          </ul>
+        </li>
+        <li>
+          対象要素のCSSアニメーションが全て完了してから実行
+          <ul>
+            <li><code>Element.getAnimations()</code> メソッドで、この要素に影響を与えるか将来的に影響を与える予定のすべての <code>Animation</code> オブジェクトの配列を取得</li>
+            <li><code>Animation.finished</code> プロパティは、アニメーションが終了した際に <code>resolve</code> する <code>Promise</code> なので、 <code>Promise.allSettled()</code> に渡せば、アニメーションが全て完了したタイミングが分かる</li>
+          </ul>
+        </li>
+        <li>
+          ユーザーの設定に応じてアニメーションが表示されるようにする
+          <ul>
+            <li>各OSの設定で、「視差効果を減らす」ような設定があるため、この設定が有効な場合はアニメーションしないようにする</li>
+            <li>macOSの場合、設定アプリの「アクセシビリティ」> 「ディスプレイ」の画面に、「視差効果を減らす」の設定欄がある</li>
+            <li>ChromeのDevToolsの場合は、「レンダリング」画面の中にある「CSS メディア特性 prefers-reduced-motion をエミュレートする」の部分で、設定をエミュレート可能</li>
+            <li>CSSメディアクエリで <code>@media (prefers-reduced-motion: no-preference)</code> を指定すると、「視差効果を減らす」設定が有効ではない場合にだけ適用することが可能</li>
+          </ul>
+        </li>
+      </ul>
       <dialog style="display: none;">
         <p>アニメーション付きのモーダルダイアログ</p>
         <br />
