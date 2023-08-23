@@ -384,5 +384,74 @@
     </script>
   </section>
 
+  <br />
+
+  <section id="sample05">
+    <style>
+      #sample05 dialog {
+        padding: 0;
+      }
+      #sample05 .dialog_container {
+        padding: 16px;
+      }
+    </style>
+    <fieldset>
+      <legend>
+        <h2>ダイアログの枠外クリックで閉じる</h2>
+      </legend>
+      <ul>
+        <li><code>dialog</code> 要素自体に <code>click</code> イベントを登録し、 <code>event.target === event.currentTarget</code> の場合は枠外クリックとなる</li>
+        <li>
+          <code>dialog</code> 要素に初期で当たっている <code>padding</code> が残っていると、この <code>padding</code> 部分をクリックしても閉じてしまう
+          <ul>
+            <li>CSS指定で <code>dialog</code> 要素を <code>0</code> にする</li>
+            <li>ダイアログ内の余白が無くなってしまうため、<code>dialog</code> 要素直下に要素を追加し、そこに余白を当てる</li>
+          </ul>
+        </li>
+      </ul>
+      <dialog>
+        <div class="dialog_container">
+          <p>ダイアログの枠外をクリックしても閉じれます。</p>
+          <br />
+          <button
+            type="button"
+            onclick="this.closest('dialog').close(`ボタンで閉じました (${(new Date()).toISOString()})`);"
+          >
+            閉じる
+          </button>
+        </div>
+      </dialog>
+      <button type="button" class="open_button">ダイアログを開く</button>
+      <dl>
+        <dt>dialog要素から受け取った値:</dt>
+        <dd><pre>　</pre></dd>
+      </dl>
+    </fieldset>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const modalDialog05 = document.querySelector('#sample05 dialog');
+        const openButton05 = document.querySelector('#sample05 button.open_button');
+        const messageBox05 = document.querySelector('#sample05 dl dd pre');
+        // 開くボタンのイベント登録
+        openButton05?.addEventListener('click', () => {
+          // モーダルダイアログを開く
+          modalDialog05?.showModal();
+        });
+        // 閉じる際に実行するイベントを登録
+        modalDialog05?.addEventListener('close', (event) => {
+          // 閉じた際に渡された値を画面に表示
+          messageBox05.textContent = event.currentTarget?.returnValue;
+        });
+        // ダイアログの枠外をクリックした際にダイアログを閉じる
+        modalDialog05?.addEventListener('click', (event) => {
+          if (event.target === event.currentTarget) {
+            const message = `枠外クリックで閉じました (${(new Date()).toISOString()})`;
+            modalDialog05.close(message);
+          }
+        });
+      })
+    </script>
+  </section>
+
 </body>
 </html>
