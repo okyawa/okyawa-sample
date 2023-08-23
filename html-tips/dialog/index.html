@@ -31,18 +31,32 @@
           <li><code>showModal()</code> は、フォーカス制御などが含まれたモーダルダイアログ</li>
         </ul>
       </li>
-      <li>ダイアログを閉じる <code>close()</code> メソッド</li>
-      <li>ダイアログの状態を表す <code>open</code> 属性</li>
+      <li>
+        ダイアログを閉じる <code>close()</code> メソッド
+        <ul>
+          <li><code>close()</code> メソッドでダイアログを閉じる際に引数として渡した値が格納される <code>returnValue</code> プロパティ</li>
+        </ul>
+      </li>
+      <li>
+        ダイアログの状態を表す <code>open</code> 属性
+        <ul>
+          <li>
+            <code>open</code> 属性を直接触るのはNG
+            <ul>
+              <li>直接 <code>open</code> 属性を変更すると、 <code>close</code> イベントが発行されなかったり、エスケープキーでダイアログが閉じれなくなったり、 <code>showModal()</code> で背景部分が操作できないままになったり</li>
+            </ul>
+          </li>
+          <li><code>show()</code> <code>showModal()</code> <code>close()</code> を使うことで、自動的に <code>open</code> 属性の付け外しが行われる</li>
+        </ul>
+      </li>
     </ul>
   </section>
-
 
   <section id="sample01">
     <fieldset>
       <legend>
         <h2><code>show()</code> メソッドでダイアログ表示</h2>
       </legend>
-      <h2><code>show()</code> メソッドでダイアログ表示</h2>
       <dialog></dialog>
       <button type="button" class="open_button">ダイアログを開く</button>
       <button type="button" class="close_button">ダイアログを閉じる</button>
@@ -62,13 +76,98 @@
       dialog01.show();
     });
     closeButton01.addEventListener('click', () => {
-      const message = `sample01のダイアログを閉じました (${(new Date()).toISOString()})`;
+      const message = `ダイアログを閉じました (${(new Date()).toISOString()})`;
       // ダイアログを閉じる
       dialog01.close(message);
       // ダイアログを閉じる際にセットした値を取得して表示
       document.querySelector('#sample01 dl dd').textContent = dialog01.returnValue;
     });
   </script>
+
+  <br />
+
+  <section id="sample02">
+    <style>
+      :root {
+      --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
+      }
+      #sample02 .dialog {
+      box-shadow: var(--dialog-shadow);
+      }
+      #sample02 .dialog::backdrop {
+        backdrop-filter: blur(8px);
+        /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
+        -webkit-backdrop-filter: blur(8px);
+      }
+    </style>
+    <fieldset>
+      <legend>
+        <h2><code>showModal()</code> メソッドでモーダルダイアログを表示</h2>
+      </legend>
+      <ul>
+        <li>モーダルダイアログは、 <code>ESC</code> ボタンでも閉じることができる</li>
+        <li>
+          <code>form</code> 要素の <code>method="dialog"</code> を使用して、 ダイアログを閉じる際に値を受け取る
+          <ul>
+            <li><code>submit</code> 時にリクエストを送信せずにダイアログを閉じることができる</li>
+            <li><code>button</code>要素など、 <code>submit</code> を指定した要素に <code>value</code> 属性がある場合は、その <code>value</code> 属性の値が <code>dialog</code> 要素の <code>returnValue</code> に渡される</li>
+          </ul>
+        </li>
+      </ul>
+      <dialog id="modalDialog" class="dialog">
+        <header style="position: relative;">
+          <h3>Header</h3>
+          <button
+            class="close_button"
+            type="button"
+            title="Close"
+            style="padding: 0 4px; position: absolute; top: 0; right: 0; border-radius: 50%;"
+          >x</button>
+        </header>
+        <p>Message</p>
+        <br />
+        <form method="dialog">
+          <button type="submit" value="ok">OK</button>
+          <button type="submit" value="cancel">Cancel</button>
+        </form>
+      </dialog>
+      <button type="button" class="open_button">ダイアログを開く</button>
+      <dl>
+        <dt>ダイアログから受け取った値:</dt>
+        <dd></dd>
+      </dl>
+    </fieldset>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const modalDialog02 = document.querySelector('#sample02 dialog');
+        const openButton02 = document.querySelector('#sample02 button.open_button');
+        const closeButton02 = document.querySelector('#sample02 button.close_button');
+        const messageBox02 = document.querySelector('#sample02 dl dd');
+        if (!(modalDialog02 instanceof HTMLDialogElement)) {
+          // dialog要素ではない場合は中断
+          return;
+        }
+        // 開くボタンのイベント登録
+        openButton02.addEventListener('click', () => {
+          // モーダルダイアログを開く
+          modalDialog02.showModal();
+        });
+        // 閉じるボタンのイベント登録
+        closeButton02?.addEventListener('click', (event) => {
+          const dialog = event.currentTarget.closest('dialog');
+          const message = `モーダルダイアログの閉じるボタンからを閉じました (${(new Date()).toISOString()})`;
+          // モーダルダイアログを閉じる
+          modalDialog.close(message);
+          // ダイアログを閉じる際にセットした値を取得して表示
+          messageBox02.textContent = dialog.returnValue;
+        });
+        // 閉じた際に渡された値を画面に表示
+        modalDialog02.addEventListener('close', (event) => {
+          messageBox02.textContent = event.currentTarget?.returnValue;
+        });
+      })
+    </script>
+  </section>
 
 </body>
 </html>
