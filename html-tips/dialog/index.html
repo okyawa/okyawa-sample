@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>dialog要素 Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/res/css/neat.css">
+
+  <style>
+
+  </style>
+
+</head>
+<body>
+
+  <header>
+    <h1>dialog要素 Sample</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <h2>dialog要素が提供するAPIと属性</h2>
+    <ul>
+      <li>ダイアログを表示するための <code>show()</code> メソッド</li>
+      <li>
+        モーダルダイアログを表示するための <code>showModal()</code> メソッド
+        <ul>
+          <li><code>showModal()</code> は、フォーカス制御などが含まれたモーダルダイアログ</li>
+        </ul>
+      </li>
+      <li>ダイアログを閉じる <code>close()</code> メソッド</li>
+      <li>ダイアログの状態を表す <code>open</code> 属性</li>
+    </ul>
+  </section>
+
+
+  <section id="sample01">
+    <fieldset>
+      <legend>
+        <h2><code>show()</code> メソッドでダイアログ表示</h2>
+      </legend>
+      <h2><code>show()</code> メソッドでダイアログ表示</h2>
+      <dialog></dialog>
+      <button type="button" class="open_button">ダイアログを開く</button>
+      <button type="button" class="close_button">ダイアログを閉じる</button>
+      <dl>
+        <dt>ダイアログから受け取った値:</dt>
+        <dd></dd>
+      </dl>
+    </fieldset>
+  </section>
+  <script>
+    const dialog01 = document.querySelector('#sample01 dialog');
+    const openButton01 = document.querySelector('#sample01 button.open_button');
+    const closeButton01 = document.querySelector('#sample01 button.close_button');
+    openButton01.addEventListener('click', () => {
+      dialog01.textContent = 'dialog要素のサンプルです。';
+      // ダイアログを開く
+      dialog01.show();
+    });
+    closeButton01.addEventListener('click', () => {
+      const message = `sample01のダイアログを閉じました (${(new Date()).toISOString()})`;
+      // ダイアログを閉じる
+      dialog01.close(message);
+      // ダイアログを閉じる際にセットした値を取得して表示
+      document.querySelector('#sample01 dl dd').textContent = dialog01.returnValue;
+    });
+  </script>
+
+</body>
+</html>
