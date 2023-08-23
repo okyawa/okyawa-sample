@@ -57,9 +57,17 @@
       <legend>
         <h2><code>show()</code> メソッドでダイアログ表示</h2>
       </legend>
-      <dialog></dialog>
+      <dialog>
+        <p><code>show()</code> メソッドで開いたダイアログ</p>
+        <br>
+        <button
+          type="button"
+          onclick="this.closest('dialog').close(`閉じました (${(new Date()).toISOString()})`);"
+        >
+          閉じる
+        </button>
+      </dialog>
       <button type="button" class="open_button">ダイアログを開く</button>
-      <button type="button" class="close_button">ダイアログを閉じる</button>
       <dl>
         <dt>dialog要素から受け取った値:</dt>
         <dd><pre>　</pre></dd>
@@ -69,19 +77,15 @@
   <script>
     const dialog01 = document.querySelector('#sample01 dialog');
     const openButton01 = document.querySelector('#sample01 button.open_button');
-    const closeButton01 = document.querySelector('#sample01 button.close_button');
     const messageBox01 = document.querySelector('#sample01 dl dd pre');
     openButton01?.addEventListener('click', () => {
-      dialog01.textContent = 'dialog要素のサンプルです。';
       // ダイアログを開く
       dialog01.show();
     });
-    closeButton01?.addEventListener('click', () => {
-      const message = `ダイアログを閉じました (${(new Date()).toISOString()})`;
-      // ダイアログを閉じる
-      dialog01.close(message);
-      // ダイアログを閉じる際にセットした値を取得して表示
-      messageBox01.textContent = dialog01.returnValue;
+    // 閉じる際に実行するイベントを登録
+    dialog01?.addEventListener('close', (event) => {
+      // 閉じた際に渡された値を画面に表示
+      messageBox01.textContent = event.currentTarget?.returnValue;
     });
   </script>
 
@@ -94,6 +98,7 @@
       </legend>
       <ul>
         <li>モーダルダイアログは、 <code>ESC</code> ボタンでも閉じることができる</li>
+        <li><code>showModal()</code> で開くと、最初にネストしたフォーカス可能な要素にフォーカスが設定される</li>
       </ul>
       <dialog>
         <p><code>showModal()</code> メソッドでモーダルダイアログです。</p>
