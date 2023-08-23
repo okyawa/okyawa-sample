@@ -70,12 +70,12 @@
     const dialog01 = document.querySelector('#sample01 dialog');
     const openButton01 = document.querySelector('#sample01 button.open_button');
     const closeButton01 = document.querySelector('#sample01 button.close_button');
-    openButton01.addEventListener('click', () => {
+    openButton01?.addEventListener('click', () => {
       dialog01.textContent = 'dialog要素のサンプルです。';
       // ダイアログを開く
       dialog01.show();
     });
-    closeButton01.addEventListener('click', () => {
+    closeButton01?.addEventListener('click', () => {
       const message = `ダイアログを閉じました (${(new Date()).toISOString()})`;
       // ダイアログを閉じる
       dialog01.close(message);
@@ -87,14 +87,56 @@
   <br />
 
   <section id="sample02">
+    <fieldset>
+      <legend>
+        <h2><code>showModal()</code> メソッドでモーダルダイアログを表示</h2>
+      </legend>
+      <dialog id="modalDialog" class="dialog">
+        <p><code>showModal()</code> メソッドでモーダルダイアログです。</p>
+        <br />
+        <button
+          type="button"
+          onclick="this.closest('dialog').close(`閉じました (${(new Date()).toISOString()})`);"
+        >
+          閉じる
+        </button>
+      </dialog>
+      <button type="button" class="open_button">ダイアログを開く</button>
+      <dl>
+        <dt>ダイアログから受け取った値:</dt>
+        <dd></dd>
+      </dl>
+    </fieldset>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const modalDialog02 = document.querySelector('#sample02 dialog');
+        const openButton02 = document.querySelector('#sample02 button.open_button');
+        const messageBox02 = document.querySelector('#sample02 dl dd');
+        // 開くボタンのイベント登録
+        openButton02?.addEventListener('click', () => {
+          // モーダルダイアログを開く
+          modalDialog02?.showModal();
+        });
+        // 閉じる際に実行するイベントを登録
+        modalDialog02?.addEventListener('close', (event) => {
+          // 閉じた際に渡された値を画面に表示
+          messageBox02.textContent = event.currentTarget?.returnValue;
+        });
+      })
+    </script>
+  </section>
+
+  <br />
+
+  <section id="sample03">
     <style>
       :root {
       --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
       }
-      #sample02 .dialog {
+      #sample03 .dialog {
       box-shadow: var(--dialog-shadow);
       }
-      #sample02 .dialog::backdrop {
+      #sample03 .dialog::backdrop {
         backdrop-filter: blur(8px);
         /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
         -webkit-backdrop-filter: blur(8px);
@@ -102,10 +144,11 @@
     </style>
     <fieldset>
       <legend>
-        <h2><code>showModal()</code> メソッドでモーダルダイアログを表示</h2>
+        <h2>モーダルダイアログと<code>form</code> 要素の <code>method="dialog"</code></h2>
       </legend>
       <ul>
         <li>モーダルダイアログは、 <code>ESC</code> ボタンでも閉じることができる</li>
+        <li><code>dialog</code> 要素の <code>::backdrop</code> 疑似要素にstyle指定を当てることにより、背景部分にCSS指定を適用できる</li>
         <li>
           <code>form</code> 要素の <code>method="dialog"</code> を使用して、 ダイアログを閉じる際に値を受け取る
           <ul>
@@ -139,36 +182,36 @@
     </fieldset>
     <script>
       window.addEventListener('DOMContentLoaded', () => {
-        const modalDialog02 = document.querySelector('#sample02 dialog');
-        const openButton02 = document.querySelector('#sample02 button.open_button');
-        const closeButton02 = document.querySelector('#sample02 button.close_button');
-        const messageBox02 = document.querySelector('#sample02 dl dd');
-        if (!(modalDialog02 instanceof HTMLDialogElement)) {
+        const modalDialog03 = document.querySelector('#sample03 dialog');
+        const openButton03 = document.querySelector('#sample03 button.open_button');
+        const closeButton03 = document.querySelector('#sample03 button.close_button');
+        const messageBox03 = document.querySelector('#sample03 dl dd');
+        if (!(modalDialog03 instanceof HTMLDialogElement)) {
           // dialog要素ではない場合は中断
           return;
         }
         // 開くボタンのイベント登録
-        openButton02.addEventListener('click', () => {
+        openButton03?.addEventListener('click', () => {
           // モーダルダイアログを開く
-          modalDialog02.showModal();
+          modalDialog03.showModal();
           // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
           document.documentElement.style.overflow = 'hidden';
         });
         // 閉じるボタンのイベント登録
-        closeButton02?.addEventListener('click', (event) => {
+        closeButton03?.addEventListener('click', (event) => {
           const dialog = event.currentTarget.closest('dialog');
           const message = `モーダルダイアログの閉じるボタンからを閉じました (${(new Date()).toISOString()})`;
           // モーダルダイアログを閉じる
-          modalDialog.close(message);
+          modalDialog03.close(message);
           // ダイアログを閉じる際にセットした値を取得して表示
-          messageBox02.textContent = dialog.returnValue;
+          messageBox03.textContent = dialog.returnValue;
         });
         // 閉じる際に実行するイベントを登録
-        modalDialog02.addEventListener('close', (event) => {
+        modalDialog03.addEventListener('close', (event) => {
           // 背景スクロールを防ぐために追加したスタイルを削除
           document.documentElement.style.overflow = '';
           // 閉じた際に渡された値を画面に表示
-          messageBox02.textContent = event.currentTarget?.returnValue;
+          messageBox03.textContent = event.currentTarget?.returnValue;
         });
       })
     </script>
