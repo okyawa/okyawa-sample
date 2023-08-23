@@ -151,6 +151,8 @@
         openButton02.addEventListener('click', () => {
           // モーダルダイアログを開く
           modalDialog02.showModal();
+          // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
+          document.documentElement.style.overflow = 'hidden';
         });
         // 閉じるボタンのイベント登録
         closeButton02?.addEventListener('click', (event) => {
@@ -161,8 +163,11 @@
           // ダイアログを閉じる際にセットした値を取得して表示
           messageBox02.textContent = dialog.returnValue;
         });
-        // 閉じた際に渡された値を画面に表示
+        // 閉じる際に実行するイベントを登録
         modalDialog02.addEventListener('close', (event) => {
+          // 背景スクロールを防ぐために追加したスタイルを削除
+          document.documentElement.style.overflow = '';
+          // 閉じた際に渡された値を画面に表示
           messageBox02.textContent = event.currentTarget?.returnValue;
         });
       })
