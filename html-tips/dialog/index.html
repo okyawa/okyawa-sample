@@ -61,8 +61,8 @@
       <button type="button" class="open_button">ダイアログを開く</button>
       <button type="button" class="close_button">ダイアログを閉じる</button>
       <dl>
-        <dt>ダイアログから受け取った値:</dt>
-        <dd></dd>
+        <dt>dialog要素から受け取った値:</dt>
+        <dd><pre>　</pre></dd>
       </dl>
     </fieldset>
   </section>
@@ -70,6 +70,7 @@
     const dialog01 = document.querySelector('#sample01 dialog');
     const openButton01 = document.querySelector('#sample01 button.open_button');
     const closeButton01 = document.querySelector('#sample01 button.close_button');
+    const messageBox01 = document.querySelector('#sample01 dl dd pre');
     openButton01?.addEventListener('click', () => {
       dialog01.textContent = 'dialog要素のサンプルです。';
       // ダイアログを開く
@@ -80,7 +81,7 @@
       // ダイアログを閉じる
       dialog01.close(message);
       // ダイアログを閉じる際にセットした値を取得して表示
-      document.querySelector('#sample01 dl dd').textContent = dialog01.returnValue;
+      messageBox01.textContent = dialog01.returnValue;
     });
   </script>
 
@@ -91,7 +92,10 @@
       <legend>
         <h2><code>showModal()</code> メソッドでモーダルダイアログを表示</h2>
       </legend>
-      <dialog id="modalDialog" class="dialog">
+      <ul>
+        <li>モーダルダイアログは、 <code>ESC</code> ボタンでも閉じることができる</li>
+      </ul>
+      <dialog>
         <p><code>showModal()</code> メソッドでモーダルダイアログです。</p>
         <br />
         <button
@@ -103,15 +107,15 @@
       </dialog>
       <button type="button" class="open_button">ダイアログを開く</button>
       <dl>
-        <dt>ダイアログから受け取った値:</dt>
-        <dd></dd>
+        <dt>dialog要素から受け取った値:</dt>
+        <dd><pre>　</pre></dd>
       </dl>
     </fieldset>
     <script>
       window.addEventListener('DOMContentLoaded', () => {
         const modalDialog02 = document.querySelector('#sample02 dialog');
         const openButton02 = document.querySelector('#sample02 button.open_button');
-        const messageBox02 = document.querySelector('#sample02 dl dd');
+        const messageBox02 = document.querySelector('#sample02 dl dd pre');
         // 開くボタンのイベント登録
         openButton02?.addEventListener('click', () => {
           // モーダルダイアログを開く
@@ -131,12 +135,12 @@
   <section id="sample03">
     <style>
       :root {
-      --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
+        --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
       }
-      #sample03 .dialog {
-      box-shadow: var(--dialog-shadow);
+      :where(#sample03, #sample04) dialog {
+        box-shadow: var(--dialog-shadow);
       }
-      #sample03 .dialog::backdrop {
+      :where(#sample03, #sample04) dialog::backdrop {
         backdrop-filter: blur(8px);
         /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
         -webkit-backdrop-filter: blur(8px);
@@ -147,7 +151,6 @@
         <h2>モーダルダイアログと<code>form</code> 要素の <code>method="dialog"</code></h2>
       </legend>
       <ul>
-        <li>モーダルダイアログは、 <code>ESC</code> ボタンでも閉じることができる</li>
         <li><code>dialog</code> 要素の <code>::backdrop</code> 疑似要素にstyle指定を当てることにより、背景部分にCSS指定を適用できる</li>
         <li>
           <code>form</code> 要素の <code>method="dialog"</code> を使用して、 ダイアログを閉じる際に値を受け取る
@@ -157,7 +160,7 @@
           </ul>
         </li>
       </ul>
-      <dialog id="modalDialog" class="dialog">
+      <dialog>
         <header style="position: relative;">
           <h3>Header</h3>
           <button
@@ -176,8 +179,8 @@
       </dialog>
       <button type="button" class="open_button">ダイアログを開く</button>
       <dl>
-        <dt>ダイアログから受け取った値:</dt>
-        <dd></dd>
+        <dt>dialog要素から受け取った値:</dt>
+        <dd><pre>　</pre></dd>
       </dl>
     </fieldset>
     <script>
@@ -185,7 +188,7 @@
         const modalDialog03 = document.querySelector('#sample03 dialog');
         const openButton03 = document.querySelector('#sample03 button.open_button');
         const closeButton03 = document.querySelector('#sample03 button.close_button');
-        const messageBox03 = document.querySelector('#sample03 dl dd');
+        const messageBox03 = document.querySelector('#sample03 dl dd pre');
         if (!(modalDialog03 instanceof HTMLDialogElement)) {
           // dialog要素ではない場合は中断
           return;
@@ -212,6 +215,135 @@
           document.documentElement.style.overflow = '';
           // 閉じた際に渡された値を画面に表示
           messageBox03.textContent = event.currentTarget?.returnValue;
+        });
+      })
+    </script>
+  </section>
+
+  <br />
+
+  <section id="sample04">
+    <style> 
+      /* フェード・インのアニメーション*/
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      /* ズーム・インのアニメーション */
+      @keyframes zoomIn {
+        from {
+          transform: scale(0.6);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+      /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
+      #sample04 dialog[open] {
+        /* @keyframesで作成したアニメーション名 */
+        animation-name: fadeIn, zoomIn;
+        /* アニメーションの進行状況 */
+        animation-fill-mode: forwards;
+        /* アニメーションの実行時間 */
+        animation-duration: 200ms;
+        /* アニメーションの進行状況 */
+        animation-timing-function: ease-out;
+      }
+      /* フェード・アウトのアニメーション */
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+      /* ズーム・アウトのアニメーション */
+      @keyframes zoomOut {
+        from {
+          transform: scale(1);
+        }
+        to {
+          transform: scale(0.6);
+        }
+      }
+      /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
+      #sample04 dialog {
+        animation-name: fadeOut, zoomOut;
+        animation-fill-mode: forwards;
+        animation-duration: 200ms;
+        animation-timing-function: ease-out;
+      }
+      #sample04 dialog {
+        display: block;
+        position: fixed;
+        inset-inline: 0;
+        inset-block: 0;
+      }
+    </style>
+    <fieldset>
+      <legend>
+        <h2>ダイアログ表示時のアニメーション</h2>
+      </legend>
+      <dialog style="display: none;">
+        <p>アニメーション付きのモーダルダイアログ</p>
+        <br />
+        <button
+          type="button"
+          onclick="this.closest('dialog').close(`閉じました (${(new Date()).toISOString()})`);"
+        >
+          閉じる
+        </button>
+      </dialog>
+      <button type="button" class="open_button">ダイアログを開く</button>
+      <dl>
+        <dt>dialog要素から受け取った値:</dt>
+        <dd><pre>　</pre></dd>
+      </dl>
+    </fieldset>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const modalDialog04 = document.querySelector('#sample04 dialog');
+        const openButton04 = document.querySelector('#sample04 button.open_button');
+        const messageBox04 = document.querySelector('#sample04 dl dd pre');
+        if (!(modalDialog04 instanceof HTMLDialogElement)) {
+          // dialog要素ではない場合は中断
+          return;
+        }
+        // dialog要素のアニメーションがすべて終了するのを待つ関数
+        const waitDialogAnimation = (dialog) => Promise.allSettled(
+          dialog.getAnimations().map((animation) => animation.finished)
+        );
+        // 開くボタンのイベント登録
+        openButton04?.addEventListener('click', async () => {
+          // dialog要素の開くアニメーションがすべて終了するまで待つ
+          await waitDialogAnimation(modalDialog04);
+          // dialog要素にデフォルトで付与していたdisplayのstyle指定を削除
+          modalDialog04.style.display = '';
+          // モーダルダイアログを開く
+          modalDialog04.showModal();
+          // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
+          document.documentElement.style.overflow = 'hidden';
+        });
+        // 閉じる際に実行するイベントを登録
+        modalDialog04.addEventListener('close', async (event) => {
+          const dialog = event.currentTarget;
+          if (!(dialog instanceof HTMLDialogElement)) {
+            // dialog要素ではない場合は中断
+            return;
+          }
+          // dialog要素の閉じるアニメーションがすべて終了するまで待つ
+          await waitDialogAnimation(dialog);
+          // dialog要素のstyle指定で非表示にする
+          dialog.style.display = 'none';
+          // 背景スクロールを防ぐために追加したスタイルを削除
+          document.documentElement.style.overflow = '';
+          // 閉じた際に渡された値を画面に表示
+          messageBox04.textContent = dialog.returnValue;
         });
       })
     </script>
