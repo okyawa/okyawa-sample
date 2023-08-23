@@ -224,59 +224,61 @@
 
   <section id="sample04">
     <style> 
-      /* フェード・インのアニメーション*/
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
+      @media (prefers-reduced-motion: no-preference) {
+        /* フェード・インのアニメーション*/
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
-        to {
-          opacity: 1;
+        /* ズーム・インのアニメーション */
+        @keyframes zoomIn {
+          from {
+            transform: scale(0.6);
+          }
+          to {
+            transform: scale(1);
+          }
         }
-      }
-      /* ズーム・インのアニメーション */
-      @keyframes zoomIn {
-        from {
-          transform: scale(0.6);
+        /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
+        #sample04 dialog[open] {
+          /* @keyframesで作成したアニメーション名 */
+          animation-name: fadeIn, zoomIn;
+          /* アニメーションの進行状況 */
+          animation-fill-mode: forwards;
+          /* アニメーションの実行時間 */
+          animation-duration: 200ms;
+          /* アニメーションの進行状況 */
+          animation-timing-function: ease-out;
         }
-        to {
-          transform: scale(1);
+        /* フェード・アウトのアニメーション */
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
         }
-      }
-      /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
-      #sample04 dialog[open] {
-        /* @keyframesで作成したアニメーション名 */
-        animation-name: fadeIn, zoomIn;
-        /* アニメーションの進行状況 */
-        animation-fill-mode: forwards;
-        /* アニメーションの実行時間 */
-        animation-duration: 200ms;
-        /* アニメーションの進行状況 */
-        animation-timing-function: ease-out;
-      }
-      /* フェード・アウトのアニメーション */
-      @keyframes fadeOut {
-        from {
-          opacity: 1;
+        /* ズーム・アウトのアニメーション */
+        @keyframes zoomOut {
+          from {
+            transform: scale(1);
+          }
+          to {
+            transform: scale(0.6);
+          }
         }
-        to {
-          opacity: 0;
+        /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
+        #sample04 dialog {
+          animation-name: fadeOut, zoomOut;
+          animation-fill-mode: forwards;
+          animation-duration: 200ms;
+          animation-timing-function: ease-out;
         }
-      }
-      /* ズーム・アウトのアニメーション */
-      @keyframes zoomOut {
-        from {
-          transform: scale(1);
-        }
-        to {
-          transform: scale(0.6);
-        }
-      }
-      /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
-      #sample04 dialog {
-        animation-name: fadeOut, zoomOut;
-        animation-fill-mode: forwards;
-        animation-duration: 200ms;
-        animation-timing-function: ease-out;
       }
       #sample04 dialog {
         display: block;
