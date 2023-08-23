@@ -167,7 +167,7 @@
       </ul>
       <dialog>
         <header style="position: relative;">
-          <h3>Header</h3>
+          <h3><code>form</code> 要素の <code>method="dialog"</code></h3>
           <button
             class="close_button"
             type="button"
@@ -175,11 +175,17 @@
             style="padding: 0 4px; position: absolute; top: 0; right: 0; border-radius: 50%;"
           >x</button>
         </header>
-        <p>Message</p>
-        <br />
+        <p>
+          ボタンをクリックすると、<br />
+          <code>button</code> 要素の <code>value</code> 属性値が、<br />
+          <code>dialog</code> 要素の <code>returnValue</code> プロパティにセットされます。
+        </p>
         <form method="dialog">
-          <button type="submit" value="ok">OK</button>
-          <button type="submit" value="cancel">Cancel</button>
+          <fieldset style="text-align: center;">
+            <legend>form要素で囲われたボタン</legend>
+            <button type="submit" value="ok">OK</button>
+            <button type="submit" value="cancel">Cancel</button>
+          </fieldset>
         </form>
       </dialog>
       <button type="button" class="open_button">ダイアログを開く</button>
