@@ -13,18 +13,18 @@
 
   <h1>IndexedDB Sample</h1>
 
-  <form>
+  <form id="add_form">
     <fieldset>
       <legend>IndexDBにデータを追加</legend>
       <div>
         <label for="name">タスク:</label>
-        <input type="text" id="name" name="name" />
+        <input type="text" id="name" name="name" required="required" />
       </div>
       <div>
         <label for="age">優先度:</label>
-        <input type="number" id="priority" name="priority" inputmode="" min="1" max="5" />
+        <input type="number" id="priority" name="priority" inputmode="" min="1" max="5" required="required" />
       </div>
-      <button type="button" id="add_button">追加</button>
+      <button type="submit" id="add_button">追加</button>
     </fieldset>
   </form>
 

@@ -90,8 +90,9 @@ function setupAddItemButton(idb) {
  * DBのオブジェクトストアにアイテムを追加
  */
 function setupAddItemButton() {
-  const buttonElement = document.getElementById('add_button')
-  buttonElement.addEventListener('click', () => {
+  const formElement = document.getElementById('add_form')
+  formElement.addEventListener('submit', (event) => {
+    event.preventDefault()
     if (!db) {
       return
     }
@@ -317,8 +318,8 @@ function init() {
     document.getElementById('message').textContent = `[Note]: This browser doesn't support IndexedDB.`
     return
   }
-/* 
   // TODO: IDBをインスタンス化し、処理を置き換える
+/* 
   const idb = new IDB(
     DB_NAME,
     DB_VERSION,
