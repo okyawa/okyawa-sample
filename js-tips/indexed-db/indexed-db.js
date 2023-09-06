@@ -269,6 +269,42 @@ function insertTaskTableRow(data, idb) {
  */
 
 /**
+ * IndexDBで保存されているデータを1件更新
+ */
+function putIndexDB(id, key, value) {
+    // 読み書き用のトランザクションを開き、データを追加する準備
+    const transaction = db.transaction([OBJECT_STORE_TASKS], 'readwrite')
+    transaction.oncomplete = (event) => {
+      updateMessage(`データ更新のトランザクションが完了しました。`)
+    }
+    transaction.onerror = (event) => {
+      updateMessage(`トランザクションはエラーのため開けませんでした。アイテムの重複は許可されていません。`)
+    }
+
+    // トランザクションでオブジェクトストアを作成
+    const objectStore = transaction.objectStore(OBJECT_STORE_TASKS)
+
+    // 保存されているデータを1件取得する要求
+    const objectStoreGetRequest = objectStore.get(id)
+
+    objectStoreGetRequest.onsuccess = () => {
+      // IndexDBから取得したデータ
+      const item = objectStoreGetRequest.result
+      // 更新内容を反映
+      item[key] = value
+
+      // オブジェクトストアにオブジェクトを追加する要求
+      const objectStorePutRequest = objectStore.put(item)
+
+      objectStorePutRequest.onsuccess = () => {
+        updateMessage(`データを更新の要求は成功しました。 ( ${key} を ${value} に更新)`)
+        fetchAll()
+        clearInputFields()
+      }
+    }
+}
+
+/**
  * テーブルに行を追加
  * @param {object} data 
  */
@@ -278,11 +314,26 @@ function insertTaskTableRow(data) {
   const idTdElement = document.createElement('td')
   const taskTdElement = document.createElement('td')
   const priorityTdElement = document.createElement('td')
+  const priorityInputElement = document.createElement('input')
   const deleteTdElement = document.createElement('td')
   const deleteButtonElement = document.createElement('button')
   idTdElement.textContent = data.id
   taskTdElement.textContent = data.name
-  priorityTdElement.textContent = data.priority
+  priorityInputElement.value = data.priority
+  priorityInputElement.setAttribute('type', 'number')
+  priorityInputElement.setAttribute('min', '1')
+  priorityInputElement.setAttribute('max', '5')
+  priorityInputElement.addEventListener('change', (event) => {
+    // 優先度の更新処理
+    const targetElement = event.currentTarget;
+    const value = targetElement.value;
+    if (!['1', '2', '3', '4', '5'].includes(value)) {
+      return
+    }
+    // IndexDBの更新処理を実行
+    putIndexDB(data.id, 'priority', value)
+  })
+  priorityTdElement.appendChild(priorityInputElement)
   deleteButtonElement.textContent = '削除';
   deleteButtonElement.dataset.id = data.id;
   deleteButtonElement.setAttribute('type', 'button');
@@ -318,7 +369,7 @@ function init() {
     document.getElementById('message').textContent = `[Note]: This browser doesn't support IndexedDB.`
     return
   }
-  // TODO: IDBをインスタンス化し、処理を置き換える
+  // TODO: IDBをインスタンス化し、処理を置き換える →難しそう。。？
 /* 
   const idb = new IDB(
     DB_NAME,
