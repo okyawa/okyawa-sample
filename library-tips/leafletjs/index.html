@@ -3,15 +3,87 @@
 <head>
   <meta charset="utf-8" />
   <title>leafletjsを使った地図のサンプル</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="author" content="okyawa">
-  <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="/res/css/neat.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="author" content="okyawa" />
+  <meta name="robots" content="noindex" />
+  <!-- <link rel="stylesheet" href="/res/css/neat.css" /> -->
+
+  <link rel="stylesheet" href="/library-tips/leafletjs/leaflet.css" />
+  <script src="/library-tips/leafletjs/leaflet.js"></script>
+
+  <style>
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 <body>
+  <main>
 
-<h1>leafletjsを使った地図のサンプル</h1>
+    <h1>leafletjsを使った地図のサンプル</h1>
 
+    <dl>
+      <dt>Leafletとは</dt>
+      <dd>
+        モバイル対応の対話型マップ用のオープンソースJavaScriptライブラリで、OpenStreetMapを使った地図表示
+      </dd>
+      <dt>Leaflet 公式URL</dt>
+      <dd>
+        <a href="https://leafletjs.com" ref="nofollow noreferrer noopener" target="_blank">https://leafletjs.com</a></dd>
+    </dl>
 
+    <br />
+    <hr />
+
+    <section>
+      <style>
+        #map01 {
+          height: 180px;
+        }
+      </style>
+
+      <h2>最も単純な設置</h2>
+      <div id="map01"></div>
+
+      <script>
+        (() => {
+          const map = L.map('map01').setView([51.505, -0.09], 13);
+          const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" ref="nofollow noreferrer noopener" target="_blank">OpenStreetMap</a>'
+          }).addTo(map);
+        })();
+      </script>
+    </section>
+
+    <br />
+    <hr />
+
+    <section>
+      <style>
+        #map02 {
+          height: 180px;
+        }
+      </style>
+
+      <h2>ピンを立てる</h2>
+      <div id="map02"></div>
+
+      <script>
+        (() => {
+          const map = L.map('map02').setView([51.505, -0.09], 13);
+          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" ref="nofollow noreferrer noopener" target="_blank">OpenStreetMap</a>'
+          }).addTo(map);
+          L.marker([51.5, -0.09]).addTo(map)
+            .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+            .openPopup();
+        })();
+      </script>
+  </section>
+
+  </main>
 </body>
 </html>
