@@ -99,8 +99,14 @@
           const id = event.dataTransfer.getData('text/plain');
           // ドラッグした要素
           const draggedElement = document.getElementById(id);
-          // ドラッグした要素をドロップした要素の前に挿入
-          droppedElement.parentNode.insertBefore(draggedElement, droppedElement);
+          // ドラッグした要素の並び替え前index値
+          const draggedIndex = Array.from(draggedElement.parentNode.children).indexOf(draggedElement);
+          // ドロップした要素の並び替え前index値
+          const droppedIndex = Array.from(droppedElement.parentNode.children).indexOf(droppedElement);
+          const isIndexIncreasing = draggedIndex < droppedIndex;
+          // ドラッグした要素をドロップした要素を挿入
+          const referenceNode = isIndexIncreasing ? droppedElement.nextSibling : droppedElement;
+          droppedElement.parentNode.insertBefore(draggedElement, referenceNode);
         });
 
         // ドラッグ終了時
