@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>details要素を使ったJS無しのアコーディオン Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/res/css/neat.css">
+
+  <style>
+
+  </style>
+
+</head>
+<body>
+
+  <header>
+    <h1>JavaScript不要のアコーディオンSample</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <h2>仕組み</h2>
+    <ul>
+      <li>各<code>details</code>要素の<code>name</code>属性に同じ値を指定すると、同じ<code>name</code>属性値の<code>details</code>要素内で開けるものが1つだけとなり、他に開いている<code>details</code>要素があっても自動的に閉じることから、アコーディオンのような動作となる</li>
+    </ul>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>アコーディオンのサンプル</h2>
+    <ul>
+      <li><code>details</code>要素に<code>name</code>属性指定あり</li>
+      <li>同じ<code>name</code>属性値の<code>details</code>要素の場合、開くことができるのは1つだけ</li>
+    </ul>
+    <details name="sample">
+      <summary>項目01</summary>
+      <p>項目01の内容です。項目01の内容です。項目01の内容です。項目01の内容です。項目01の内容です。</p>
+    </details>
+    <details name="sample">
+      <summary>項目02</summary>
+      <p>項目02の内容です。項目02の内容です。項目02の内容です。項目02の内容です。項目02の内容です。</p>
+    </details>
+    <details name="sample">
+      <summary>項目03</summary>
+      <p>項目03の内容です。項目03の内容です。項目03の内容です。項目03の内容です。項目03の内容です。</p>
+    </details>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>通常のdetails要素の動き</h2>
+    <ul>
+      <li><code>details</code>要素に<code>name</code>属性指定なしの場合</li>
+      <li>全て同時に開くことが可能</li>
+    </ul>
+    <details>
+      <summary>項目01</summary>
+      <p>項目01の内容です。項目01の内容です。項目01の内容です。項目01の内容です。項目01の内容です。</p>
+    </details>
+    <details>
+      <summary>項目02</summary>
+      <p>項目02の内容です。項目02の内容です。項目02の内容です。項目02の内容です。項目02の内容です。</p>
+    </details>
+    <details>
+      <summary>項目03</summary>
+      <p>項目03の内容です。項目03の内容です。項目03の内容です。項目03の内容です。項目03の内容です。</p>
+    </details>
+  </section>
+
+</body>
+</html>
