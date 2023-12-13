@@ -17,13 +17,50 @@
   </style>
 
   <script>
+    /** CSS.highlightsにセットする名前 */
+    const HIGHLIGHT_NAME = 'search-results';
+
     /**
      * テキストのハイライトの初期化処理
      */
     function setupHighlight() {
-      const query = document.getElementById('query');
-      const article = document.querySelector('article');
+      // テキスト入力欄要素
+      const queryInputElement = document.getElementById('query');
+      // ハイライト対象テキストが入っている要素
+      const articleElement = document.querySelector('article');
 
+      // 記事内のすべてのテキストノードを検索
+      const allTextNodes = findAllTextNodes(articleElement);
+
+      // テキスト入力欄にイベントを登録
+      queryInputElement.addEventListener('input', () => {
+        // CSS Custom Highlight API がサポートされているブラウザかどうかをチェック
+        if (!CSS.highlights) {
+          articleElement.textContent = "ご利用中のブラウザは、CSS Custom Highlight APIがサポートされていません。";
+          return;
+        }
+
+        // 前のハイライト状態をリセット
+        CSS.highlights.clear();
+        // 検索文字列を取得
+        const str = queryInputElement.value.trim().toLowerCase();
+        if (!str) {
+          return;
+        }
+        // 検索対象の文字列に一致する部分のRangeオブジェクト配列を生成
+        const ranges = createTargetRanges(allTextNodes, str);
+        // テキストの対象部分だけをハイライト
+        highlightText(ranges, HIGHLIGHT_NAME);
+      });
+    }
+
+    /**
+     * 記事内のすべてのテキストノードを検索して配列にして返す
+     * 
+     * @param {HTMLElement} article
+     * @returns {Node[]}
+     */
+    function findAllTextNodes(article) {
       // 記事内のすべてのテキストノードを検索
       const treeWalker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT);
       const allTextNodes = [];
@@ -31,56 +68,55 @@
       while (treeWalker.nextNode()) {
         allTextNodes.push(treeWalker.currentNode);
       }
-
-      // テキスト入力欄にイベントを登録
-      query.addEventListener('input', () => {
-        // CSS Custom Highlight API がサポートされているブラウザかどうかをチェック
-        if (!CSS.highlights) {
-          article.textContent = "ご利用中のブラウザは、CSS Custom Highlight APIがサポートされていません。";
-          return;
-        }
-
-        // 前のハイライト状態をリセット
-        CSS.highlights.clear();
-
-        // 検索文字列を取得
-        const str = query.value.trim().toLowerCase();
-        if (!str) {
-          return;
-        }
-
-        // すべてのテキストノードを反復処理し、一致するものを見つける
-        const ranges = allTextNodes
-          .map((el) => {
-            return { el, text: el.textContent.toLowerCase()}
-          })
-          .map(({text, el}) => {
-            const indices = [];
-            let startPos = 0;
-            while (startPos < text.length) {
-              const index = text.indexOf(str, startPos);
-              if (index === -1) break;
-              indices.push(index);
-              startPos = index + str.length;
-            }
-
-            // 検索対象文字列のインスタンスごとにrangeオブジェクトを作成
-            return indices.map((index) => {
-              const range = new Range();
-              range.setStart(el, index);
-              range.setEnd(el, index + str.length);
-              return range;
-            });
-          });
-
-        // 範囲のHighlightオブジェクトを生成
-        const searchResultHighlight = new Highlight(...ranges.flat());
-
-        // Highlightオブジェクトをレジストリに登録
-        CSS.highlights.set('search-results', searchResultHighlight);
-      });
+      return allTextNodes;
     }
 
+    /**
+     * 検索対象の文字列に一致する部分のRangeオブジェクト配列を生成
+     * 
+     * @param {Node[]} allTextNodes
+     * @param {string} str
+     * @returns {Range[][]}
+     */
+    function createTargetRanges(allTextNodes, str) {
+      // すべてのテキストノードを反復処理し、一致するものを見つける
+      return allTextNodes
+        .map((element) => {
+          const text = element.textContent.toLowerCase()
+          // マッチした文字列のインデックスを格納
+          const indices = [];
+          let startPos = 0;
+          while (startPos < text.length) {
+            const index = text.indexOf(str, startPos);
+            if (index === -1) break;
+            indices.push(index);
+            startPos = index + str.length;
+          }
+
+          // 検索対象文字列のindexごとにrangeオブジェクトを作成
+          return indices.map((index) => {
+            const range = new Range();
+            range.setStart(element, index);
+            range.setEnd(element, index + str.length);
+            return range;
+          });
+        });
+    }
+
+    /**
+     * テキストの対象部分だけをハイライト
+     * 
+     * @param {Range[][]} ranges
+     * @param {string} highlightName CSS.highlightsにセットする名前
+     */
+    function highlightText(ranges, highlightName) {
+      // 範囲のHighlightオブジェクトを生成
+      const searchResultHighlight = new Highlight(...ranges.flat());
+      // Highlightオブジェクトをレジストリに登録
+      CSS.highlights.set(highlightName, searchResultHighlight);
+    }
+
+    // 画面読み込み後に初期化処理を呼び出し
     window.addEventListener('DOMContentLoaded', setupHighlight);
   </script>
 
