@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Drag and Drop APIのサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/res/css/neat.css">
+
+  <style>
+    /* 見た目だけのstyle指定 */
+    li {
+      padding: 8px;
+      border: 1px solid;
+      cursor: grab;
+    }
+  </style>
+
+</head>
+<body>
+
+  <header>
+    <h1>HTML Drag and Drop APIのサンプル</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <h2>概要</h2>
+    <ul>
+    </ul>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>並び替えサンプル</h2>
+  </section>
+  <ol>
+    <li id="test1" draggable="true">リスト1</li>
+    <li id="test2" draggable="true">リスト2</li>
+    <li id="test3" draggable="true">リスト3</li>
+  </ol>
+  <script>
+    document.querySelectorAll('li').forEach (element => {
+      element.ondragstart = function () {
+        event.dataTransfer.setData('text/plain', event.target.id);
+      };
+      
+      element.ondragover = function () {
+        event.preventDefault();
+        this.style.borderTop = '3px solid';
+      };
+
+      element.ondragleave = function () {
+        this.style.borderTop = "";
+      };
+
+      element.ondrop = function () {
+        event.preventDefault();
+        let id = event.dataTransfer.getData('text');
+        let element_drag = document.getElementById(id);
+        this.parentNode.insertBefore(element_drag, this);
+        this.style.borderTop = '';
+      };
+    });
+  </script>
+
+</body>
+</html>
