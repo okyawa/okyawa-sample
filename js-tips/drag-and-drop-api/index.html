@@ -13,7 +13,6 @@
       margin: 0.5rem 0;
       padding: 8px;
       border: 1px solid;
-      cursor: grab;
     }
     .dragging {
       opacity: 0.5;
@@ -43,86 +42,213 @@
       <li id="item_04">アイテム04</li>
     </ol>
 
+    <style>
+      #sortable_list li {
+        cursor: grab;
+      }
+    </style>
+
     <script>
-      /**
-       * Drag and Drop APIを使った並び替えの初期化処理
-       * 
-       * @param {string} itemSelector
-       */
-      function setupDragAndDropElements(itemSelector) {
-        // 並び替え対象の要素を取得
-        const targetElements = document.querySelectorAll(itemSelector);
-        targetElements.forEach((element) => {
-          // 並び替え可能な要素には "draggable" 要素の指定が必要
-          element.setAttribute('draggable', 'true');
-          // Drag and Dropのイベントを登録
-          setupDragAndDropEvent(element);
+      (() => {
+        /**
+         * Drag and Drop APIを使った並び替えの初期化処理
+         * 
+         * @param {string} itemSelector
+         */
+        function setupDragAndDropElements(itemSelector) {
+          // 並び替え対象の要素を取得
+          const targetElements = document.querySelectorAll(itemSelector);
+          targetElements.forEach((element) => {
+            // 並び替え可能な要素には "draggable" 要素の指定が必要
+            element.setAttribute('draggable', 'true');
+            // Drag and Dropのイベントを登録
+            setupDragAndDropEvent(element);
+          });
+        }
+
+        /**
+         * Drag and Dropのイベントを登録する
+         * 
+         * @param {HTMLElement} element 
+         */
+        function setupDragAndDropEvent(element) {
+          const DRAGGING_CLASS_NAME = 'dragging';
+          const DRAG_OVER_CLASS_NAME = 'drag_over';
+
+          // ドラッグ開始時
+          element.addEventListener('dragstart', (event) => {
+            const draggedElement = event.currentTarget;
+            draggedElement.classList.add(DRAGGING_CLASS_NAME);
+            // ドラッグする要素の値をセット
+            event.dataTransfer.setData('text/plain', draggedElement.id);
+          });
+
+          // ドラッグ中
+          element.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            const dragOveredElement = event.currentTarget;
+            dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
+          });
+
+          // ドラッグ項目が有効なドロップ対象を離れた場合
+          element.addEventListener('dragleave', (event) => {
+            const dragLeftElement = event.currentTarget;
+            dragLeftElement.classList.remove(DRAG_OVER_CLASS_NAME);
+          });
+
+          // ドロップ時
+          element.addEventListener('drop', (event) => {
+            event.preventDefault();
+            const droppedElement = event.currentTarget;
+            droppedElement.classList.remove(DRAG_OVER_CLASS_NAME);
+            // ドラッグ開始時にセットした値を取得
+            const id = event.dataTransfer.getData('text/plain');
+            // ドラッグした要素
+            const draggedElement = document.getElementById(id);
+            // ドラッグした要素の並び替え前index値
+            const draggedIndex = Array.from(draggedElement.parentNode.children).indexOf(draggedElement);
+            // ドロップした要素の並び替え前index値
+            const droppedIndex = Array.from(droppedElement.parentNode.children).indexOf(droppedElement);
+            const isIndexIncreasing = draggedIndex < droppedIndex;
+            // ドラッグした要素をドロップした要素を挿入
+            const referenceNode = isIndexIncreasing ? droppedElement.nextSibling : droppedElement;
+            droppedElement.parentNode.insertBefore(draggedElement, referenceNode);
+          });
+
+          // ドラッグ終了時
+          element.addEventListener('dragend', (event) => {
+            const dragEndedElement = event.currentTarget;
+            dragEndedElement.classList.remove(DRAGGING_CLASS_NAME);
+          });
+        }
+
+        // 画面読み込み後に初期化処理を呼び出し
+        window.addEventListener('DOMContentLoaded', () => {
+          setupDragAndDropElements('#sortable_list li');
         });
-      }
-
-      /**
-       * Drag and Dropのイベントを登録する
-       * 
-       * @param {HTMLElement} element 
-       */
-      function setupDragAndDropEvent(element) {
-        const DRAGGING_CLASS_NAME = 'dragging';
-        const DRAG_OVER_CLASS_NAME = 'drag_over';
-
-        // ドラッグ開始時
-        element.addEventListener('dragstart', (event) => {
-          const draggedElement = event.currentTarget;
-          draggedElement.classList.add(DRAGGING_CLASS_NAME);
-          // ドラッグする要素の値をセット
-          event.dataTransfer.setData('text/plain', draggedElement.id);
-        });
-
-        // ドラッグ中
-        element.addEventListener('dragover', (event) => {
-          event.preventDefault();
-          const dragOveredElement = event.currentTarget;
-          dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
-        });
-
-        // ドラッグ項目が有効なドロップ対象を離れた場合
-        element.addEventListener('dragleave', (event) => {
-          const dragLeftElement = event.currentTarget;
-          dragLeftElement.classList.remove(DRAG_OVER_CLASS_NAME);
-        });
-
-        // ドロップ時
-        element.addEventListener('drop', (event) => {
-          event.preventDefault();
-          const droppedElement = event.currentTarget;
-          droppedElement.classList.remove(DRAG_OVER_CLASS_NAME);
-          // ドラッグ開始時にセットした値を取得
-          const id = event.dataTransfer.getData('text/plain');
-          // ドラッグした要素
-          const draggedElement = document.getElementById(id);
-          // ドラッグした要素の並び替え前index値
-          const draggedIndex = Array.from(draggedElement.parentNode.children).indexOf(draggedElement);
-          // ドロップした要素の並び替え前index値
-          const droppedIndex = Array.from(droppedElement.parentNode.children).indexOf(droppedElement);
-          const isIndexIncreasing = draggedIndex < droppedIndex;
-          // ドラッグした要素をドロップした要素を挿入
-          const referenceNode = isIndexIncreasing ? droppedElement.nextSibling : droppedElement;
-          droppedElement.parentNode.insertBefore(draggedElement, referenceNode);
-        });
-
-        // ドラッグ終了時
-        element.addEventListener('dragend', (event) => {
-          const dragEndedElement = event.currentTarget;
-          dragEndedElement.classList.remove(DRAGGING_CLASS_NAME);
-        });
-      }
-
-      // 画面読み込み後に初期化処理を呼び出し
-      window.addEventListener('DOMContentLoaded', () => {
-        setupDragAndDropElements('#sortable_list li');
-      });
+      })();
     </script>
 
   </section>
 
+  <br />
+
+  <section>
+    <h2>ハンドル部分だけ並び替え可能なサンプル</h2>
+
+    <ol id="handle_sortable_list">
+      <li id="list_item_01"><span class="handle"></span>アイテム01</li>
+      <li id="list_item_02"><span class="handle"></span>アイテム02</li>
+      <li id="list_item_03"><span class="handle"></span>アイテム03</li>
+      <li id="list_item_04"><span class="handle"></span>アイテム04</li>
+    </ol>
+
+    <style>
+      .handle {
+        margin-right: 5px;
+        width: 1rem;
+        height: 1.5rem;
+        display: inline-block;
+        background-color: #ccc;
+        cursor: grab;
+      }
+      .handle::after {
+        content: '︙';
+        color: #666;
+      }
+      .dragging .handle {
+        cursor: grabbing;
+      }
+    </style>
+
+    <script>
+      (() => {
+        /**
+         * Drag and Drop APIを使った並び替えの初期化処理
+         * 
+         * @param {string} itemSelector
+         * @param {string} handleSelector
+         */
+        function setupDragAndDropElements(itemSelector, handleSelector) {
+          // 並び替え対象の要素を取得
+          const droppableElements = document.querySelectorAll(itemSelector);
+          droppableElements.forEach((droppableElement) => {
+            // ハンドル部分の要素を取得
+            const draggableElement = droppableElement.querySelector(handleSelector);
+            // 並び替え可能な要素には "draggable" 要素の指定が必要
+            draggableElement.setAttribute('draggable', 'true');
+            // Drag and Dropのイベントを登録
+            setupDragAndDropEvent(draggableElement, droppableElement);
+          });
+        }
+
+        /**
+         * Drag and Dropのイベントを登録する
+         * 
+         * @param {HTMLElement} draggableElement 
+         * @param {HTMLElement} droppableElement 
+         */
+        function setupDragAndDropEvent(draggableElement, droppableElement) {
+          const DRAGGING_CLASS_NAME = 'dragging';
+          const DRAG_OVER_CLASS_NAME = 'drag_over';
+          const parentSelector = 'li';
+
+          // ドラッグ開始時
+          draggableElement.addEventListener('dragstart', (event) => {
+            const draggedHandleElement = event.currentTarget;
+            const draggedElement = draggedHandleElement.closest(parentSelector);
+            draggedElement.classList.add(DRAGGING_CLASS_NAME);
+            // ドラッグする要素の値をセット
+            event.dataTransfer.setData('text/plain', draggedElement.id);
+          });
+
+          // ドラッグ中
+          droppableElement.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            const dragOveredElement = event.currentTarget;
+            dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
+          });
+
+          // ドラッグ項目が有効なドロップ対象を離れた場合
+          droppableElement.addEventListener('dragleave', (event) => {
+            const dragLeftElement = event.currentTarget;
+            dragLeftElement.classList.remove(DRAG_OVER_CLASS_NAME);
+          });
+
+          // ドロップ時
+          droppableElement.addEventListener('drop', (event) => {
+            event.preventDefault();
+            const droppedElement = event.currentTarget;
+            droppedElement.classList.remove(DRAG_OVER_CLASS_NAME);
+            // ドラッグ開始時にセットした値を取得
+            const id = event.dataTransfer.getData('text/plain');
+            // ドラッグした要素
+            const draggedElement = document.getElementById(id);
+            // ドラッグした要素の並び替え前index値
+            const draggedIndex = Array.from(draggedElement.parentNode.children).indexOf(draggedElement);
+            // ドロップした要素の並び替え前index値
+            const droppedIndex = Array.from(droppedElement.parentNode.children).indexOf(droppedElement);
+            const isIndexIncreasing = draggedIndex < droppedIndex;
+            // ドラッグした要素をドロップした要素を挿入
+            const referenceNode = isIndexIncreasing ? droppedElement.nextSibling : droppedElement;
+            droppedElement.parentNode.insertBefore(draggedElement, referenceNode);
+          });
+
+          // ドラッグ終了時
+          draggableElement.addEventListener('dragend', (event) => {
+            const draggedHandleElement = event.currentTarget;
+            const draggedElement = draggedHandleElement.closest(parentSelector);
+            draggedElement.classList.remove(DRAGGING_CLASS_NAME);
+          });
+        }
+
+        // 画面読み込み後に初期化処理を呼び出し
+        window.addEventListener('DOMContentLoaded', () => {
+          setupDragAndDropElements('#handle_sortable_list li', '.handle');
+        });
+      })();
+    </script>
+
+  </section>
 </body>
 </html>
