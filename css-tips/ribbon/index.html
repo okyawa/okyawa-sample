@@ -1,0 +1,812 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>リボンをCSSで実装したSample (HTMLはdiv要素1つだけ)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/res/css/neat.css">
+
+  <style>
+    .ribbon {
+      text-align: center;
+    }
+
+    .contents {
+      width: 300px;
+      height: 150px;
+      margin: 0 24px;
+      background-color: #ccc;
+      position: relative;
+      line-height: 1.6;
+    }
+  </style>
+
+</head>
+<body>
+
+  <header>
+    <h1>リボンをCSSで実装したSample</h1>
+    <h2>HTMLはdiv要素1つだけ</h2>
+  </header>
+
+  <ul>
+    <li>参照: <a href="https://css-generators.com/ribbon-shapes/" target="_blank" ref="nofollow noreferrer noopener">CSS Generators</a></li>
+  </ul>
+
+  <br />
+
+  <section id="sample_01">
+    <h2>タイトル用</h2>
+
+    <style>
+      #sample_01 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --s: 1.8em; /* the ribbon size */
+          --d: .8em;  /* the depth */
+          --c: .8em;  /* the cutout part */
+          
+          padding: 0 calc(var(--s) + .5em) var(--d);
+          line-height: 1.8;
+          background:
+            conic-gradient(at left  var(--s) bottom var(--d),
+            #0000 25%,#0008 0 37.5%,#0004 0) 0   /50% 100% no-repeat,
+            conic-gradient(at right var(--s) bottom var(--d),
+            #0004 62.5%,#0008 0 75%,#0000 0) 100%/50% 100% no-repeat;
+          clip-path: polygon(0 var(--d), var(--s) var(--d),var(--s) 0,calc(100% - var(--s)) 0,calc(100% - var(--s)) var(--d),100% var(--d),calc(100% - var(--c)) calc(50% + var(--d)/2),100% 100%,calc(100% - var(--s) - var(--d)) 100%,calc(100% - var(--s) - var(--d)) calc(100% - var(--d)),calc(var(--s) + var(--d)) calc(100% - var(--d)),calc(var(--s) + var(--d)) 100%,0 100%,var(--c) calc(50% + var(--d)/2));
+          background-color: #CC333F; /* the main color */
+          width: fit-content;
+        }
+      }
+    </style>
+
+    <div class="ribbon">This is ribbon</div>
+  </section>
+
+  <br />
+
+  <section id="sample_02">
+    <h2>上部横帯</h2>
+
+    <style>
+      #sample_02 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --d: .8em; /* the depth */
+          
+          position: absolute;
+          top: 20px;
+          inset-inline: calc(-1*var(--d));
+          border-bottom: var(--d) solid #0008;
+          line-height: 1.8;
+          clip-path: polygon(0 0,100% 0,100% calc(100% - var(--d)),calc(100% - var(--d)) 100%,calc(100% - var(--d)) calc(100% - var(--d)),var(--d) calc(100% - var(--d)),var(--d) 100%,0 calc(100% - var(--d)));
+          background-color: #3FB8AF; /* the main color */
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">This is ribbon</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_03">
+    <h2>左上リボン</h2>
+
+    <style>
+      #sample_03 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --f: .5em; /* control the folded part*/
+          --r: .8em; /* control the ribbon shape */
+          
+          position: absolute;
+          left: 20px;
+          top: calc(-1*var(--f));
+          padding: .2em;
+          background: #BF4D28;
+          border-left: var(--f) solid #0005;
+          border-bottom: var(--r) solid #0000;
+          clip-path: polygon(var(--f) 0,100% 0,100% 100%,calc(50% + var(--f)/2) calc(100% - var(--r)), var(--f) 100%,var(--f) var(--f),0 var(--f));
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">CSS <br />100%</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_04">
+    <h2>左上リボン</h2>
+
+    <style>
+      #sample_04 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --f: .5em; /* control the folded part*/
+          --r: .8em; /* control the ribbon shape */
+          
+          position: absolute;
+          right: 20px;
+          top: calc(-1*var(--f));
+          padding: .2em;
+          background: #C8CF02;
+          border-right: var(--f) solid #0005;
+          border-bottom: var(--r) solid #0000;
+          clip-path: polygon(calc(100% - var(--f)) 0,0 0,0 calc(100% - var(--r)),calc(50% - var(--f)/2) 100%,calc(100% - var(--f)) calc(100% - var(--r)),calc(100% - var(--f)) var(--f),100% var(--f));
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">CSS <br />100%</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_05">
+    <h2>上部左側リボン</h2>
+
+    <style>
+      #sample_05 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --f: .5em; /* control the folded part*/
+          --r: .8em; /* control the ribbon shape */
+          
+          position: absolute;
+          top: 20px;
+          left: calc(-1*var(--f));
+          padding-inline: .25em;
+          line-height: 1.8;
+          background: #987F69;
+          border-bottom: var(--f) solid #0005;
+          border-right: var(--r) solid #0000;
+          clip-path: 
+            polygon(0 0,0 calc(100% - var(--f)),var(--f) 100%,
+              var(--f) calc(100% - var(--f)),100% calc(100% - var(--f)),
+              calc(100% - var(--r)) calc(50% - var(--f)/2),100% 0);
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">This is ribbon</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_06">
+    <h2>Z型リボン</h2>
+
+    <style>
+      #sample_06 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .8em;  /* control the cutout of the ribbon */
+          --a: 15deg; /* control the angle (only positive values) */
+          --c: #8FBE00;
+          
+          line-height: 1.7;
+          padding-inline: calc(tan(var(--a))*1lh + .3em);
+          background:
+            linear-gradient(calc(90deg + var(--a)),
+              #0000 calc(1lh*sin(var(--a)) - 1px),
+              var(--c) calc(1lh*sin(var(--a))) calc(100% - 1lh*sin(var(--a))),
+              #0000 calc(100% - 1lh*sin(var(--a)) + 1px)
+            );
+          position: relative;
+          rotate: calc(-1*var(--a));
+          width: fit-content;
+        }
+        .ribbon:before,
+        .ribbon:after{
+          content: "";
+          position: absolute;
+          rotate: var(--a);
+          height: calc(1lh/cos(var(--a)));
+          width: calc(100%*cos(var(--a)) - 1lh*sin(var(--a))) ;
+          background: color-mix(in srgb,var(--c),#000 40%);
+        }
+        .ribbon:before {
+          right: 0;
+          top: 0;
+          transform-origin: top right;
+          clip-path: polygon(0 0,100% 0,calc(100% - 1lh/sin(var(--a))) 100%,0 100%,var(--r) 50%);
+          /* for smaller angles you may need the below 
+          -webkit-mask: conic-gradient(from calc(-1*var(--a) - 90deg) at 100% 0,#000 25%,#0000 0);
+          */
+        }
+        .ribbon:after {
+          left: 0;
+          bottom: 0;
+          transform-origin: bottom left;
+          clip-path: polygon(calc(1lh/sin(var(--a))) 0,100% 0,calc(100% - var(--r)) 50%,100% 100%,0 100%);
+          /* for smaller angles you may need the below 
+          -webkit-mask: conic-gradient(from calc(90deg - var(--a)) at 0 100%,#000 25%,#0000 0);
+          */
+        }
+      }
+    </style>
+
+    <div style="padding: 32px 0;">
+      <div class="ribbon">This is ribbon</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_07">
+    <h2>左上横向きリボンの丸形</h2>
+
+    <style>
+      #sample_07 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .4em; /* control the ribbon shape (the radius) */
+          --c: #FA6900;
+
+          position: absolute;
+          top: 20px;
+          left: calc(-1*var(--r));
+          line-height: 1.8; 
+          padding: 0 .5em calc(2*var(--r));
+          border-radius: var(--r) 0 0 var(--r);
+          background: 
+            radial-gradient(100% 50% at left,var(--c) 98%,#0000 101%)
+            100% 0/.5lh calc(100% - 2*var(--r)),
+            radial-gradient(100% 50% at right,#0005 98%,#0000 101%) 
+            0 100%/var(--r) calc(2*var(--r)),
+            conic-gradient(from 90deg at var(--r) calc(100% - 2*var(--r)),#0000 25%,var(--c) 0)
+            0 0/calc(101% - .5lh) 100%;
+          background-repeat: no-repeat;   
+        }
+      }
+
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">This is ribbon</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_08">
+    <h2>上部横巻きリボン</h2>
+
+    <style>
+      #sample_08 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .4em; /* control the ribbon shape (the radius) */
+
+          position: absolute;
+          top: 20px;
+          inset-inline: calc(-1*var(--r));
+          text-align: center;
+          line-height: 1.8; 
+          padding: 0 .5em calc(2*var(--r));
+          border-radius: var(--r);
+          --_g:100%/var(--r) calc(2*var(--r)) no-repeat;
+          background: 
+            radial-gradient(100% 50% at right,#0005 98%,#0000 101%) 0    var(--_g),
+            radial-gradient(100% 50% at left ,#0005 98%,#0000 101%) 100% var(--_g),
+            conic-gradient(from 90deg at var(--r) calc(100% - 2*var(--r)),#0000 25%,#3FB8AF 0)
+            0 0/calc(100% - var(--r)) 100%;
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">This is ribbon</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_09">
+    <h2>上部下巻きリボン</h2>
+
+    <style>
+      #sample_09 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .4em; /* control the ribbon shape (the radius) */
+
+          position: absolute;
+          bottom: 20px;
+          inset-inline: calc(-1*var(--r));
+          text-align: center;
+          line-height: 1.8; 
+          padding: calc(2*var(--r)) .5em 0;
+          border-radius: var(--r);
+          --_g:0/var(--r) calc(2*var(--r)) no-repeat;
+          background: 
+            radial-gradient(100% 50% at right,#0005 98%,#0000 101%) 0    var(--_g),
+            radial-gradient(100% 50% at left ,#0005 98%,#0000 101%) 100% var(--_g),
+            conic-gradient(at var(--r) calc(2*var(--r)),#0000 25%,#8FBE00 0)
+            0 0/calc(100% - var(--r)) 100%;
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">This is ribbon</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_10">
+    <h2>リボンのシール的なやつ</h2>
+
+    <style>
+      #sample_10 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --c: #DFBA69;
+          
+          padding: .6em 1.3em; /* you may need to adjust this based on your content */
+          aspect-ratio: 1;
+          display: grid;
+          place-content: center;
+          text-align: center;
+          position: relative;
+          z-index: 0;
+          width: fit-content;
+          box-sizing: border-box;
+        }
+        .ribbon:before {
+          content:"";
+          position: absolute;
+          z-index: -1;
+          inset: 50% 0 auto;
+          aspect-ratio: 1;
+          background: color-mix(in srgb, var(--c), #000 35%);
+          clip-path: polygon(calc(100%/3) 0,calc(200%/3) 0,100% 90%,80% 85%,calc(200%/3) 100%,calc(100%/3) 0,calc(200%/3) 0,calc(100%/3) 100%,20% 85%,0 90%);
+        }
+        .ribbon:after {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          inset: 0;
+          background: radial-gradient(35% 35%,#0000 96%,#0003 97% 99%,#0000) var(--c);
+          clip-path: polygon(100.00% 50.00%,89.23% 57.80%,96.19% 69.13%,83.26% 72.22%,85.36% 85.36%,72.22% 83.26%,69.13% 96.19%,57.80% 89.23%,50.00% 100.00%,42.20% 89.23%,30.87% 96.19%,27.78% 83.26%,14.64% 85.36%,16.74% 72.22%,3.81% 69.13%,10.77% 57.80%,0.00% 50.00%,10.77% 42.20%,3.81% 30.87%,16.74% 27.78%,14.64% 14.64%,27.78% 16.74%,30.87% 3.81%,42.20% 10.77%,50.00% 0.00%,57.80% 10.77%,69.13% 3.81%,72.22% 16.74%,85.36% 14.64%,83.26% 27.78%,96.19% 30.87%,89.23% 42.20%); /* from https://css-generators.com/starburst-shape/ */
+        }
+      }
+    </style>
+
+    <div style="padding-bottom: 96px;">
+      <div class="ribbon">CSS</div>
+    </div>
+  </section>
+
+  <section id="sample_11">
+    <h2>左側の切れ目から出ているリボン</h2>
+
+    <style>
+      #sample_11 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .8em; /* control the cutout */
+          
+          border-block: .5em solid #0000;
+          padding-inline: .5em calc(var(--r) + .25em);
+          line-height: 1.8;
+          clip-path: polygon(100% 0,0 0,0 100%,100% 100%,100% calc(100% - .25em),calc(100% - var(--r)) 50%,100% .25em);
+          background:
+          radial-gradient(.2em 50% at left,#000a,#0000) border-box,
+          #FF6B6B padding-box; /* the color  */
+          width: fit-content;
+        }
+      }
+    </style>
+
+    <div class="ribbon">This is ribbon</div>
+  </section>
+
+  <br />
+
+  <section id="sample_13">
+    <h2>両端を折り曲げたリボン</h2>
+
+    <style>
+      #sample_13{
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --s: 4em;   /* the ribbon size */
+          --a: 40deg; /* the angle of the folded part */
+          --r: .8em;  /* the cutout part */
+          --c: #8FBE00;
+          
+          line-height: 1.9;
+          padding-inline: calc(1lh*tan(var(--a)/2) + .3em);
+          margin-top: calc(var(--s)*sin(var(--a)));
+          clip-path: polygon(0 0,0 -999px,100% -999px,100% 0,calc(100% - 1lh*tan(var(--a)/2)) 100%,calc(1lh*tan(var(--a)/2)) 100%);
+          background-color: var(--c); 
+          width: fit-content;
+          position: relative;
+        }
+        .ribbon:before,
+        .ribbon:after {
+          content:"";
+          position: absolute;
+          top: 0;
+          height: 1lh;
+          width: var(--s);
+          background: color-mix(in srgb,var(--c),#000 40%);
+        }
+        .ribbon:before {
+          right: 0;
+          transform-origin: top right;
+          rotate: var(--a);
+          clip-path: polygon(0 0,100% 0,calc(100% - 1lh/tan(var(--a))) 100%,0 100%, var(--r) 50%);
+        }
+        .ribbon:after {
+          left: 0;
+          transform-origin: top left;
+          rotate: calc(-1*var(--a));
+          clip-path: polygon(0 0,100% 0,calc(100% - var(--r)) 50%,100% 100%,calc(1lh/tan(var(--a))) 100%);
+        }
+      }
+    </style>
+
+    <div class="ribbon">This is ribbon</div>
+  </section>
+
+  <br />
+
+  <section id="sample_14">
+    <h2>ハートのリボン</h2>
+
+    <style>
+      #sample_14 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --c: #e31b23;
+          --r: 20%; /* control the cutout part */
+          
+          padding: .6em 1.5em 1.6em; /* you may need to adjust this based on your content */
+          aspect-ratio: 1;
+          display: grid;
+          place-content: center;
+          text-align: center;
+          position: relative;
+          z-index: 0;
+          width: fit-content;
+          box-sizing: border-box;
+        }
+        .ribbon:before {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          inset: 50% 20% -35%;
+          background: color-mix(in srgb, var(--c), #000 35%);
+          clip-path: polygon(5% 0,95% 0,100% 100%,50% calc(100% - var(--r)),0 100%);
+        }
+        .ribbon:after {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          inset: 0;
+          background: var(--c);
+          -webkit-mask:
+          radial-gradient(at 70% 31%,#000 29%,#0000 30%),
+          radial-gradient(at 30% 31%,#000 29%,#0000 30%),
+          linear-gradient(#000 0 0) bottom/100% 50% no-repeat;
+          clip-path: polygon(-41% 0,50% 91%, 141% 0);
+        }
+      }
+    </style>
+
+    <div style="padding-bottom: 48px;">
+      <div class="ribbon">CSS</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_15">
+    <h2>左上からまくり上がるリボン</h2>
+
+    <style>
+      #sample_15 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --f: .4em; /* control the folded part */
+          --r: .8em; /* control the cutout */
+          
+          position: absolute;
+          left: 20px;
+          top: calc(-1*var(--f));
+          padding: .2em;
+          border: solid #0000;
+          border-width: 0 0 var(--r) calc(2*var(--f));
+          background: 
+            radial-gradient(50% 100% at bottom,#0005 98%,#0000 101%) 
+            0 0/calc(2*var(--f)) var(--f) no-repeat border-box;
+          background-color: #BF4D28;
+          border-radius: var(--f) var(--f) 0 0;
+          clip-path: polygon(0 0,100% 0,100% calc(100% - var(--r)),calc(50% + var(--f)) 100%,calc(2*var(--f)) calc(100% - var(--r)),calc(2*var(--f)) var(--f),0 var(--f));
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">100%<br />CSS</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_16">
+    <h2>右上からまくり上がるリボン</h2>
+
+    <style>
+      #sample_16 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --f: .4em; /* control the folded part */
+          --r: .8em; /* control the cutout */
+          
+          position: absolute;
+          right: 20px;
+          top: calc(-1*var(--f));
+          padding: .2em;
+          border: solid #0000;
+          border-width: 0 calc(2*var(--f)) var(--r) 0;
+          background: 
+            radial-gradient(50% 100% at bottom,#0005 98%,#0000 101%) 
+            100% 0/calc(2*var(--f)) var(--f) no-repeat border-box;
+          background-color: #C8CF02;
+          border-radius: var(--f) var(--f) 0 0;
+          clip-path: polygon(100% 0,0 0,0 100%,calc(50% - var(--f)) calc(100% - var(--r)),calc(100% - 2*var(--f)) 100%,calc(100% - 2*var(--f)) var(--f),100% var(--f));
+        }
+      }
+    </style>
+
+    <div class="contents">
+      <div class="ribbon">100%<br />CSS</div>
+    </div>
+  </section>
+
+  <br />
+
+  <section id="sample_17">
+    <h2>上部の切れ目から出るリボン</h2>
+
+    <style>
+      #sample_17 {
+        .ribbon {
+          font-size: 28px;
+          line-height: 1.4;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .8em; /* control the cutout */
+          
+          border-inline: .5em solid #0000;
+          padding: .5em .2em calc(var(--r) + .2em);
+          clip-path: polygon(0 0,100% 0,100% 100%,calc(100% - .5em) calc(100% - var(--r)),50% 100%,.5em calc(100% - var(--r)),0 100%);
+          background:
+          radial-gradient(50% .2em at top,#000a,#0000) border-box,
+          #bd1550 padding-box; /* the color  */
+          width: fit-content;
+        }
+      }
+    </style>
+
+    <div class="ribbon">100%<br />CSS</div>  
+  </section>
+
+  <br />
+
+  <section id="sample_18">
+    <h2>横に開いたリボンシール</h2>
+
+    <style>
+      #sample_18 {
+        /* HTML: <div class="ribbon">Your text content</div> */
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --c: #2699dc;
+          /* control the ribbon shape (adjust each variable to understand what it does) */
+          --a: 56deg; 
+          --r: 6deg; 
+          --s: 1.6em;
+          
+          padding: .6em 1.3em; /* you may need to adjust this based on your content */
+          aspect-ratio: 1;
+          display: grid;
+          place-content: center;
+          text-align: center;
+          position: relative;
+          z-index: 0;
+          width: fit-content;
+          box-sizing: border-box;
+        }
+        .ribbon:before {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          inset: calc(50% - var(--s)/2) -150% auto; /* you can also adjust the 150% to control the shape */
+          border-radius: 999px 999px 0 0;
+          aspect-ratio: 2;
+          border: var(--s) solid color-mix(in srgb, var(--c), #000 35%);
+          border-bottom: none;
+          clip-path: polygon(
+            100% 0,
+            calc(50% + 50%*cos(var(--a))) calc(100% - 100%*sin(var(--a))),
+            calc(50% + (50% - var(--s)/2)*cos(var(--a) + var(--r))) calc(100% - (100% - var(--s)/2)*sin(var(--a) + var(--r))),
+            calc(50% + (50% - var(--s))*cos(var(--a))) calc(100% - (100% - var(--s))*sin(var(--a))),
+            50% 100%,
+            calc(50% - (50% - var(--s))*cos(var(--a))) calc(100% - (100% - var(--s))*sin(var(--a))),
+            calc(50% - (50% - var(--s)/2)*cos(var(--a) + var(--r))) calc(100% - (100% - var(--s)/2)*sin(var(--a) + var(--r))),
+            calc(50% - 50%*cos(var(--a))) calc(100% - 100%*sin(var(--a))),
+            0 0
+          );
+        }
+        .ribbon:after {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          inset: 0;
+          background: radial-gradient(35% 35%,#0000 96%,#0003 97% 99%,#0000) var(--c);
+          clip-path: polygon(100.00% 50.00%,89.23% 57.80%,96.19% 69.13%,83.26% 72.22%,85.36% 85.36%,72.22% 83.26%,69.13% 96.19%,57.80% 89.23%,50.00% 100.00%,42.20% 89.23%,30.87% 96.19%,27.78% 83.26%,14.64% 85.36%,16.74% 72.22%,3.81% 69.13%,10.77% 57.80%,0.00% 50.00%,10.77% 42.20%,3.81% 30.87%,16.74% 27.78%,14.64% 14.64%,27.78% 16.74%,30.87% 3.81%,42.20% 10.77%,50.00% 0.00%,57.80% 10.77%,69.13% 3.81%,72.22% 16.74%,85.36% 14.64%,83.26% 27.78%,96.19% 30.87%,89.23% 42.20%); /* from https://css-generators.com/starburst-shape/ */
+        }
+      }
+    </style>
+
+    <div class="ribbon">CSS</div>
+  </section>
+
+  <br />
+
+  <section id="sample_19">
+    <h2>折り返して複数行を表示するリボン</h2>
+
+    <style>
+      #sample_19 {
+        .ribbon {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .ribbon {
+          --r: .5em;  /* control the cutout of the ribbon */
+          --a: 20deg; /* control the angle of the folded part */
+          --s: 6em;   /* control the size of the folded part  */
+          --c: #ff6b6b;
+          
+          padding-inline: calc(1lh*tan(var(--a)/2) + .3em);
+          margin-block: calc(var(--s)*sin(var(--a)) - .15lh);
+          text-align: center;
+          line-height: 2;
+          background-image: 
+            linear-gradient(var(--c) 70%,#0000 0), 
+            linear-gradient(to bottom right,#0000 50%, color-mix(in srgb,var(--c),#000 40%) 51% 84%,#0000 85%);
+          background-position: 0 .15lh;
+          background-size: 100% 1lh;
+          position: relative;
+          clip-path: polygon(
+            100% .15lh,
+            calc(.7lh/sin(var(--a))) .15lh,
+            calc(.7lh/sin(var(--a)) + 999px) calc(.15lh - 999px*tan(var(--a))),
+            0 -999px,
+            0 .15lh,
+            calc(.7lh*tan(var(--a)/2)) .85lh,
+            0 1lh,
+            0 calc(100% - .15lh),
+            calc(100% - .7lh/sin(var(--a))) calc(100% - .15lh),
+            calc(100% - .7lh/sin(var(--a)) - 999px) calc(100% - .15lh + 999px*tan(var(--a))),
+            100% 999px,
+            100% calc(100% - .15lh),
+            calc(100% - .7lh*tan(var(--a)/2)) calc(100% - .85lh),
+            100% calc(100% - 1lh)
+          );
+          width: fit-content;
+        }
+        .ribbon:before,
+        .ribbon:after {
+          content:"";
+          position: absolute;
+          height: .7lh;
+          width: var(--s);
+          background: color-mix(in srgb,var(--c),#000 40%);
+          rotate: calc(-1*var(--a));
+        }
+        .ribbon:before {
+          top: .15lh;
+          left: 0;
+          transform-origin: top left;
+          clip-path: polygon(100% 0,0 0,calc(.7lh/tan(var(--a))) 100%,100% 100%,calc(100% - var(--r)) 50%);
+        }
+        .ribbon:after {
+          bottom: .15lh;
+          right: 0;
+          transform-origin: bottom right;
+          clip-path: polygon(calc(100% - .7lh/tan(var(--a))) 0,0 0,var(--r) 50%,0 100%,100% 100%);
+        }
+      }
+    </style>
+
+    <div class="ribbon">A Ribbon<br />With Many Lines<br />Of Text</div>
+  </section>
+
+</body>
+</html>
