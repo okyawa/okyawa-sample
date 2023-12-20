@@ -85,12 +85,16 @@
             event.dataTransfer.effectAllowed = 'move';
           });
 
-          // ドラッグ中
-          element.addEventListener('dragover', (event) => {
+          // ドラッグ項目が有効なドロップ対象に入った場合
+          element.addEventListener('dragenter', (event) => {
             event.preventDefault();
             const dragOveredElement = event.currentTarget;
             dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
-            // ドラッグ中視覚的な効果を移動に指定
+          });
+
+          // ドラッグ項目が有効なドロップ対象の上を移動中
+          element.addEventListener('dragover', (event) => {
+            event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
           });
 
@@ -210,7 +214,16 @@
             event.dataTransfer.effectAllowed = 'move';
           });
 
-          // ドラッグ中
+          // ドラッグ項目が有効なドロップ対象に入った場合
+          droppableElement.addEventListener('dragenter', (event) => {
+            event.preventDefault();
+            // ハンドル部分だけ並び替え可能にする場合、
+            // dragenterだとハンドル部分に入った時に付与したクラス名が外れしてしまう
+            // const dragOveredElement = event.currentTarget;
+            // dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
+          });
+
+          // ドラッグ項目が有効なドロップ対象の上を移動中
           droppableElement.addEventListener('dragover', (event) => {
             event.preventDefault();
             const dragOveredElement = event.currentTarget;
