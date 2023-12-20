@@ -81,6 +81,8 @@
             draggedElement.classList.add(DRAGGING_CLASS_NAME);
             // ドラッグする要素の値をセット
             event.dataTransfer.setData('text/plain', draggedElement.id);
+            // ドラッグ操作で許可される効果を移動に指定
+            event.dataTransfer.effectAllowed = 'move';
           });
 
           // ドラッグ中
@@ -88,6 +90,8 @@
             event.preventDefault();
             const dragOveredElement = event.currentTarget;
             dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
+            // ドラッグ中視覚的な効果を移動に指定
+            event.dataTransfer.dropEffect = 'move';
           });
 
           // ドラッグ項目が有効なドロップ対象を離れた場合
@@ -202,6 +206,8 @@
             draggedElement.classList.add(DRAGGING_CLASS_NAME);
             // ドラッグする要素の値をセット
             event.dataTransfer.setData('text/plain', draggedElement.id);
+            // ドラッグ操作で許可される効果を移動に指定
+            event.dataTransfer.effectAllowed = 'move';
           });
 
           // ドラッグ中
@@ -209,6 +215,8 @@
             event.preventDefault();
             const dragOveredElement = event.currentTarget;
             dragOveredElement.classList.add(DRAG_OVER_CLASS_NAME);
+            // ドラッグ中視覚的な効果を移動に指定
+            event.dataTransfer.dropEffect = 'move';
           });
 
           // ドラッグ項目が有効なドロップ対象を離れた場合
