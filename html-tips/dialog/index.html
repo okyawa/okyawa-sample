@@ -9,7 +9,11 @@
   <link rel="stylesheet" href="/res/css/neat.css">
 
   <style>
-
+    /* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
+    html:has(dialog[open]) {
+        /* overflow: hidden; */
+        scrollbar-gutter: stable;
+    }
   </style>
 
 </head>
