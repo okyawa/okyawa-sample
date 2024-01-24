@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+#container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+header {
+  margin :128px 0 64px 0;
+}
+
+code {
+  padding: 2px 4px;
+  background-color: #f5f5f5;
+  font-family: monospace;
+}
+
+summary {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  summary:hover {
+    opacity: 0.8;
+  }
+}
+
+summary :is(h1, h2, h3, h4, h5, h6) {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+details section {
+  margin: 0 1rem;
+}

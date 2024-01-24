@@ -7,34 +7,7 @@
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
 
-  <style>
-    #container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-    code {
-      padding: 2px 4px;
-      background-color: #f5f5f5;
-      font-family: monospace;
-    }
-    summary {
-      cursor: pointer;
-    }
-    @media (hover: hover) {
-      summary:hover {
-        opacity: 0.8;
-      }
-    }
-    summary :is(h1, h2, h3, h4, h5, h6) {
-      display: inline-block;
-      vertical-align: middle;
-    }
-    details section {
-      margin: 0 1rem;
-    }
-  </style>
-
+  <link rel="stylesheet" href="/res/css/presentation.css" />
 
   <!-- ↓コードのシンタックスハイライト -->
   <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
@@ -44,28 +17,12 @@
   </script>
   <!-- ↑コードのシンタックスハイライト -->
 
+  <script src="/res/js/presentation/presentation.js"></script>
   <script>
-    /**
-     * 全てのdetails要素を閉じ、プレゼンテーション用のモードにする
-     */
-    function switchPresentationMode() {
-      const detailsElements = document.querySelectorAll('details');
-      detailsElements.forEach((detailsElement) => {
-        // detailsの中で1つだけを開く指定
-        detailsElement.name = 'section';
-      });
-    }
-    /**
-     * 全てのdetails要素を閉じる
-     */
-    function closeAllDetails() {
-      const detailsElements = document.querySelectorAll('details');
-      detailsElements.forEach((detailsElement) => {
-        detailsElement.open = false;
-      });
-    }
     window.addEventListener('DOMContentLoaded', () => {
+      // 全てのdetails要素を閉じる
       // closeAllDetails();
+      // プレゼンテーション用にアコーディオンの動作となるモードにする
       // switchPresentationMode();
     });
   </script>
@@ -75,7 +32,7 @@
   <div id="container">
 
 
-  <header style="margin :128px 0 64px 0;">
+  <header>
     <h1>importmapでESModulesを読み込む</h1>
   </header>
 
