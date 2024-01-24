@@ -29,7 +29,7 @@
 
 </head>
 <body>
-  <div id="container">
+<div id="container">
 
 
   <header>
@@ -65,7 +65,7 @@
       </ul>
 
       <section>
-        <h3>/js-tips/importmap/modules/square.js</h3>
+        <h3>/js-tips/importmap/modules/shapes/square.js</h3>
         <pre><code class="language-js">
           export function appendSquare() {
             document.querySelector('#result_01')?.append('🟪');
@@ -74,7 +74,7 @@
       </section>
 
       <section>
-        <h3>/js-tips/importmap/modules/circle.js</h3>
+        <h3>/js-tips/importmap/modules/shapes/circle.js</h3>
         <pre><code class="language-js">
           export function appendCircle() {
             document.querySelector('#result_01')?.append('🟠');
@@ -99,8 +99,8 @@
         <h3>HTML</h3>
         <pre><code class="language-html">
           &lt;script type="module"&gt;
-            import { appendSquare } from '/js-tips/importmap/modules/square.js';
-            import { appendCircle } from '/js-tips/importmap/modules/circle.js';
+            import { appendSquare } from '/js-tips/importmap/modules/shapes/square.js';
+            import { appendCircle } from '/js-tips/importmap/modules/shapes/circle.js';
 
             appendSquare();
             appendCircle();
@@ -116,7 +116,7 @@
 
   <section>
     <details open>
-      <summary><h2>ベアモジュールのデモ</h2></summary>
+      <summary><h2>ベアモジュールでESModulesを読み込む</h2></summary>
 
       <ul>
         <li>パスがないモジュールをベアモジュール <i>(bare module)</i> と呼ばれる</li>
@@ -132,8 +132,8 @@
           &lt;script type="importmap"&gt;
             {
               "imports": {
-                "square": "/js-tips/importmap/modules/square.js",
-                "circle": "/js-tips/importmap/modules/circle.js"
+                "square": "/js-tips/importmap/modules/shapes/square.js",
+                "circle": "/js-tips/importmap/modules/shapes/circle.js"
               }
             }
           &lt;/script&gt;
@@ -154,8 +154,9 @@
         <script type="importmap">
           {
             "imports": {
-              "square": "/js-tips/importmap/modules/square.js",
-              "circle": "/js-tips/importmap/modules/circle.js"
+              "square": "/js-tips/importmap/modules/shapes/square.js",
+              "circle": "/js-tips/importmap/modules/shapes/circle.js",
+              "shapes/": "/js-tips/importmap/modules/shapes/"
             }
           }
         </script>
@@ -175,7 +176,55 @@
   <br />
   <br />
 
-  </div>
+  <section>
+    <details open>
+      <summary><h2>パス接頭辞のマッピングでESModulesを読み込む</h2></summary>
 
+      <ul>
+        <li>モジュール指定子のマップキーは、モジュール指定子のパスの接頭辞を割り当て直すために使用することも可能</li>
+        <li>この場合、プロパティと割り当てられたパスは、どちらも末尾にフォワードスラッシュ (<code>/</code>) を保有する必要がある</li>
+      </ul>
+
+      <section>
+        <h3>HTML</h3>
+        <pre><code class="language-html">
+          &lt;script type="importmap"&gt;
+            {
+              "imports": {
+                "shapes/": "/js-tips/importmap/modules/shapes/"
+              }
+            }
+          &lt;/script&gt;
+
+          &lt;script&gt;
+            import { appendSquare } from 'shapes/square.js';
+            import { appendCircle } from 'shapes/circle.js';
+
+            appendSquare('#result_02');
+            appendCircle('#result_02');
+          &lt;/script&gt;
+        </code></pre>
+      </section>
+
+      <section>
+        <h3>実行結果</h3>
+        <pre><div id="result_02" style="padding: 8px;"></div></pre>
+        <script type="module">
+          // モジュール読み込み
+          import { appendSquare } from 'shapes/square.js';
+          import { appendCircle } from 'shapes/circle.js';
+          // 実行
+          appendSquare('#result_02');
+          appendCircle('#result_02');
+        </script>
+      </section>
+
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+</div>
 </body>
 </html>
