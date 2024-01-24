@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>importmapでESModulesを読み込む</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+    #container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    code {
+      padding: 2px 4px;
+      background-color: #f5f5f5;
+      font-family: monospace;
+    }
+  </style>
+
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+
+</head>
+<body>
+  <div id="container">
+
+
+  <header>
+    <h1>importmapでESModulesを読み込む</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <h2>概要</h2>
+    <ul>
+      <li><code>script</code> 要素の <code>type</code> 属性に <code>importmap</code> を指定すると、 <code>script</code> 要素の本体がインポートマップになる</li>
+      <li>インポートマップは、JavaScript モジュールをインポートする際に、ブラウザがモジュール指定子を解決する方法を開発者が制御できるようにするためのJSONオブジェクト</li>
+    </ul>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <h2>読み込むESModulesのJavaScriptサンプルのファイル</h2>
+    <ul>
+      <li>ESModulesは、JavaScriptファイルを読み込む仕組み</li>
+      <li><code>export</code> や <code>import</code> を使うことで、ESModulesになる</li>
+      <li>ESModulesの場合、<code>"use strict;"</code> を付けた場合と同じ挙動で、自動的に厳格モードになる</li>
+    </ul>
+
+    <section>
+      <h3>/js-tips/importmap/modules/square.js</h3>
+      <pre><code class="language-js">
+        export function appendSquare() {
+          document.querySelector('#result_01')?.append('🟪');
+        }
+      </code></pre>
+    </section>
+
+    <section>
+      <h3>/js-tips/importmap/modules/circle.js</h3>
+      <pre><code class="language-js">
+        export function appendCircle() {
+          document.querySelector('#result_01')?.append('🟠');
+        }
+      </code></pre>
+    </section>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <h2>普通にESModulesをHTMLで読み込む場合</h2>
+    <ul>
+      <li>ブラウザーがESModulesをインポートするためには、絶対的なURLか相対的なURLの指定が必要</li>
+    </ul>
+    <section>
+      <h3>HTML</h3>
+      <pre><code class="language-html">
+        &lt;script type="module"&gt;
+          import { appendSquare } from '/js-tips/importmap/modules/square.js';
+          import { appendCircle } from '/js-tips/importmap/modules/circle.js';
+
+          appendSquare();
+          appendCircle();
+        &lt;/script&gt;
+      </code></pre>
+    </section>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <h2>ベアモジュールのデモ</h2>
+
+    <ul>
+      <li>パスがないモジュールをベアモジュール <i>(bare module)</i> と呼ばれる</li>
+      <li>通常、ブラウザではモジュールを使って <code>import</code> することはできない</li>
+      <li>インポートマップを使った際は、モジュール指定でベアモジュールを使用する</li>
+      <li>インポートマップの <code>script</code> 要素は、ESModulesをインポートする <code>script</code> 要素の前に宣言し、処理する必要がある</li>
+      <li>インポートマップで指定するモジュールのパス指定は、絶対URLでも <code>/</code> <code>./</code> <code>../</code> で始まる相対URLパスでも可能</li>
+    </ul>
+
+    <section>
+      <h3>HTML</h3>
+      <pre><code class="language-html">
+        &lt;script type="importmap"&gt;
+          {
+            "imports": {
+              "square": "/js-tips/importmap/modules/square.js",
+              "circle": "/js-tips/importmap/modules/circle.js"
+            }
+          }
+        &lt;/script&gt;
+
+        &lt;script&gt;
+          import { appendSquare } from 'square';
+          import { appendCircle } from 'circle';
+
+          appendSquare('#result_01');
+          appendCircle('#result_01');
+        &lt;/script&gt;
+      </code></pre>
+    </section>
+
+    <section>
+      <h3>実行結果</h3>
+      <pre><div id="result_01" style="padding: 8px;"></div></pre>
+      <script type="importmap">
+        {
+          "imports": {
+            "square": "/js-tips/importmap/modules/square.js",
+            "circle": "/js-tips/importmap/modules/circle.js"
+          }
+        }
+      </script>
+      <script type="module">
+        // モジュール読み込み
+        import { appendSquare } from 'square';
+        import { appendCircle } from 'circle';
+        // 実行
+        appendSquare('#result_01');
+        appendCircle('#result_01');
+      </script>
+    </section>
+  </section>
+
+  <br />
+  <br />
+
+  </div>
+
+</body>
+</html>
