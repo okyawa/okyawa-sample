@@ -67,8 +67,8 @@
       <section>
         <h3>/js-tips/importmap/modules/shapes/square.js</h3>
         <pre><code class="language-js">
-          export function appendSquare() {
-            document.querySelector('#result_01')?.append('🟪');
+          export function appendSquare(selector) {
+            document.querySelector(selector)?.append('🟪');
           }
         </code></pre>
       </section>
@@ -76,8 +76,8 @@
       <section>
         <h3>/js-tips/importmap/modules/shapes/circle.js</h3>
         <pre><code class="language-js">
-          export function appendCircle() {
-            document.querySelector('#result_01')?.append('🟠');
+          export function appendCircle(selector) {
+            document.querySelector(selector)?.append('🟠');
           }
         </code></pre>
       </section>
