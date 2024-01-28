@@ -102,8 +102,8 @@
             import { appendSquare } from '/js-tips/importmap/modules/shapes/square.js';
             import { appendCircle } from '/js-tips/importmap/modules/shapes/circle.js';
 
-            appendSquare();
-            appendCircle();
+            appendSquare('#result_01');
+            appendCircle('#result_01');
           &lt;/script&gt;
         </code></pre>
       </section>
@@ -181,7 +181,7 @@
       <summary><h2>パス接頭辞のマッピングでESModulesを読み込む</h2></summary>
 
       <ul>
-        <li>モジュール指定子のマップキーは、モジュール指定子のパスの接頭辞を割り当て直すために使用することも可能</li>
+        <li>モジュール指定子のマップキーは、モジュール指定子のパスの接頭辞 (prefix) を割り当て直すために使用することも可能</li>
         <li>この場合、プロパティと割り当てられたパスは、どちらも末尾にフォワードスラッシュ (<code>/</code>) を保有する必要がある</li>
       </ul>
 
@@ -218,6 +218,23 @@
           appendCircle('#result_02');
         </script>
       </section>
+
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <details open>
+      <summary><h2>importmapの各ブラウザ対応状況</h2></summary>
+
+      <ul>
+        <li>全モダンブラウザで対応済み</li>
+        <li>
+          <a href="https://caniuse.com/?search=importmap" target="_blank" ref="nofollow noreferrer noopener">https://caniuse.com/?search=importmap</a>
+        </li>
+      </ul>
 
     </details>
   </section>
