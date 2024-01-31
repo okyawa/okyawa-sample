@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>CSS scroll snap を使った3枚毎のカルーセルSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+      header {
+        margin-bottom: 16px;
+      }
+      h1,
+      h2 {
+        margin: 0;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+      .desc {
+        margin: 24px auto;
+        text-align: left;
+        width: fit-content;
+      }
+  </style>
+
+  <style>
+    #carousel {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }  
+
+    #slide-container {
+      scroll-snap-type: x mandatory;
+      overflow-x: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .slide {
+      scroll-snap-align: center;
+      scroll-snap-stop: always; /* スクロールコンテナーが可能なスナップ位置を「通り過ぎる」ことを許可しない */
+      width: calc((100% - 20px) / 3); /* gap指定分を引いてから割る必要あり */
+      min-width: calc((100% - 20px) / 3);
+    }
+    .slide img {
+      width: 100%;
+      height: auto;
+      vertical-align: middle;
+    }
+
+    .slide-indicators {
+      display: flex;
+      justify-content: center;
+    }
+    .slide-indicator {
+      height: 44px;
+      width: 50px;
+      display: flex;
+      justify-items: center;
+      cursor: pointer;
+    }
+    .slide-indicator:after {
+      content: "";
+      background-color: #878787;
+      height: 10px;
+      margin-top: 10px;
+      width: 40px;
+    }
+    .slide-indicator.active:after,
+    .slide-indicator:hover:after {
+      background-color: #000000;
+    }
+    .arrow {
+      color: #ffffff;
+      height: 20px;
+      width: 20px;
+      background-color: #000000;
+      position: absolute;
+      padding: 10px;
+      opacity: .3;
+      cursor: pointer;
+    }
+    .arrow.back {
+      left: 10px;
+      top: 10px;
+    }
+    .arrow.forward {
+      right: 10px;
+      top: 10px;
+    }
+    .arrow:hover {
+      opacity: 1;
+    }
+
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>CSS scroll snap</h1>
+    <h2>
+      <span class="fit_content">3枚毎のカルーセルSample</span>
+    </h2>
+  </header>
+
+  <ul>
+    <li>まだ検証中</li>
+    <li>全体が見えるのが複数になると、現在地表示が上手くいかない状態</li>
+  </ul>
+
+  <div id="carousel">
+    <div id="slide-container">
+      <div class="slide" data-slideindex="0">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_01.jpg">
+      </div>
+      <div class="slide" data-slideindex="1">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_02.jpg">
+      </div>
+      <div class="slide" data-slideindex="2">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_03.jpg">
+      </div>
+      <div class="slide" data-slideindex="3">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_04.jpg">
+      </div>
+      <div class="slide" data-slideindex="4">
+        <img width="1200" height="800" src="/css-tips/scroll-snap/images/car_05.jpg">
+      </div>
+    </div>
+    <div id="back-button" class="arrow back">←</div>
+    <div id="forward-button" class="arrow forward">→</div>
+    <div class="slide-indicators">
+      <!-- <div class="slide-indicator active"></div>
+      <div class="slide-indicator"></div> -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function autoplayCarousel() {
+    const ENABLED_AUTOPLAY_CAROUSEL = false;
+    const carouselEl = document.querySelector('#carousel');
+    const slideContainerEl = carouselEl.querySelector('#slide-container');
+    const slideEl = carouselEl.querySelector('.slide');
+    const slideElList = slideContainerEl.querySelectorAll('.slide')
+    let slideWidth = slideEl.offsetWidth;
+
+    // Init slide indicators
+    const slideIndicatorsElem = carouselEl.querySelector('.slide-indicators');
+    slideIndicatorsElem.innerHTML = '';
+    slideElList.forEach((elem, index) => {
+        const spanElem = document.createElement('span');
+        spanElem.classList.add('slide-indicator');
+        spanElem.setAttribute('role', 'button');
+        if (index === 0) {
+            spanElem.classList.add('active');
+        }
+        slideIndicatorsElem.append(spanElem);
+    });
+
+    // Add click handlers
+    document.querySelector("#back-button")
+      .addEventListener("click", () => navigate("backward"));
+    document.querySelector("#forward-button")
+      .addEventListener("click", () => navigate("forward"));
+    document.querySelectorAll(".slide-indicator")
+      .forEach((dot, index) => {
+        dot.addEventListener("click", () => navigate(index));
+        dot.addEventListener("mouseenter", () => clearInterval(autoplay));
+      });
+    // Add keyboard handlers
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft') {
+        clearInterval(autoplay);
+        navigate("backward");
+      } else if (e.code === 'ArrowRight') {
+        clearInterval(autoplay);
+        navigate("forward");
+      }
+    });
+    // Add resize handler
+    window.addEventListener('resize', () => {
+      slideWidth = slideEl.offsetWidth;
+    });
+    // Autoplay
+    if (ENABLED_AUTOPLAY_CAROUSEL) {
+      const autoplay = setInterval(() => navigate("forward"), 3000);
+      slideContainerEl.addEventListener("mouseenter touchstart", () => clearInterval(autoplay));
+    }
+    // Slide transition
+    const getNewScrollPosition = (arg) => {
+      const gap = 10;
+      const maxScrollLeft = slideContainerEl.scrollWidth - slideWidth;
+      if (arg === "forward") {
+        const x = slideContainerEl.scrollLeft + slideWidth + gap;
+        return x <= maxScrollLeft ? x : 0;
+      } else if (arg === "backward") {
+        const x = slideContainerEl.scrollLeft - slideWidth - gap;
+        return x >= 0 ? x : maxScrollLeft;
+      } else if (typeof arg === "number") {
+        const x = arg * (slideWidth + gap);
+        return x;
+      }
+    }
+    const navigate = (arg) => {
+      slideContainerEl.scrollLeft = getNewScrollPosition(arg);
+    }
+    // Slide indicators
+    const slideObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const slideIndex = entry.target.dataset.slideindex;
+          carouselEl.querySelector('.slide-indicator.active').classList.remove('active');
+          carouselEl.querySelectorAll('.slide-indicator')[slideIndex].classList.add('active');
+        }
+      });
+    }, { root: slideContainerEl, threshold: .7 });
+    document.querySelectorAll('.slide').forEach((slide) => {
+      slideObserver.observe(slide);
+    });
+  }
+  autoplayCarousel();
+</script>
+</body>
+</html>
