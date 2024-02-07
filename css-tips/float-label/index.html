@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>CSSでフォームの入力時にフロートする入力欄ラベルのサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <!-- ↓ フォームの入力時にフロートする入力欄のCSS指定 -->
+  <style>
+    /* 入力欄枠の指定 ======================= */
+    .input_wrapper {
+      position: relative;
+      margin-top: 32px; /* ラベルをフローティング表示するための余白指定 */
+      margin-bottom: 24px;
+      max-width: 400px;
+    }
+
+    /* テキスト入力欄の指定 ======================= */
+    .input_wrapper input {
+      font-size: 20px;
+      width: 100%;
+      padding: 8px 0;
+      padding-right: 30px; /* クリアボタンと重ならないようにするための余白指定 */
+      color: #333;
+      border: none;
+      border-bottom: 1px solid #ddd;
+      box-sizing: border-box;
+      transition: border-color 250ms;
+      background-color: transparent;
+    }
+    .input_wrapper input:focus {
+      outline: none;
+      border-bottom-color: #777;
+    }
+    .input_wrapper input::placeholder {
+      color: transparent;
+    }
+    /* Safariのオートフィルボタンを隠す */
+    .input_wrapper input::-webkit-contacts-auto-fill-button {
+      visibility: hidden;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    /* 未入力時のラベル要素指定 ======================= */
+    .input_wrapper label {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      color: #43454e;
+      pointer-events: none;
+      transform-origin: left center;
+      transition: transform 250ms;
+    }
+
+    /* 入力時にラベルをフロートして再配置 (※フォーカス時かプレースホルダーが表示されない場合) */
+    .input_wrapper input:focus + .label,
+    .input_wrapper input:not(:placeholder-shown) + .label {
+      transform: translateY(-100%) scale(0.75);
+    }
+  </style>
+  <!-- ↑ フォームの入力時にフロートする入力欄のCSS指定 -->
+
+  <!-- ↓ クリアボタンのCSS指定 -->
+  <style>
+    /* クリアボタンの非表示指定 (※プレースホルダーが表示されている状態の場合) */
+    .input_wrapper input:placeholder-shown + .label + .clear_button {
+      display: none;
+    }
+
+    /* クリアボタンの表示指定 ======================= */
+    .input_wrapper .clear_button {
+      height: 30px;
+      width: 30px;
+      position: absolute;
+      right: -9px; /* 入力欄の右端に設置 */
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      border-radius: 50%;
+      color: #777;
+      transition: color 250ms;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .input_wrapper .clear_button:hover,
+    .input_wrapper .clear_button:focus {
+      color: #333;
+    }
+  </style>
+  <!-- ↑ クリアボタンのCSS指定 -->
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>フォームの入力時にフロートする入力欄のラベル</h1>
+      <h2>CSSのみで実装</h2>
+    </header>
+
+    <br />
+
+    <section>
+
+      <h2>DEMO <small>(CSSのみ)</small></h2>
+
+      <fieldset>
+        <div class="input_wrapper">
+          <input class="input" type="text" id="name" name="name" placeholder="Name">
+          <label class="label" for="name">名前</label>
+        </div>
+        <div class="input_wrapper">
+          <input class="input" type="text" id="email" name="email" placeholder="Name">
+          <label class="label" for="email">メールアドレス</label>
+        </div>
+      </fieldset>
+
+    </section>
+
+    <br />
+    <br />
+
+    <section>
+
+      <h2>DEMO <small>(JSのクリアボタン有り)</small></h2>
+
+      <fieldset>
+        <div class="input_wrapper">
+          <input autocomplete="off" class="input" type="text" id="name" name="name" placeholder="Name">
+          <label class="label" for="name">名前</label>
+
+          <button class="clear_button" aria-label="Clear input">
+            <!-- ↓クリアボタン用のSVG -->
+            <svg viewBox="0 0 16 16" width="12" height="12">
+              <path d="M 1 1 L 15 15 M 1 15 L 15 1" fill="none" stroke-width="2" stroke="currentColor" />
+            </svg>
+            <!-- ↑クリアボタン用のSVG -->
+          </button>
+        </div>
+      </fieldset>
+
+      <script>
+        [...document.querySelectorAll('.input_wrapper .clear_button')].forEach(clearButtonElem => {
+          const $searchInput = clearButtonElem.parentElement.querySelector('.input');
+          clearButtonElem.addEventListener('click', () => {
+            $searchInput.value = '';
+            $searchInput.focus();
+          });
+        });
+      </script>
+    </section>
+
+    <br />
+    <br />
+
+    <section>
+      <h2>仕組み</h2>
+      <ul>
+        <li>入力欄の枠要素上部に <code>margin</code> を持たせ、フォーカスした際と入力されている場合でプレースホルダーが表示されていなときに、ラベルを浮かせて小さく上部に <code>transform</code> と <code>transition</code> で表示してる</li>
+        <li>入力欄に値がない場合は <code>input:placeholder-shown</code></li>
+        <li>入力欄に値がある場合は <code>input:not(:placeholder-shown)</code></li>
+        <li>クリアボタンが必要な場合は、JavaScriptで入力内容をクリアする処理を別途実装</li>
+      </ul>
+    </section>
+
+    <br />
+    <br />
+
+  </div>
+</body>
+</html>
