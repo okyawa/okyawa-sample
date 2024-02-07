@@ -34,3 +34,14 @@ summary :is(h1, h2, h3, h4, h5, h6) {
 details section {
   margin: 0 1rem;
 }
+
+fieldset {
+  padding: 1rem;
+  border: solid 1px #ccc;
+}
+
+hr {
+  height: 1px;
+  background-color: #ccc;
+  border: none;
+}
