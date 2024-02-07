@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>:autofill 擬似クラスを使ったサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <style>
+    #container input[type="text"]:autofill {
+      border: dashed 2px green;
+    }
+  </style>
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>:autofill 擬似クラスを使ったサンプル</h1>
+    </header>
+
+    <section>
+      <h2><code>:autofill</code> 擬似クラスとは</h2>
+      <ul>
+        <li><code>:autofill</code> はCSSの擬似クラスで、 <code>&lt;input&gt;</code> 要素の値がブラウザーによって自動補完された時に一致する</li>
+        <li>ユーザーが自動補完されたフィールドを編集すると、一致しなくなる</li>
+        <li>フォームでオートフィルされたフィールドは、JavaScriptから <code>:autofill</code> 擬似クラスで取得可能</li>
+      </ul>
+    </section>
+
+    <br />
+
+    <section>
+      <h2>CSSで自動補完された際にborderを変更するサンプル</h2>
+
+      <ul>
+        <li>オートコンプリートの自動補完で入力すると、入力欄が緑破線に変わる</li>
+        <li>オートコンプリートの自動補完で入力すると、自動補完されたテキストが別枠に表示される</li>
+      </ul>
+
+      <fieldset>
+        <label>
+          名前:
+          <input type="text" name="name" placeholder="山田太郎" autocomplete="name" />
+        </label>
+        <label>
+          <h3>自動補完されたテキスト</h3>
+          <textarea name="result" readonly rows="1"></textarea>
+        </label>
+      </fieldset>
+
+      <script>
+        const inputElem = document.querySelector('input[name="name"]');
+        const resultElem = document.querySelector('textarea[name="result"]');
+        inputElem.addEventListener('input', () => {
+          const autofillValue = document.querySelector('input[name="name"]:autofill')?.value;
+          resultElem.value = autofillValue ?? '';
+        });
+      </script>
+
+      <section>
+        <h3>コード</h3>
+
+        <h4>HTML</h4>
+        <pre><code>
+          &lt;input type="text" name="name" placeholder="山田太郎" autocomplete="name" /&gt;
+          &lt;textarea name="result" readonly rows="1"&gt;&lt;/textarea&gt;
+        </code></pre>
+
+        <h4>CSS</h4>
+        <pre><code>
+          #container input[type="text"]:autofill {
+            border: dashed 2px green;
+          }
+        </code></pre>
+
+        <h4>JavaScript</h4>
+        <pre><code>
+          const inputElem = document.querySelector('input[name="name"]');
+          const resultElem = document.querySelector('textarea[name="result"]');
+          inputElem.addEventListener('input', () => {
+            const autofillValue = document.querySelector('input[name="name"]:autofill')?.value;
+            resultElem.value = autofillValue ?? '';
+          });
+        </code></pre>
+      </section>
+
+    </section>
+
+    <br />
+    <br />
+
+
+  </div>
+</body>
+</html>
