@@ -14,17 +14,16 @@
     /* 入力欄枠の指定 ======================= */
     .input_wrapper {
       position: relative;
-      margin-top: 32px; /* ラベルをフローティング表示するための余白指定 */
-      margin-bottom: 24px;
+      margin-top: 2.5rem; /* ラベルをフローティング表示するための余白指定 */
+      margin-bottom: 2rem;
       max-width: 400px;
     }
 
     /* テキスト入力欄の指定 ======================= */
     .input_wrapper input {
-      font-size: 20px;
+      font-size: 1rem;
       width: 100%;
-      padding: 8px 0;
-      padding-right: 30px; /* クリアボタンと重ならないようにするための余白指定 */
+      padding: 0.5rem 0;
       color: #333;
       border: none;
       border-bottom: 1px solid #ddd;
@@ -49,7 +48,7 @@
     /* 未入力時のラベル要素指定 ======================= */
     .input_wrapper label {
       position: absolute;
-      top: 8px;
+      top: 0.2rem;
       left: 0;
       color: #43454e;
       pointer-events: none;
@@ -61,6 +60,7 @@
     .input_wrapper input:focus + .label,
     .input_wrapper input:not(:placeholder-shown) + .label {
       transform: translateY(-100%) scale(0.75);
+      color: #000;
     }
   </style>
   <!-- ↑ フォームの入力時にフロートする入力欄のCSS指定 -->
@@ -77,7 +77,7 @@
       height: 30px;
       width: 30px;
       position: absolute;
-      right: -9px; /* 入力欄の右端に設置 */
+      right: -4px; /* 入力欄の右端に設置 */
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -95,6 +95,11 @@
     .input_wrapper .clear_button:hover,
     .input_wrapper .clear_button:focus {
       color: #333;
+    }
+
+    /* クリアボタンと入力テキストが重ならないようにするための余白指定 */
+    .input_wrapper:has(.clear_button) input {
+      padding-right: 24px;
     }
   </style>
   <!-- ↑ クリアボタンのCSS指定 -->
@@ -128,7 +133,7 @@
           <label class="label" for="name">名前</label>
         </div>
         <div class="input_wrapper">
-          <input class="input" type="text" id="email" name="email" placeholder="Name">
+          <input class="input" type="text" id="email" name="email" placeholder="Email">
           <label class="label" for="email">メールアドレス</label>
         </div>
       </fieldset>
@@ -144,7 +149,7 @@
 
       <fieldset>
         <div class="input_wrapper">
-          <input autocomplete="off" class="input" type="text" id="name" name="name" placeholder="Name">
+          <input class="input" type="text" id="name" name="name" placeholder="Name">
           <label class="label" for="name">名前</label>
 
           <button class="clear_button" aria-label="Clear input">
@@ -179,6 +184,22 @@
         <li>入力欄に値がある場合は <code>input:not(:placeholder-shown)</code></li>
         <li>クリアボタンが必要な場合は、JavaScriptで入力内容をクリアする処理を別途実装</li>
       </ul>
+    </section>
+
+    <br />
+    <br />
+
+    <section>
+      <h2>コード</h2>
+
+      <h3>HTML</h3>
+
+      <h3>フロートする入力欄のラベルのCSS</h3>
+
+      <h3>クリアボタンのCSS</h3>
+
+      <h3>クリアボタンのJavaScript</h3>
+
     </section>
 
     <br />
