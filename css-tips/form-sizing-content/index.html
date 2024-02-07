@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>form-sizing: content を使ってフォームのサイズを入力された文字量に合わせて自動変更するサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <style>
+    textarea {
+      /* 旧式 */
+      form-sizing: content;
+      /* 新方式 */
+      field-sizing: content;
+    }
+  </style>
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>form-sizing: content を使ったサンプル</h1>
+      <h2>フォームのサイズを入力された文字量に合わせて自動変更</h2>
+    </header>
+
+    <section>
+      <ul>
+        <li><code>form-sizing: content;</code> のCSS指定を <code>textarea</code> 要素に当てると、入力された文字量に合わせて入力欄のサイズが自動変更される</li>
+        <li>試してみたところ、現状は動かず、まだ時期尚早 (2024/02/07)</li>
+        <li>WHATWGの提案が <code>form-sizing</code> から <code>field-sizing</code> に変わったようで、まだまだ流動的 <a href="https://github.com/whatwg/html/pull/9903" ref="nofollow noreferrer noopener" target="_blank">https://github.com/whatwg/html/pull/9903</a></li>
+        <li>Chromeは <code>123</code> のバージョンから <code>field-sizing</code> に対応予定 (<a href="https://chromestatus.com/feature/5176596826161152" ref="nofollow noreferrer noopener" target="_blank">https://chromestatus.com/feature/5176596826161152</a>)</li>
+      </ul>
+    </section>
+
+    <br />
+
+    <section>
+
+      <h2>DEMO</h2>
+
+      <fieldset>
+        <textarea name="content" placeholder="入力してください"></textarea>
+      </fieldset>
+
+
+    </section>
+
+    <br />
+    <br />
+
+  </div>
+</body>
+</html>
