@@ -30,64 +30,121 @@
     <br />
 
     <section>
+      <details open>
+        <summary><h2>デモ1: script要素に直書きのTypeScript</h2></summary>
 
-      <h2>デモ</h2>
-      <p>TypeScript realtime transpile and execution demo.</p>
-      <p>[Status] <i id="status">Processing...</i></p>
-      <p>[Loaded Data]
-        <pre><code id="data" class="language-json"></code></pre>
-      </p>
+        <p>TypeScript realtime transpile and execution demo.</p>
+        <p>[Status] <i id="status1">Processing...</i></p>
+        <p>[Loaded Data]
+          <pre><code id="data1" class="language-json"></code></pre>
+        </p>
 
-      <script async type="module">
-        // TypeScript本家のパッケージ
-        import { transpile, ScriptTarget } from 'https://esm.sh/typescript@5.3.3?bundle&target=esnext';
-        // ソースコード圧縮し、minifyするパッケージ
-        import { minify_sync } from 'https://esm.sh/terser@5.27.0?bundle&target=esnext';
-    
-        // script 要素のうち、メディアタイプがTypeScriptな要素のみを抽出しJavaScriptにトランスパイルする
-        for (const {type, textContent} of document.getElementsByTagName('script')) {
-            if(type !== 'text/typescript' || !textContent){
-                continue;
-            }
-    
-            // TypeScriptからJavaScriptへのトラインスパイルを実行
-            const js = transpile(textContent, {
-                target: ScriptTarget.ESNext
-            });
-    
-            // ソースコードの圧縮
-            const { code } = minify_sync(js, {
-                module: true
-            });
-    
-            // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
-            // 動的インポートでJavaScriptを読み込んで実行
-            await import(`data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`);
-        }
-      </script>
+        <script async type="module">
+          // TypeScript本家のパッケージ
+          import { transpile, ScriptTarget } from 'https://esm.sh/typescript@5.3.3?bundle&target=esnext';
+          // ソースコード圧縮し、minifyするパッケージ
+          import { minify_sync } from 'https://esm.sh/terser@5.27.0?bundle&target=esnext';
       
-      <script type="text/typescript">
-          interface Demo {
-              a: string;
-              b: number;
-              c: boolean;
+          // script 要素のうち、メディアタイプがTypeScriptな要素のみを抽出しJavaScriptにトランスパイルする
+          for (const {type, textContent} of document.getElementsByTagName('script')) {
+              if(type !== 'text/typescript' || !textContent){
+                  continue;
+              }
+      
+              // TypeScriptからJavaScriptへのトラインスパイルを実行
+              const js = transpile(textContent, {
+                  target: ScriptTarget.ESNext
+              });
+      
+              // ソースコードの圧縮
+              const { code } = minify_sync(js, {
+                  module: true
+              });
+      
+              // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
+              // 動的インポートでJavaScriptを読み込んで実行
+              await import(`data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`);
           }
-          const demo: Demo = {
-              a: 'aaa',
-              b: 111,
-              c: true
-          };
-      
-          await new Promise<void>(done => setTimeout(done, 100));
-          console.log(demo);
-          document.getElementById('status').textContent = 'Complete!';
-          const dataElement = document.getElementById('data');
-          dataElement.textContent = JSON.stringify(demo);
+        </script>
+        
+        <script type="text/typescript">
+            interface Demo {
+                a: string;
+                b: number;
+                c: boolean;
+            }
+            const demo: Demo = {
+                a: 'aaa',
+                b: 111,
+                c: true,
+            };
+
+            // 擬似的に通信時の遅延状態を再現
+            await new Promise<void>(done => setTimeout(done, 100));
+            console.log('デモ1: ', demo);
+
+            // 結果を画面に表示
+            const statusElement = document.getElementById('status1');
+            const dataElement = document.getElementById('data1');
+            statusElement.textContent = 'Complete!';
+            dataElement.textContent = JSON.stringify(demo);
+
+            // コードのシンタックスハイライト
+            hljs.highlightElement(dataElement)
+        </script>
+
+      </details>
+
+    </section>
+
+    <br />
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>デモ2: TypeScriptファイルの読み込み</h2></summary>
+
+        <p>TypeScript file realtime transpile and execution demo.</p>
+        <p>[Status] <i id="status2">Processing...</i></p>
+        <p>[Loaded Data]
+          <pre><code id="data2" class="language-json"></code></pre>
+        </p>
+
+        <script async type="module">
+          // TypeScript本家のパッケージ
+          import { transpile, ScriptTarget } from 'https://esm.sh/typescript@5.3.3?bundle&target=esnext';
+          // ソースコード圧縮し、minifyするパッケージ
+          import { minify_sync } from 'https://esm.sh/terser@5.27.0?bundle&target=esnext';
+
+          const response = await fetch('./demo.ts');
+          const tsText = await response.text();
+
+          // TypeScriptからJavaScriptへのトラインスパイルを実行
+          const js = transpile(tsText, {
+              target: ScriptTarget.ESNext
+          });
+  
+          // ソースコードの圧縮
+          const { code } = minify_sync(js, {
+              module: true
+          });
+
+          // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
+          // 動的インポートでJavaScriptを読み込んで実行
+          const demo = await import(`data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`);
+
+          // 読み込んだスクリプトの実行
+          const statusElement = document.getElementById('status2');
+          const dataElement = document.getElementById('data2');
+          const values = await demo.execute(statusElement, dataElement);
+          console.log('デモ2: ', values);
 
           // コードのシンタックスハイライト
           hljs.highlightElement(dataElement)
-      </script>
-      
+        </script>
+
+      </details>
+
     </section>
 
     <br />
