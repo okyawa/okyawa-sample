@@ -14,6 +14,13 @@
   <script src="/res/js/highlight-js/highlight.min.js"></script>
   <script>
     // hljs.highlightAll();
+    window.addEventListener('DOMContentLoaded', (event) => {
+      // 非同期処理でコードのハイライトを適用しない部分にだけ、highlightElement()を適用
+      const codeElements = document.querySelectorAll('.code pre code');
+      codeElements.forEach((codeElement) => {
+        hljs.highlightElement(codeElement);
+      });
+    });
   </script>
   <!-- ↑コードのシンタックスハイライト -->
 
@@ -111,27 +118,13 @@
         </p>
 
         <script async type="module">
-          // TypeScript本家のパッケージ
-          import { transpile, ScriptTarget } from 'https://esm.sh/typescript@5.3.3?bundle&target=esnext';
-          // ソースコード圧縮し、minifyするパッケージ
-          import { minify_sync } from 'https://esm.sh/terser@5.27.0?bundle&target=esnext';
+          // TypeScriptからJavaScriptへ変換するためのJSを読み込み
+          import { transpileTS } from './ts-transpile.js';
 
-          const response = await fetch('./demo.ts');
-          const tsText = await response.text();
-
-          // TypeScriptからJavaScriptへのトラインスパイルを実行
-          const js = transpile(tsText, {
-              target: ScriptTarget.ESNext
-          });
-  
-          // ソースコードの圧縮
-          const { code } = minify_sync(js, {
-              module: true
-          });
-
-          // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
-          // 動的インポートでJavaScriptを読み込んで実行
-          const demo = await import(`data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`);
+          // TypeScriptファイルの読み込んで、DataURL形式のJavaScriptに変換
+          const dataUrlJs = await transpileTS('./demo.ts');
+          // 変換したJavaScriptを読み込み
+          const demo = await import(dataUrlJs);
 
           // 読み込んだスクリプトの実行
           const statusElement = document.getElementById('status2');
@@ -142,6 +135,108 @@
           // コードのシンタックスハイライト
           hljs.highlightElement(dataElement)
         </script>
+
+        <details open class="code">
+          <summary><h3>コード</h3></summary>
+
+          <details open>
+            <summary><h4>./demo.ts</h4></summary>
+            <pre><code class="language-ts">
+interface Demo {
+  e: string;
+  f: number;
+  g: boolean;
+}
+
+const demo: Demo = {
+  e: 'eee',
+  f: 222,
+  g: false,
+};
+
+export function execute(statusElement: HTMLElement, dataElement: HTMLElement): Promise<Demo> {
+  return new Promise(async (resolve, reject) => {
+    // 擬似的に通信時の遅延状態を再現
+    await new Promise<void>(done => setTimeout(done, 100));
+
+    // 結果を画面に表示
+    statusElement.textContent = 'Complete!';
+    dataElement.textContent = JSON.stringify(demo);
+
+    resolve(demo);
+  });
+}
+            </code></pre>
+          </details>
+
+          <details open>
+            <summary><h4>./ts-transpile.js</h4></summary>
+            <pre><code class="language-js">
+// TypeScript本家のパッケージ
+import { transpile, ScriptTarget } from 'https://esm.sh/typescript@5.3.3?bundle&target=esnext';
+// ソースコード圧縮し、minifyするパッケージ
+import { minify_sync } from 'https://esm.sh/terser@5.27.0?bundle&target=esnext';
+
+/**
+  * TypeScriptファイルを読み込み、JavaScriptにトランスパイルして圧縮したDataURLを返す
+  * @param {string} url TypeScriptファイルのURL
+  * @returns {Promise<string>}
+  */
+export async function transpileTS(url) {
+  const response = await fetch(url);
+  const tsText = await response.text();
+
+  // TypeScriptからJavaScriptへのトラインスパイルを実行
+  const js = transpile(tsText, {
+    target: ScriptTarget.ESNext,
+  });
+
+  // ソースコードの圧縮
+  const { code } = minify_sync(js, {
+    module: true,
+  });
+
+  // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
+  return `data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`;
+}
+            </code></pre>
+          </details>
+
+          <details open>
+            <summary><h4>script要素指定</h4></summary>
+            <pre><code class="language-html">
+&lt;script async type="module"&gt;
+  // TypeScriptからJavaScriptへ変換するためのJSを読み込み
+  import { transpileTS } from './ts-transpile.js';
+
+  // TypeScriptファイルの読み込んで、DataURL形式のJavaScriptに変換
+  const dataUrlJs = await transpileTS('./demo.ts');
+  // 変換したJavaScriptを読み込み
+  const demo = await import(dataUrlJs);
+
+  // 読み込んだスクリプトの実行
+  const statusElement = document.getElementById('status2');
+  const dataElement = document.getElementById('data2');
+  const values = await demo.execute(statusElement, dataElement);
+  console.log('デモ2: ', values);
+
+  // コードのシンタックスハイライト
+  hljs.highlightElement(dataElement)
+&lt;/script&gt;
+            </code></pre>
+          </details>
+
+          <details open>
+            <summary><h4>HTML</h4></summary>
+            <pre><code>
+&lt;p&gt;[Status] &lt;i id="status2"&gt;Processing...&lt;/i&gt;&lt;/p&gt;
+&lt;p&gt;[Loaded Data]
+  &lt;pre&gt;&lt;code id="data2" class="language-json"&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/p&gt;
+            </code></pre>
+          </details>
+
+        </details>
 
       </details>
 
