@@ -23,5 +23,5 @@ export async function transpileTS(url) {
   });
 
   // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
-  return `data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`;
+  return `data:text/javascript;charset=utf-8,${encodeURIComponent(code)}`;
 }
