@@ -193,10 +193,10 @@
 
         <script async type="module">
           // TypeScriptからJavaScriptへ変換するためのJSを読み込み
-          import { transpileTS } from './ts-transpile.js';
+          import { transpileTS } from '/js-tips/typescript-on-web/ts-transpile.js';
 
           // TypeScriptファイルの読み込んで、DataURL形式のJavaScriptに変換
-          const dataUrlJs = await transpileTS('./demo.ts');
+          const dataUrlJs = await transpileTS('/js-tips/typescript-on-web/demo.ts');
           // 変換したJavaScriptを読み込み
           const demo = await import(dataUrlJs);
 
