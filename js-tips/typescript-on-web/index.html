@@ -100,6 +100,80 @@
             hljs.highlightElement(dataElement)
         </script>
 
+        <details class="code">
+          <summary><h3>コード</h3></summary>
+
+          <details open>
+            <summary><h4>script要素指定</h4></summary>
+            <pre><code class="language-html">
+&lt;script async type="module"&gt;
+  // TypeScript本家のパッケージ
+  import { transpile, ScriptTarget } from 'https://esm.sh/typescript@5.3.3?bundle&target=esnext';
+  // ソースコード圧縮し、minifyするパッケージ
+  import { minify_sync } from 'https://esm.sh/terser@5.27.0?bundle&target=esnext';
+
+  // script 要素のうち、メディアタイプがTypeScriptな要素のみを抽出しJavaScriptにトランスパイルする
+  for (const {type, textContent} of document.getElementsByTagName('script')) {
+      if(type !== 'text/typescript' || !textContent){
+          continue;
+      }
+
+      // TypeScriptからJavaScriptへのトラインスパイルを実行
+      const js = transpile(textContent, {
+          target: ScriptTarget.ESNext
+      });
+
+      // ソースコードの圧縮
+      const { code } = minify_sync(js, {
+          module: true
+      });
+
+      // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
+      // 動的インポートでJavaScriptを読み込んで実行
+      await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(code)}`);
+  }
+&lt;/script&gt;
+
+&lt;script type="text/typescript"&gt;
+    interface Demo {
+        a: string;
+        b: number;
+        c: boolean;
+    }
+    const demo: Demo = {
+        a: 'aaa',
+        b: 111,
+        c: true,
+    };
+
+    // 擬似的に通信時の遅延状態を再現
+    await new Promise<void>(done => setTimeout(done, 100));
+    console.log('デモ1: ', demo);
+
+    // 結果を画面に表示
+    const statusElement = document.getElementById('status1');
+    const dataElement = document.getElementById('data1');
+    statusElement.textContent = 'Complete!';
+    dataElement.textContent = JSON.stringify(demo);
+
+    // コードのシンタックスハイライト
+    hljs.highlightElement(dataElement)
+&lt;/script&gt;
+            </code></pre>
+          </details>
+
+          <details open>
+            <summary><h4>HTML</h4></summary>
+            <pre><code>
+&lt;p&gt;[Status] &lt;i id="status1"&gt;Processing...&lt;/i&gt;&lt;/p&gt;
+&lt;p&gt;[Loaded Data]
+  &lt;pre&gt;&lt;code id="data1" class="language-json"&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/p&gt;
+            </code></pre>
+          </details>
+
+        </details>
+
       </details>
 
     </section>
@@ -154,7 +228,7 @@ const demo: Demo = {
   g: false,
 };
 
-export function execute(statusElement: HTMLElement, dataElement: HTMLElement): Promise<Demo> {
+export function execute(statusElement: HTMLElement, dataElement: HTMLElement): Promise&lt;Demo&gt; {
   return new Promise(async (resolve, reject) => {
     // 擬似的に通信時の遅延状態を再現
     await new Promise<void>(done => setTimeout(done, 100));
@@ -197,7 +271,7 @@ export async function transpileTS(url) {
   });
 
   // UTF-8でエンコードしBASE64へ変換したDataURLへ変換
-  return `data:text/javascript;base64,${btoa([...new TextEncoder().encode(code)].map(v => String.fromCharCode(v)).join(''))}`;
+  return `data:text/javascript;charset=utf-8,${encodeURIComponent(code)}`;
 }
             </code></pre>
           </details>
