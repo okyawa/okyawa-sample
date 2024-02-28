@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Web Share APIの画像付き検証 →失敗。。</title>
+  <meta name="description" content="Web Share APIのサンプルです。デモはWeb Share APIに対応してるブラウザのみで動作します。">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+<div id="container">
+
+
+  <header>
+    <h1>Web Share APIの画像付き検証 →失敗。。</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <details open>
+      <summary><h2>概要</h2></summary>
+
+      <ul>
+        <li><code>Web Share API</code> に <code>files</code> を指定して画像付きでシェアした際の検証を行ったが、結果は上手くいかず。。</li>
+      </ul>
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <details open>
+      <summary>
+        <h2>Demo</h2>
+      </summary>
+
+      <p>
+        <button id="share_button" type="button">シェア</button>
+      </p>
+
+      <blockquote id="result"></blockquote>
+      <canvas id="canvas" width="640" height="640"></canvas>
+
+      <script>
+        function setupWebShareAPI() {
+          createShareImageBlog(processWebShare);
+          // processWebShare();
+        }
+
+        function createShareImageBlog(callback) {
+          // ※同じドメイン上の画像URLじゃないと、CORSの制約に引っ掛かり、
+          // "Tainted canvases may not be exported." のエラーになる
+          const imageUrl = '/img/cocktails/w640/sol_cubano.jpeg';
+          const image = new Image();
+          image.onload = () => {
+            // const canvas = document.getElementById('canvas');
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0);
+            const dataURL = canvas.toDataURL("image/jpeg");
+            callback(dataURL);
+          };
+          image.src = imageUrl;
+
+          // const file = new File([], imageUrl, { type: 'image/jpeg' });
+
+// console.log(navigator.canShare({files: [file]}));
+
+        }
+
+        function processWebShare(dataURL) {
+          const shareData = {
+            title: document.title,
+            text: document.querySelector('meta[name="description"]').content,
+            url: location.href,
+            files: [dataURL],
+          };
+
+          const buttonElem = document.querySelector('#share_button');
+          const resultElem = document.querySelector("#result");
+// console.log(dataURL);
+// console.log(navigator.canShare({files: [dataURL]}));
+
+          // シェアは「ユーザーによる有効化」により起動させる必要あり
+          buttonElem.addEventListener('click', async () => {
+            try {
+              await navigator.share(shareData);
+              resultElem.textContent = 'Data shared successfully.';
+            } catch (error) {
+              resultElem.textContent = `Error: ${error}`;
+              throw error;
+            }
+          });
+        }
+
+        setupWebShareAPI();
+      </script>
+
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+</div>
+</body>
+</html>
