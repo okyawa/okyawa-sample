@@ -54,7 +54,7 @@
         <button id="share_button" type="button">シェア</button>
       </p>
 
-      <pre><code id="result"></code></pre>
+      <blockquote id="result"></blockquote>
 
       <script>
         function setupWebShareAPI() {
@@ -71,7 +71,7 @@
           buttonElem.addEventListener('click', async () => {
             try {
               await navigator.share(shareData);
-              resultElem.textContent = 'Data shared successfully';
+              resultElem.textContent = 'Data shared successfully.';
             } catch (error) {
               resultElem.textContent = `Error: ${error}`;
             }

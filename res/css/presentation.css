@@ -21,6 +21,12 @@ code {
   font-family: monospace;
 }
 
+blockquote {
+  min-height: 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f5f5f5;
+}
+
 summary {
   cursor: pointer;
 }
