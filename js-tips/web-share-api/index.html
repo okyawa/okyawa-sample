@@ -58,6 +58,7 @@
 
       <script>
         function setupWebShareAPI() {
+          /** シェアする際に渡すデータ */
           const shareData = {
             title: document.title,
             text: document.querySelector('meta[name="description"]').content,
@@ -70,9 +71,13 @@
           // シェアは「ユーザーによる有効化」により起動させる必要あり
           buttonElem.addEventListener('click', async () => {
             try {
+              // Web Share APIを使って、OSのシェア機能を開く
               await navigator.share(shareData);
               resultElem.textContent = 'Data shared successfully.';
             } catch (error) {
+              // Web Share APIが使えないブラウザの場合
+              await navigator.clipboard.writeText(shareData.url);
+              alert('URLをコピーしました');
               resultElem.textContent = `Error: ${error}`;
             }
           });
@@ -98,6 +103,7 @@
       <summary><h3>JavaScript</h3></summary>
 <pre><code class="language-js">
   function setupWebShareAPI() {
+    /** シェアする際に渡すデータ */
     const shareData = {
       title: document.title,
       text: document.querySelector('meta[name="description"]').content,
@@ -110,9 +116,13 @@
     // シェアは「ユーザーによる有効化」により起動させる必要あり
     buttonElem.addEventListener('click', async () => {
       try {
+        // Web Share APIを使って、OSのシェア機能を開く
         await navigator.share(shareData);
-        resultElem.textContent = 'Data shared successfully';
+        resultElem.textContent = 'Data shared successfully.';
       } catch (error) {
+        // Web Share APIが使えないブラウザの場合
+        await navigator.clipboard.writeText(shareData.url);
+        alert('URLをコピーしました');
         resultElem.textContent = `Error: ${error}`;
       }
     });
