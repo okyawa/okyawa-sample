@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Web Share APIのサンプル</title>
+  <meta name="description" content="Web Share APIのサンプルです。デモはWeb Share APIに対応してるブラウザのみで動作します。">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+<div id="container">
+
+
+  <header>
+    <h1>Web Share APIのサンプル</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <details open>
+      <summary><h2>概要</h2></summary>
+
+      <ul>
+        <li><code>Web Share API</code> を使うと、OSの共有メカニズムを利用して、ユーザーが選択した共有ターゲットに共有することができる</li>
+      </ul>
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <details open>
+      <summary>
+        <h2>Demo</h2>
+      </summary>
+
+      <p>
+        <button id="share_button" type="button">シェア</button>
+      </p>
+
+      <pre><code id="result"></code></pre>
+
+      <script>
+        function setupWebShareAPI() {
+          const shareData = {
+            title: document.title,
+            text: document.querySelector('meta[name="description"]').content,
+            url: location.href,
+          };
+
+          const buttonElem = document.querySelector('#share_button');
+          const resultElem = document.querySelector("#result");
+
+          // シェアは「ユーザーによる有効化」により起動させる必要あり
+          buttonElem.addEventListener('click', async () => {
+            try {
+              await navigator.share(shareData);
+              resultElem.textContent = 'Data shared successfully';
+            } catch (error) {
+              resultElem.textContent = `Error: ${error}`;
+            }
+          });
+        }
+
+        setupWebShareAPI();
+      </script>
+
+    </details>
+  </section>
+
+  <details>
+    <summary><h2>コード</h2></summary>
+    
+    <details open>
+      <summary><h3>HTML</h3></summary>
+<pre><code class="language-html">&lt;button id="share_button" type="button"&gt;シェア&lt;/button&gt;
+&lt;div id="result"&gt;&lt;/div&gt;
+</code></pre>
+    </details>
+
+    <details open>
+      <summary><h3>JavaScript</h3></summary>
+<pre><code class="language-js">
+  function setupWebShareAPI() {
+    const shareData = {
+      title: document.title,
+      text: document.querySelector('meta[name="description"]').content,
+      url: location.href,
+    };
+
+    const buttonElem = document.querySelector('#share_button');
+    const resultElem = document.querySelector("#result");
+
+    // シェアは「ユーザーによる有効化」により起動させる必要あり
+    buttonElem.addEventListener('click', async () => {
+      try {
+        await navigator.share(shareData);
+        resultElem.textContent = 'Data shared successfully';
+      } catch (error) {
+        resultElem.textContent = `Error: ${error}`;
+      }
+    });
+  }
+
+  setupWebShareAPI();
+</code></pre>
+
+    </details>
+  </details>
+
+  <br />
+  <br />
+
+</div>
+</body>
+</html>
