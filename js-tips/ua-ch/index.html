@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>User-Agent Client Hints (UA-CH) のサンプル</title>
+  <meta name="description" content="Web Share APIのサンプルです。デモはWeb Share APIに対応してるブラウザのみで動作します。">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+<div id="container">
+
+
+  <header>
+    <h1>User-Agent Client Hints (UA-CH) のサンプル</h1>
+  </header>
+
+  <br />
+
+  <section>
+    <details open>
+      <summary><h2>概要</h2></summary>
+
+      <ul>
+        <li>ユーザーエージェントの文字列は、近い将来固定化され、正常に情報を取得できなくなってしまう</li>
+        <li>現在策定されている新しいユーザーエージェント仕様が「User-Agent Client Hints」(UA-CH)</li>
+        <li>User-Agent Client HintsはJavaScriptの <code>navigator.userAgentData</code>オブジェクトでデータを参照できるようになります。</li>
+        <li>未対応ブラウザでは、 <code>navigator.userAgentData</code> が <code>undefined</code> になる</li>
+      </ul>
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <details open>
+      <summary>
+        <h2>userAgentDataをそのまま出力するDemo</h2>
+      </summary>
+
+      <h3>JavaScript</h3>
+      <pre><code class="language-js">console.log(navigator.userAgentData);</code></pre>
+
+      <h3>結果</h3>
+      <pre><code id="result1" class="language-json"></code></pre>
+
+      <script>
+        (() => {
+          const uaData = navigator.userAgentData;
+          document.getElementById('result1').textContent = JSON.stringify(uaData, null, 2);
+        })();
+      </script>
+
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+  <section>
+    <details open>
+      <summary>
+        <h2>高エントロピー値の返却</h2>
+      </summary>
+
+      <ul>
+        <li><code>NavigatorUAData.getHighEntropyValues()</code> メソッドを使用すると、多くのヒントをリクエスト可能</li>
+        <li><code>Promise</code> で値が返ってくる</li>
+      </ul>
+
+      <h3>JavaScript</h3>
+<pre><code class="language-js">navigator.userAgentData
+  .getHighEntropyValues([
+    'platform',
+    'platformVersion',
+    'architecture',
+    'model',
+  ])
+  .then((uaData) => {
+    console.log(uaData);
+  });
+</code></pre>
+
+      <h3>結果</h3>
+      <pre><code id="result2" class="language-json"></code></pre>
+
+      <script>
+        (() => {
+          navigator.userAgentData
+            .getHighEntropyValues([
+              'platform',
+              'platformVersion',
+              'architecture',
+              'model',
+            ])
+            .then((uaData) => {
+              document.getElementById('result2').textContent = JSON.stringify(uaData, null, 2);
+            });
+        })();
+      </script>
+
+    </details>
+  </section>
+
+  <br />
+  <br />
+
+</div>
+</body>
+</html>
