@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>CSSで円形のプログレスバー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <!-- ↓円形プログレスバーのCSS指定 ================= -->
+  <style>
+    @property --progress-value {
+      syntax: "<integer>";
+      initial-value: 0;
+      inherits: false;
+    }
+    .progress_circle {
+      --progress-value: 0;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background-image: 
+        radial-gradient(closest-side, white 86%, transparent 88% 100%),
+        conic-gradient(#3588D1 calc(var(--progress-value) * 1%), #f5f5f5 0);
+      /* transition: all 1s ease-out; */
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress_circle::before {
+      content: "Loading";
+    }
+    .progress_circle::after {
+      content: attr(data-value) "%";
+      font-size: 16px;
+    }
+    .progress_circle progress {
+      height: 0;
+      width: 0;
+      visibility: hidden;
+    }
+  </style>
+  <!-- ↑円形プログレスバーのCSS指定 ================= -->
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>CSSで円形のプログレスバー</h1>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>DEMO</h2></summary>
+
+        <ul>
+          <li>入力欄に入れた0〜100の値に応じて、円形のプログレスバーの表示が切り替わるサンプル</li>
+        </ul>
+
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div class="progress_circle" data-value="0">
+            <progress value="0" min="0" max="100"></progress>
+          </div>
+
+          <br />
+
+          <span>
+            <input id="percent_input" type="number" min="0" max="100" value="0" /> %
+          </span>
+        </div>
+
+        <script>
+          /**
+           * 円形プログレスバーの更新
+           * @type {HTMLElement} progressBarElem プログレスバーの要素
+           * @type {string} value 文字列の数値 (0〜100)
+           */
+          function updateProgressCircle(progressBarElem, value) {
+            // JSからCSSのカスタムプロパティ値を更新 (※CSSからattr()で取得した値だと、stringになってしまうため)
+            progressBarElem.style.setProperty('--progress-value', Number(value));
+            progressBarElem.setAttribute('data-value', value);
+          }
+          window.addEventListener('DOMContentLoaded', () => {
+            // 画面読み込み時の初期化処理
+            const progressBarElem = document.querySelector('.progress_circle');
+            const value = progressBarElem.getAttribute('data-value');
+            updateProgressCircle(progressBarElem, value);
+          
+            // 擬似的に、入力欄に入れた値をプログレスバーへ反映
+            const percentInputElem = document.getElementById('percent_input');
+            percentInputElem.addEventListener('input', (event) => {
+              updateProgressCircle(progressBarElem, event.target.value);
+            });
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <br />
+    <br />
+
+  </div>
+</body>
+</html>
