@@ -11,55 +11,45 @@
 
   <!-- ↓SVG円形プログレスバーのCSS指定 ================= -->
   <style>
-    .progress {
-      position: relative;
+    .progress_circle {
       display: inline-block;
-      padding: 0;
+      position: relative;
       text-align: center;
-      &>li {
-        display: inline-block;
-        position: relative;
-        text-align: center;
-        color: #93A2AC;
-        font-family: Lato;
-        font-weight:100;
-        margin: 2rem;
-        &:before {
-          content: attr(data-name);
-          position: absolute;
-          width: 100%;
-          bottom: -2rem;
-          font-weight:400;
-        }
-        &:after {
-          content: attr(data-percent);
-          position: absolute;
-          width: 100%;
-          top: 3.7rem;
-          left: 0;
-          font-size: 2rem;
-          text-align: center;
-        }
-      }
-      svg {
-        width: 10rem;
-        height: 10rem;
-        &:nth-child(2) {
-          position: absolute;
-          left: 0;
-          top: 0;
-          transform: rotate(-90deg);
-        }
-        &:nth-child(2) path {
-          fill: none;
-          stroke-width: 25;
-          stroke-dasharray: 629;
-          stroke: #fff;
-          opacity:.9;
-          transition: stroke-dashoffset 1s;
-          /* animation: load 10s; */
-        }
-      }
+      color: #93A2AC;
+      font-family: Lato;
+      font-weight:100;
+    }
+    .progress_circle::before {
+      content: attr(data-percent) "%";
+      width: 100%;
+      position: absolute;
+      top: 3.7rem;
+      left: 0;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .progress_circle svg {
+      width: 10rem;
+      height: 10rem;
+    }
+    .progress_circle svg:nth-child(2) {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: rotate(-90deg);
+    }
+    .progress_circle svg:nth-child(2) path {
+      fill: none;
+      stroke-width: 25;
+      stroke-dasharray: 629;
+      stroke: #fff;
+      opacity:.9;
+      transition: stroke-dashoffset 1s;
+    }
+    .progress_circle progress {
+      height: 0;
+      width: 0;
+      visibility: hidden;
     }
   </style>
   <!-- ↑SVGプログレスバーのCSS指定 ================= -->
@@ -92,29 +82,32 @@
         <ul>
           <li>入力欄に入れた0〜100の値に応じて、SVGの円形プログレスバー表示が切り替わるサンプル</li>
           <li><code>svg</code> 要素内にある <code>path</code> 要素の <code>stroke-dashoffset</code> 属性値をJavaScriptで変更することで、動的に変更が可能</li>
-          <li>アニメーションは、CSSで <code>transition: stroke-dashoffset 1s;</code> を指定</li>
+          <li>値を変更した際のアニメーションは、CSSで <code>transition: stroke-dashoffset 1s;</code> を指定</li>
+          <li><code>progress</code>要素を隠して値だけを更新することで、セマンティックなコードに対応</li>
         </ul>
 
         <div style="display: flex; flex-direction: column; align-items: center;">
-          <ul class="progress progress_circle">
-            <li data-name="Demo" data-percent="0%">
-              <svg viewBox="-10 -10 220 220">
-                <g fill="none" stroke-width="6" transform="translate(100,100)">
-                  <path d="M 0,-100 A 100,100 0 0,1 86.6,-50" stroke="url(#cl1)" />
-                  <path d="M 86.6,-50 A 100,100 0 0,1 86.6,50" stroke="url(#cl2)" />
-                  <path d="M 86.6,50 A 100,100 0 0,1 0,100" stroke="url(#cl3)" />
-                  <path d="M 0,100 A 100,100 0 0,1 -86.6,50" stroke="url(#cl4)" />
-                  <path d="M -86.6,50 A 100,100 0 0,1 -86.6,-50" stroke="url(#cl5)" />
-                  <path d="M -86.6,-50 A 100,100 0 0,1 0,-100" stroke="url(#cl6)" />
-                </g>
-              </svg>
-              <svg viewBox="-10 -10 220 220">
-                <path
-                  d="M200,100 C200,44.771525 155.228475,0 100,0 C44.771525,0 0,44.771525 0,100 C0,155.228475 44.771525,200 100,200 C155.228475,200 200,155.228475 200,100 Z"
-                  stroke-dashoffset="0"></path>
-              </svg>
-            </li>
-          </ul>
+
+          <!-- ↓SVGの円形プログレスバー ====================== -->
+          <div class="progress_circle" data-percent="0">
+            <svg viewBox="-10 -10 220 220">
+              <g fill="none" stroke-width="6" transform="translate(100,100)">
+                <path d="M 0,-100 A 100,100 0 0,1 86.6,-50" stroke="url(#cl1)" />
+                <path d="M 86.6,-50 A 100,100 0 0,1 86.6,50" stroke="url(#cl2)" />
+                <path d="M 86.6,50 A 100,100 0 0,1 0,100" stroke="url(#cl3)" />
+                <path d="M 0,100 A 100,100 0 0,1 -86.6,50" stroke="url(#cl4)" />
+                <path d="M -86.6,50 A 100,100 0 0,1 -86.6,-50" stroke="url(#cl5)" />
+                <path d="M -86.6,-50 A 100,100 0 0,1 0,-100" stroke="url(#cl6)" />
+              </g>
+            </svg>
+            <svg viewBox="-10 -10 220 220">
+              <path
+                d="M200,100 C200,44.771525 155.228475,0 100,0 C44.771525,0 0,44.771525 0,100 C0,155.228475 44.771525,200 100,200 C155.228475,200 200,155.228475 200,100 Z"
+                stroke-dashoffset="0"></path>
+            </svg>
+            <progress value="0" min="0" max="100"></progress>
+          </div>
+          <!-- ↑SVGの円形プログレスバー ====================== -->
           <!-- ↓SVGのグラデーション色定義 ====================== -->
           <svg width="0" height="0">
             <defs>
@@ -146,32 +139,38 @@
           </svg>
           <!-- ↑SVGの色定義 ====================== -->
 
+          <!-- ↓数値の入力欄 -->
           <div>
             <input id="percent_input" type="number" min="0" max="100" value="0" /> %
           </div>
+          <!-- ↑数値の入力欄 -->
         </div>
 
         <script>
           /**
            * SVG円形プログレスバーの更新
-           * @type {HTMLElement} pathElem プログレスバーの要素
+           * @type {HTMLElement} progressCircleElem プログレスバーの枠要素
+           * @type {HTMLElement} pathElem svgのpath要素
            * @type {string} value 文字列の数値 (0〜100)
            */
-          function updateProgressCircle(pathElem, value) {
+          function updateProgressCircle(progressCircleElem, pathElem, value) {
             const STROKE_DASHARRAY_VALUE = 629;
+            progressCircleElem.querySelector('progress').value = value;
+            progressCircleElem.dataset.percent = value;
             const dashoffset = Math.round(STROKE_DASHARRAY_VALUE * 100 / 100 * Number(value) / 100);
             pathElem.setAttribute('stroke-dashoffset', dashoffset);
           }
           window.addEventListener('load', function () {
             // 初期化
             const INIT_VALUE = 0;
-            const pathElem = document.querySelector('.progress_circle svg path[stroke-dashoffset]');
-            updateProgressCircle(pathElem, INIT_VALUE);
+            const progressCircleElem = document.querySelector('.progress_circle');
+            const pathElem = progressCircleElem.querySelector('svg path[stroke-dashoffset]');
+            updateProgressCircle(progressCircleElem, pathElem, INIT_VALUE);
 
             // 擬似的に、入力欄に入れた値をプログレスバーへ反映
             const percentInputElem = document.getElementById('percent_input');
             percentInputElem.addEventListener('input', (event) => {
-              updateProgressCircle(pathElem, event.target.value);
+              updateProgressCircle(progressCircleElem, pathElem, event.target.value);
             });
           });
         </script>
