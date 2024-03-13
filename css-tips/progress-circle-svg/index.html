@@ -11,23 +11,27 @@
 
   <!-- ↓SVG円形プログレスバーのCSS指定 ================= -->
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
     .progress_circle {
+      margin-bottom: 20px;
       display: inline-block;
       position: relative;
       text-align: center;
-      color: #93A2AC;
-      font-family: Lato;
-      font-weight:100;
+      font-family: "Lato", sans-serif;
+      font-weight: 400;
+      color: #BFBDC8;
     }
     .progress_circle::before {
-      content: "Loading";
-      top: 30%;
-      font-size: 16px;
+      content: "Loading...";
+      bottom: -15px;
+      font-size: 14px;
+      animation: blink 1s ease-in-out infinite alternate;
     }
     .progress_circle::after {
       content: attr(data-percent) "%";
-      top: 42%;
-      font-size: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
     }
     .progress_circle::before,
     .progress_circle::after {
@@ -35,11 +39,10 @@
       position: absolute;
       left: 0;
       text-align: center;
-      animation: blink 1s ease-in-out infinite alternate;
     }
     .progress_circle svg {
-      width: 10rem;
-      height: 10rem;
+      width: 220px;
+      height: 220px;
     }
     .progress_circle svg:nth-child(2) {
       position: absolute;
@@ -112,7 +115,7 @@
           <!-- ↓SVGの円形プログレスバー ====================== -->
           <div class="progress_circle" data-percent="0">
             <svg viewBox="-10 -10 220 220">
-              <g fill="none" stroke-width="6" transform="translate(100,100)">
+              <g fill="none" stroke-width="10" transform="translate(100,100)">
                 <path d="M 0,-100 A 100,100 0 0,1 86.6,-50" stroke="url(#cl1)" />
                 <path d="M 86.6,-50 A 100,100 0 0,1 86.6,50" stroke="url(#cl2)" />
                 <path d="M 86.6,50 A 100,100 0 0,1 0,100" stroke="url(#cl3)" />
@@ -159,6 +162,8 @@
             </defs>
           </svg>
           <!-- ↑SVGの色定義 ====================== -->
+
+          <br />
 
           <!-- ↓数値の入力欄 -->
           <div>
@@ -211,7 +216,7 @@
 <pre><code class="language-html">&lt;!-- &darr;SVGの円形プログレスバー ====================== --&gt;
 &lt;div class=&quot;progress_circle&quot; data-percent=&quot;0&quot;&gt;
   &lt;svg viewBox=&quot;-10 -10 220 220&quot;&gt;
-    &lt;g fill=&quot;none&quot; stroke-width=&quot;6&quot; transform=&quot;translate(100,100)&quot;&gt;
+    &lt;g fill=&quot;none&quot; stroke-width=&quot;10&quot; transform=&quot;translate(100,100)&quot;&gt;
       &lt;path d=&quot;M 0,-100 A 100,100 0 0,1 86.6,-50&quot; stroke=&quot;url(#cl1)&quot; /&gt;
       &lt;path d=&quot;M 86.6,-50 A 100,100 0 0,1 86.6,50&quot; stroke=&quot;url(#cl2)&quot; /&gt;
       &lt;path d=&quot;M 86.6,50 A 100,100 0 0,1 0,100&quot; stroke=&quot;url(#cl3)&quot; /&gt;
@@ -268,23 +273,27 @@
 
         <details>
           <summary><h3>CSS</h3></summary>
-<pre><code class="language-css">.progress_circle {
+<pre><code class="language-css">@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
+.progress_circle {
+  margin-bottom: 20px;
   display: inline-block;
   position: relative;
   text-align: center;
-  color: #93A2AC;
-  font-family: Lato;
-  font-weight:100;
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  color: #BFBDC8;
 }
 .progress_circle::before {
-  content: "Loading";
-  top: 30%;
-  font-size: 16px;
+  content: "Loading...";
+  bottom: -15px;
+  font-size: 14px;
+  animation: blink 1s ease-in-out infinite alternate;
 }
 .progress_circle::after {
   content: attr(data-percent) "%";
-  top: 42%;
-  font-size: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
 }
 .progress_circle::before,
 .progress_circle::after {
@@ -292,11 +301,10 @@
   position: absolute;
   left: 0;
   text-align: center;
-  animation: blink 1s ease-in-out infinite alternate;
 }
 .progress_circle svg {
-  width: 10rem;
-  height: 10rem;
+  width: 220px;
+  height: 220px;
 }
 .progress_circle svg:nth-child(2) {
   position: absolute;
