@@ -194,6 +194,165 @@
     <br />
     <br />
 
+    <section>
+      <details>
+        <summary><h2>コード (HTML/CSS/JavaScript)</h2></summary>
+
+        <details>
+          <summary><h3>HTML</h3></summary>
+<pre><code class="language-html">&lt;!-- &darr;SVGの円形プログレスバー ====================== --&gt;
+&lt;div class=&quot;progress_circle&quot; data-percent=&quot;0&quot;&gt;
+  &lt;svg viewBox=&quot;-10 -10 220 220&quot;&gt;
+    &lt;g fill=&quot;none&quot; stroke-width=&quot;6&quot; transform=&quot;translate(100,100)&quot;&gt;
+      &lt;path d=&quot;M 0,-100 A 100,100 0 0,1 86.6,-50&quot; stroke=&quot;url(#cl1)&quot; /&gt;
+      &lt;path d=&quot;M 86.6,-50 A 100,100 0 0,1 86.6,50&quot; stroke=&quot;url(#cl2)&quot; /&gt;
+      &lt;path d=&quot;M 86.6,50 A 100,100 0 0,1 0,100&quot; stroke=&quot;url(#cl3)&quot; /&gt;
+      &lt;path d=&quot;M 0,100 A 100,100 0 0,1 -86.6,50&quot; stroke=&quot;url(#cl4)&quot; /&gt;
+      &lt;path d=&quot;M -86.6,50 A 100,100 0 0,1 -86.6,-50&quot; stroke=&quot;url(#cl5)&quot; /&gt;
+      &lt;path d=&quot;M -86.6,-50 A 100,100 0 0,1 0,-100&quot; stroke=&quot;url(#cl6)&quot; /&gt;
+    &lt;/g&gt;
+  &lt;/svg&gt;
+  &lt;svg viewBox=&quot;-10 -10 220 220&quot;&gt;
+    &lt;path
+      d=&quot;M200,100 C200,44.771525 155.228475,0 100,0 C44.771525,0 0,44.771525 0,100 C0,155.228475 44.771525,200 100,200 C155.228475,200 200,155.228475 200,100 Z&quot;
+      stroke-dashoffset=&quot;0&quot;&gt;&lt;/path&gt;
+  &lt;/svg&gt;
+  &lt;progress value=&quot;0&quot; min=&quot;0&quot; max=&quot;100&quot;&gt;&lt;/progress&gt;
+&lt;/div&gt;
+&lt;!-- &uarr;SVGの円形プログレスバー ====================== --&gt;
+&lt;!-- &darr;SVGのグラデーション色定義 ====================== --&gt;
+&lt;svg width=&quot;0&quot; height=&quot;0&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;cl1&quot; gradientUnits=&quot;objectBoundingBox&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;1&quot; y2=&quot;1&quot;&gt;
+      &lt;stop stop-color=&quot;#618099&quot; /&gt;
+      &lt;stop offset=&quot;100%&quot; stop-color=&quot;#8e6677&quot; /&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;cl2&quot; gradientUnits=&quot;objectBoundingBox&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop stop-color=&quot;#8e6677&quot; /&gt;
+      &lt;stop offset=&quot;100%&quot; stop-color=&quot;#9b5e67&quot; /&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;cl3&quot; gradientUnits=&quot;objectBoundingBox&quot; x1=&quot;1&quot; y1=&quot;0&quot; x2=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop stop-color=&quot;#9b5e67&quot; /&gt;
+      &lt;stop offset=&quot;100%&quot; stop-color=&quot;#9c787a&quot; /&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;cl4&quot; gradientUnits=&quot;objectBoundingBox&quot; x1=&quot;1&quot; y1=&quot;1&quot; x2=&quot;0&quot; y2=&quot;0&quot;&gt;
+      &lt;stop stop-color=&quot;#9c787a&quot; /&gt;
+      &lt;stop offset=&quot;100%&quot; stop-color=&quot;#817a94&quot; /&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;cl5&quot; gradientUnits=&quot;objectBoundingBox&quot; x1=&quot;0&quot; y1=&quot;1&quot; x2=&quot;0&quot; y2=&quot;0&quot;&gt;
+      &lt;stop stop-color=&quot;#817a94&quot; /&gt;
+      &lt;stop offset=&quot;100%&quot; stop-color=&quot;#498a98&quot; /&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;cl6&quot; gradientUnits=&quot;objectBoundingBox&quot; x1=&quot;0&quot; y1=&quot;1&quot; x2=&quot;1&quot; y2=&quot;0&quot;&gt;
+      &lt;stop stop-color=&quot;#498a98&quot; /&gt;
+      &lt;stop offset=&quot;100%&quot; stop-color=&quot;#618099&quot; /&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+&lt;/svg&gt;
+&lt;!-- &uarr;SVGの色定義 ====================== --&gt;
+</code></pre>
+
+<pre><code class="language-html">&lt;!-- &darr;数値の入力欄 --&gt;
+&lt;input id=&quot;percent_input&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;100&quot; value=&quot;0&quot; /&gt; %
+&lt;!-- &uarr;数値の入力欄 --&gt;
+</code></pre>
+        </details>
+
+        <details>
+          <summary><h3>CSS</h3></summary>
+<pre><code class="language-css">.progress_circle {
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  color: #93A2AC;
+  font-family: Lato;
+  font-weight:100;
+}
+.progress_circle::before {
+  content: "Loading";
+  top: 30%;
+  font-size: 16px;
+}
+.progress_circle::after {
+  content: attr(data-percent) "%";
+  top: 42%;
+  font-size: 32px;
+}
+.progress_circle::before,
+.progress_circle::after {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  text-align: center;
+  animation: blink 1s ease-in-out infinite alternate;
+}
+.progress_circle svg {
+  width: 10rem;
+  height: 10rem;
+}
+.progress_circle svg:nth-child(2) {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: rotate(-90deg);
+}
+.progress_circle svg:nth-child(2) path {
+  fill: none;
+  stroke-width: 25;
+  stroke-dasharray: 629;
+  stroke: #fff;
+  opacity:.9;
+  transition: stroke-dashoffset 1s;
+}
+.progress_circle progress {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+@keyframes blink {
+  0% { opacity: 0.6; }
+  100% {opacity: 1; }
+}
+</code></pre>
+        </details>
+
+        <details>
+          <summary><h3>JavaScript</h3></summary>
+<pre><code class="language-js">/**
+  * SVG円形プログレスバーの更新
+  * @type {HTMLElement} progressCircleElem プログレスバーの枠要素
+  * @type {HTMLElement} pathElem svgのpath要素
+  * @type {string} value 文字列の数値 (0〜100)
+  */
+function updateProgressCircle(progressCircleElem, pathElem, value) {
+  const STROKE_DASHARRAY_VALUE = 629;
+  progressCircleElem.querySelector('progress').value = value;
+  progressCircleElem.dataset.percent = value;
+  const dashoffset = Math.round(STROKE_DASHARRAY_VALUE * 100 / 100 * Number(value) / 100);
+  pathElem.setAttribute('stroke-dashoffset', dashoffset);
+}
+window.addEventListener('load', function () {
+  // 初期化
+  const INIT_VALUE = 0;
+  const progressCircleElem = document.querySelector('.progress_circle');
+  const pathElem = progressCircleElem.querySelector('svg path[stroke-dashoffset]');
+  updateProgressCircle(progressCircleElem, pathElem, INIT_VALUE);
+
+  // 擬似的に、入力欄に入れた値をプログレスバーへ反映
+  const percentInputElem = document.getElementById('percent_input');
+  percentInputElem.addEventListener('input', (event) => {
+    updateProgressCircle(progressCircleElem, pathElem, event.target.value);
+  });
+});
+</code></pre>
+        </details>
+      </details>
+
+    </section>
+
+    <br />
+    <br />
+
   </div>
 </body>
 </html>
