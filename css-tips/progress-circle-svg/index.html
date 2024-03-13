@@ -20,13 +20,22 @@
       font-weight:100;
     }
     .progress_circle::before {
+      content: "Loading";
+      top: 30%;
+      font-size: 16px;
+    }
+    .progress_circle::after {
       content: attr(data-percent) "%";
+      top: 42%;
+      font-size: 32px;
+    }
+    .progress_circle::before,
+    .progress_circle::after {
       width: 100%;
       position: absolute;
-      top: 3.7rem;
       left: 0;
-      font-size: 2rem;
       text-align: center;
+      animation: blink 1s ease-in-out infinite alternate;
     }
     .progress_circle svg {
       width: 10rem;
@@ -50,6 +59,10 @@
       height: 0;
       width: 0;
       visibility: hidden;
+    }
+    @keyframes blink {
+      0% { opacity: 0.6; }
+      100% {opacity: 1; }
     }
   </style>
   <!-- ↑SVGプログレスバーのCSS指定 ================= -->
@@ -80,7 +93,7 @@
         <summary><h2>DEMO</h2></summary>
 
         <ul>
-          <li>入力欄に入れた0〜100の値に応じて、SVGの円形プログレスバー表示が切り替わるサンプル</li>
+          <li>入力欄に入れた<code>0</code>〜<code>100</code>の値に応じて、SVGの円形プログレスバー表示が切り替わるサンプル</li>
           <li><code>svg</code> 要素内にある <code>path</code> 要素の <code>stroke-dashoffset</code> 属性値をJavaScriptで変更することで、動的に変更が可能</li>
           <li>値を変更した際のアニメーションは、CSSで <code>transition: stroke-dashoffset 1s;</code> を指定</li>
           <li><code>progress</code>要素を隠して値だけを更新することで、セマンティックなコードに対応</li>
