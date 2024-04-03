@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>ファイル選択ボタンのCSSカスタマイズ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css" />
+
+  <style>
+    /* 擬似的に表示される「ファイル選択」のボタン */
+    .file_upload_label {
+      position: relative;
+      padding: 4px 10px 3px 5px;
+      background: linear-gradient(to bottom, #fff, #f5f5f5);
+      border-color: #E1E1E1 #BBBBBB #BBBBBB #E1E1E1;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 4px;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      line-height: 140%;
+      font-size: 13px;
+      color: #444444;
+      cursor: pointer;
+    }
+
+    /* 擬似的に表示されるボタンのアイコン */
+    .file_upload_label::before {
+      content: "📷";
+      width: 17px;
+      height: 17px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* 擬似的に表示されるボタンのテキスト */
+    .file_upload_label::after {
+      content: "ファイルを選択";
+    }
+
+    /* 非表示となるファイル選択のinput要素本体 */
+    /* マシンリーダブルにするため、display: none; を使わない */
+    .file_upload_label input[type="file"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+    }
+  </style>
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>ファイル選択ボタンのCSSカスタマイズ</h1>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>DEMO</h2></summary>
+
+        <ul>
+          <li><code>input[type="file"]</code> のファイル選択する要素本体は隠し、擬似的なファイル選択ボタンを表示する形式</li>
+          <li>マシンリーダブルにするため、 <code>display: none;</code> を使わずに要素本体を非表示にする</li>
+          <li>この形式の場合、「未選択」や選択済みのファイル名表示部分を非表示にすることが可能</li>
+        </ul>
+
+        <fieldset>
+          <fieldset>
+            <legend>CSS指定なし</legend>
+            <input type="file" />
+          </fieldset>
+          <br />
+          <fieldset>
+            <legend>擬似的なファイル選択ボタンにCSSカスタマイズ</legend>
+            <label class="file_upload_label">
+              <input type="file" />
+            </label>
+          </fieldset>
+        </form>
+
+      </details>
+
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+<pre><code class="language-html">&lt;label class="file_upload_label"&gt;
+  &lt;input type="file" /&gt;
+&lt;/label&gt;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+<pre><code class="language-css">/* 擬似的に表示される「ファイル選択」のボタン */
+.file_upload_label {
+  position: relative;
+  padding: 4px 10px 3px 5px;
+  background: linear-gradient(to bottom, #fff, #f5f5f5);
+  border-color: #E1E1E1 #BBBBBB #BBBBBB #E1E1E1;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 140%;
+  font-size: 13px;
+  color: #444444;
+  cursor: pointer;
+}
+
+/* 擬似的に表示されるボタンのアイコン */
+.file_upload_label::before {
+  content: "📷";
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 擬似的に表示されるボタンのテキスト */
+.file_upload_label::after {
+  content: "ファイルを選択";
+}
+
+/* 非表示となるファイル選択のinput要素本体 */
+/* マシンリーダブルにするため、display: none; を使わない */
+.file_upload_label input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+</code></pre>
+        </details>
+
+      </details>
+
+    </section>
+
+    <br />
+    <br />
+
+  </div>
+</body>
+</html>
