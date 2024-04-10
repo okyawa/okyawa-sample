@@ -67,5 +67,73 @@
     </details>
   </section>
 
+  <hr />
+
+  <section class="accordion_area">
+    <h2><code>details</code>要素の<code>name</code>属性に未対応なブラウザを考慮</h2>
+    <ul>
+      <li><code>details</code>要素の<code>name</code>属性に未対応なFirefoxでも動くように、JavaScript指定を加えたもの</li>
+    </ul>
+    <details name="sample03">
+      <summary>項目01</summary>
+      <p>項目01の内容です。項目01の内容です。項目01の内容です。項目01の内容です。項目01の内容です。</p>
+    </details>
+    <details name="sample03">
+      <summary>項目02</summary>
+      <p>項目02の内容です。項目02の内容です。項目02の内容です。項目02の内容です。項目02の内容です。</p>
+    </details>
+    <details name="sample03">
+      <summary>項目03</summary>
+      <p>項目03の内容です。項目03の内容です。項目03の内容です。項目03の内容です。項目03の内容です。</p>
+    </details>
+    <script>
+      /**
+       * アコーディオンの開閉処理を初期化
+       * 
+       * ※details要素のname属性未対応ブラウザ(Firefox)でも動くようにするためのもの
+       * ※全ブラウザが対応したら不要になる
+       */
+      function setupAccordion() {
+        /**
+         * details要素のname属性未対応ブラウザのアコーディオンの開閉処理
+         * @param {HTMLDetailsElement} targetElement
+         * @param {NodeListOf<HTMLDetailsElement>} detailElements
+         */
+        const toggleAccordion = (targetElement, detailElements) => {
+          if (!targetElement.open) {
+            // 必要な処理は開いている場合のみ
+            return;
+          }
+          detailElements.forEach((element) => {
+            if (element === targetElement) {
+              // クリックして開いたdetails要素は、開いた状態を保持
+              return;
+            }
+            if (!element.open) {
+              // 閉じているdetails要素は手入れ不要
+              return;
+            }
+            // 開いているdetails要素を閉じる
+            console.log(element, 'openを消したーーーーーーー');
+            element.removeAttribute('open');
+          });
+        };
+        // 対象要素にイベントをセット
+        const wrapperElements = document.querySelectorAll('.accordion_area');
+        wrapperElements.forEach((wrapperElement) => {
+          const detailElements = wrapperElement.querySelectorAll('details[name]');
+          detailElements.forEach((element) => {
+            element.addEventListener('toggle', (event) => {
+              toggleAccordion(event.currentTarget, detailElements);
+            });
+          });
+        });
+      }
+      window.addEventListener('DOMContentLoaded', () => {
+        setupAccordion();
+      });
+    </script>
+  </section>
+
 </body>
 </html>
