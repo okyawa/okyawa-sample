@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="/res/css/neat.css">
+  <link rel="stylesheet" href="/res/css/presentation.css" />
 
   <style>
     /* ハイライトのスタイル指定 */
@@ -120,8 +120,19 @@
     window.addEventListener('DOMContentLoaded', setupHighlight);
   </script>
 
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
 </head>
 <body>
+<div id="container">
 
   <header>
     <h1>CSS Custom Highlight APIのSample</h1>
@@ -131,49 +142,220 @@
   <br />
 
   <section>
-    <h2>概要</h2>
-    <ul>
-      <li>JavaScriptを使用して範囲を作成し、CSS 使用してその範囲をスタイル設定することにより、ドキュメント上の任意のテキスト範囲をスタイル設定するメカニズム</li>
-      <li><code>CSS Custom Highlight API</code>を使用すると、ページ内のDOM構造に影響を与えることなく、プログラムでテキスト範囲を作成し、それらをハイライトすることがでる</li>
-    </ul>
+    <details open>
+      <summary>
+        <h2>概要</h2>
+      </summary>
+      <ul>
+        <li>JavaScriptを使用して範囲を作成し、CSS 使用してその範囲をスタイル設定することにより、ドキュメント上の任意のテキスト範囲をスタイル設定するメカニズム</li>
+        <li><code>CSS Custom Highlight API</code>を使用すると、ページ内のDOM構造に影響を与えることなく、プログラムでテキスト範囲を作成し、それらをハイライトすることがでる</li>
+      </ul>
+    </details>
   </section>
+
+  <br />
+  <br />
 
   <section>
-    <h2>手順</h2>
-    <ol>
-      <li><code>Range</code>オブジェクトの作成</li>
-      <li><code>Highlight</code>の範囲オブジェクトを作成</li>
-      <li><code>HighlightRegistry</code>を使ってハイライトの登録</li>
-      <li><code>::highlight</code>のCSS疑似要素を使って、ハイライトをスタイリング</li>
-    </ol>
+    <details open>
+      <summary>
+        <h2>手順</h2>
+      </summary>
+      <ol>
+        <li><code>Range</code>オブジェクトの作成</li>
+        <li><code>Highlight</code>の範囲オブジェクトを作成</li>
+        <li><code>HighlightRegistry</code>を使ってハイライトの登録</li>
+        <li><code>::highlight</code>のCSS疑似要素を使って、ハイライトをスタイリング</li>
+      </ol>
+    </details>
   </section>
 
+  <br />
   <br />
   <hr />
   <br />
+  <br />
 
   <section>
-    <h2>ハイライトのサンプル</h2>
-    <p>検索例: "<code>カクテル</code>"</p>
-    <form>
-      <fieldset>
-        <label for="query">検索:</label>
-        <input type="search" id="query" placeholder="検索文字列" />
-      </fieldset>
-    </form>
-    <br />
-    <article>
-      <p>
-        ゾンビカクテルは、3種類のラムの風味が重なり、とても爽やさがあって、フルーティでトロピカル感たっぷりの飲みやすさがあるものの、ロングカクテルでアルコール度数が高いため、飲みきったときの総アルコール量が多く、ちょっと危険なカクテル。映画「ティファニーで朝食を」のパーティーシーンでオードリーヘップバーンが飲んでいるカクテル。ゾンビカクテルの原型は、ドン・ビーチが1934年に経営するレストラン「ドン・ザ・ビーチコマー」のために作られた。ドンは商談の前に二日酔いを治す手助けを必要としていた男性のためにこのドリンクを作ったと言われている。この二日酔いの客は、数日後にドンのバーに戻ってきて、このドリンクのせいで旅行中ずっと「ゾンビ」になってしまったと不満を漏らしたという。ドン・ザ・ビーチコーマーは、このドリンクを提供している他の多くのバーやレストランとともに、客を一人2本までに制限しており、ドンは、その目を疑うようなアルコール度数のために、このドリンクが人を「歩く死者のように」することができると説明している。
-      </p>
-      <p>
-        ミリオンダラーは、1894年、明治時代に横浜グランドホテルでイギリス人のルイス・エッピンガー (Louis Eppinger) により考案され、世界的に有名になったカクテル。口当たりは卵白の泡により、非常に滑らかでクリーミー。フルーティーさがあって、程良い甘みを感じる。当時はオールド・トム・ジンが使われていたが、近年はドライ・ジンが使用されている。横浜が発祥と言われる横浜4大カクテル、「ミリオン・ダラー」「ヨコハマ」「バンブー」「チェリーブロッサム」の一つ。
-      </p>
-      <p>
-        ジンライムは、ライムの酸味とジンの風味を、そのままさっぱりと味わうことができるカクテル。カクテル言葉は「色あせぬ恋」。同じ材料でもシェイクするだけでギムレットというカクテルになる。甘いカクテルが苦手な方にはおすすめ。
-      </p>
-    </article>
+    <details open>
+      <summary>
+        <h2>ハイライトのサンプル</h2>
+      </summary>
+      <p>検索例: "<code>カクテル</code>"</p>
+      <form>
+        <fieldset>
+          <label for="query">検索:</label>
+          <input type="search" id="query" placeholder="検索文字列" />
+        </fieldset>
+      </form>
+      <br />
+      <article>
+        <p>
+          ゾンビカクテルは、3種類のラムの風味が重なり、とても爽やさがあって、フルーティでトロピカル感たっぷりの飲みやすさがあるものの、ロングカクテルでアルコール度数が高いため、飲みきったときの総アルコール量が多く、ちょっと危険なカクテル。映画「ティファニーで朝食を」のパーティーシーンでオードリーヘップバーンが飲んでいるカクテル。ゾンビカクテルの原型は、ドン・ビーチが1934年に経営するレストラン「ドン・ザ・ビーチコマー」のために作られた。ドンは商談の前に二日酔いを治す手助けを必要としていた男性のためにこのドリンクを作ったと言われている。この二日酔いの客は、数日後にドンのバーに戻ってきて、このドリンクのせいで旅行中ずっと「ゾンビ」になってしまったと不満を漏らしたという。ドン・ザ・ビーチコーマーは、このドリンクを提供している他の多くのバーやレストランとともに、客を一人2本までに制限しており、ドンは、その目を疑うようなアルコール度数のために、このドリンクが人を「歩く死者のように」することができると説明している。
+        </p>
+        <p>
+          ミリオンダラーは、1894年、明治時代に横浜グランドホテルでイギリス人のルイス・エッピンガー (Louis Eppinger) により考案され、世界的に有名になったカクテル。口当たりは卵白の泡により、非常に滑らかでクリーミー。フルーティーさがあって、程良い甘みを感じる。当時はオールド・トム・ジンが使われていたが、近年はドライ・ジンが使用されている。横浜が発祥と言われる横浜4大カクテル、「ミリオン・ダラー」「ヨコハマ」「バンブー」「チェリーブロッサム」の一つ。
+        </p>
+        <p>
+          ジンライムは、ライムの酸味とジンの風味を、そのままさっぱりと味わうことができるカクテル。カクテル言葉は「色あせぬ恋」。同じ材料でもシェイクするだけでギムレットというカクテルになる。甘いカクテルが苦手な方にはおすすめ。
+        </p>
+      </article>
+    </details>
   </section>
 
+  <br />
+  <br />
+
+  <section>
+    <details>
+      <summary>
+        <h2>コード</h2>
+      </summary>
+
+      <details open>
+        <summary>
+          <h3>HTML</h3>
+        </summary>
+<pre><code class="language-html">&lt;article&gt;
+  &lt;p&gt;
+    ゾンビカクテルは、3種類のラムの風味が重なり、とても爽やさがあって、フルーティでトロピカル感たっぷりの飲みやすさがあるものの、ロングカクテルでアルコール度数が高いため、飲みきったときの総アルコール量が多く、ちょっと危険なカクテル。映画「ティファニーで朝食を」のパーティーシーンでオードリーヘップバーンが飲んでいるカクテル。ゾンビカクテルの原型は、ドン・ビーチが1934年に経営するレストラン「ドン・ザ・ビーチコマー」のために作られた。ドンは商談の前に二日酔いを治す手助けを必要としていた男性のためにこのドリンクを作ったと言われている。この二日酔いの客は、数日後にドンのバーに戻ってきて、このドリンクのせいで旅行中ずっと「ゾンビ」になってしまったと不満を漏らしたという。ドン・ザ・ビーチコーマーは、このドリンクを提供している他の多くのバーやレストランとともに、客を一人2本までに制限しており、ドンは、その目を疑うようなアルコール度数のために、このドリンクが人を「歩く死者のように」することができると説明している。
+  &lt;/p&gt;
+  &lt;p&gt;
+    ミリオンダラーは、1894年、明治時代に横浜グランドホテルでイギリス人のルイス・エッピンガー (Louis Eppinger) により考案され、世界的に有名になったカクテル。口当たりは卵白の泡により、非常に滑らかでクリーミー。フルーティーさがあって、程良い甘みを感じる。当時はオールド・トム・ジンが使われていたが、近年はドライ・ジンが使用されている。横浜が発祥と言われる横浜4大カクテル、「ミリオン・ダラー」「ヨコハマ」「バンブー」「チェリーブロッサム」の一つ。
+  &lt;/p&gt;
+  &lt;p&gt;
+    ジンライムは、ライムの酸味とジンの風味を、そのままさっぱりと味わうことができるカクテル。カクテル言葉は「色あせぬ恋」。同じ材料でもシェイクするだけでギムレットというカクテルになる。甘いカクテルが苦手な方にはおすすめ。
+  &lt;/p&gt;
+&lt;/article&gt;
+</code></pre>
+      </details>
+
+      <details open>
+        <summary>
+          <h3>JavaScript</h3>
+        </summary>
+<pre><code class="language-js">/** CSS.highlightsにセットする名前 */
+const HIGHLIGHT_NAME = 'search-results';
+
+/**
+  * テキストのハイライトの初期化処理
+  */
+function setupHighlight() {
+  // テキスト入力欄要素
+  const queryInputElement = document.getElementById('query');
+  // ハイライト対象テキストが入っている要素
+  const articleElement = document.querySelector('article');
+
+  // 記事内のすべてのテキストノードを検索
+  const allTextNodes = findAllTextNodes(articleElement);
+
+  // テキスト入力欄にイベントを登録
+  queryInputElement.addEventListener('input', () => {
+    // CSS Custom Highlight API がサポートされているブラウザかどうかをチェック
+    if (!CSS.highlights) {
+      articleElement.textContent = "ご利用中のブラウザは、CSS Custom Highlight APIがサポートされていません。";
+      return;
+    }
+
+    // 前のハイライト状態をリセット
+    CSS.highlights.clear();
+    // 検索文字列を取得
+    const str = queryInputElement.value.trim().toLowerCase();
+    if (!str) {
+      return;
+    }
+    // 検索対象の文字列に一致する部分のRangeオブジェクト配列を生成
+    const ranges = createTargetRanges(allTextNodes, str);
+    // テキストの対象部分だけをハイライト
+    highlightText(ranges, HIGHLIGHT_NAME);
+  });
+}
+
+/**
+  * 記事内のすべてのテキストノードを検索して配列にして返す
+  * 
+  * @param {HTMLElement} article
+  * @returns {Node[]}
+  */
+function findAllTextNodes(article) {
+  // 記事内のすべてのテキストノードを検索
+  const treeWalker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT);
+  const allTextNodes = [];
+  let currentNode = treeWalker.nextNode();
+  while (treeWalker.nextNode()) {
+    allTextNodes.push(treeWalker.currentNode);
+  }
+  return allTextNodes;
+}
+
+/**
+  * 検索対象の文字列に一致する部分のRangeオブジェクト配列を生成
+  * 
+  * @param {Node[]} allTextNodes
+  * @param {string} str
+  * @returns {Range[][]}
+  */
+function createTargetRanges(allTextNodes, str) {
+  // すべてのテキストノードを反復処理し、一致するものを見つける
+  return allTextNodes
+    .map((element) => {
+      const text = element.textContent.toLowerCase()
+      // マッチした文字列のインデックスを格納
+      const indices = [];
+      let startPos = 0;
+      while (startPos < text.length) {
+        const index = text.indexOf(str, startPos);
+        if (index === -1) break;
+        indices.push(index);
+        startPos = index + str.length;
+      }
+
+      // 検索対象文字列のindexごとにrangeオブジェクトを作成
+      return indices.map((index) => {
+        const range = new Range();
+        range.setStart(element, index);
+        range.setEnd(element, index + str.length);
+        return range;
+      });
+    });
+}
+
+/**
+  * テキストの対象部分だけをハイライト
+  * 
+  * @param {Range[][]} ranges
+  * @param {string} highlightName CSS.highlightsにセットする名前
+  */
+function highlightText(ranges, highlightName) {
+  // 範囲のHighlightオブジェクトを生成
+  const searchResultHighlight = new Highlight(...ranges.flat());
+  // Highlightオブジェクトをレジストリに登録
+  CSS.highlights.set(highlightName, searchResultHighlight);
+}
+
+// 画面読み込み後に初期化処理を呼び出し
+window.addEventListener('DOMContentLoaded', setupHighlight);
+</code></pre>
+      </details>
+
+      <details open>
+        <summary>
+          <h3>CSS</h3>
+        </summary>
+<pre><code class="language-css">/* ハイライトのスタイル指定 */
+::highlight(search-results) {
+  background-color: #f06;
+  color: white;
+}
+</code></pre>
+      </details>
+    </details>
+
+  </section>
+
+  <br />
+  <br />
+
+</div>
 </body>
 </html>
