@@ -8,7 +8,7 @@
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
 
-  <link rel="stylesheet" href="/res/css/presentation.css" />
+  <link rel="stylesheet" href="/res/css/presentation.css?v=2" />
 
   <!-- ↓コードのシンタックスハイライト -->
   <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
@@ -29,8 +29,6 @@
     <h1>Web Share APIのサンプル</h1>
   </header>
 
-  <br />
-
   <section>
     <details open>
       <summary><h2>概要</h2></summary>
@@ -40,9 +38,6 @@
       </ul>
     </details>
   </section>
-
-  <br />
-  <br />
 
   <section>
     <details open>
@@ -89,18 +84,19 @@
     </details>
   </section>
 
-  <details>
-    <summary><h2>コード</h2></summary>
-    
-    <details open>
-      <summary><h3>HTML</h3></summary>
+  <section>
+    <details>
+      <summary><h2>コード</h2></summary>
+      
+      <details open>
+        <summary><h3>HTML</h3></summary>
 <pre><code class="language-html">&lt;button id="share_button" type="button"&gt;シェア&lt;/button&gt;
 &lt;div id="result"&gt;&lt;/div&gt;
 </code></pre>
-    </details>
+      </details>
 
-    <details open>
-      <summary><h3>JavaScript</h3></summary>
+      <details open>
+        <summary><h3>JavaScript</h3></summary>
 <pre><code class="language-js">
   function setupWebShareAPI() {
     /** シェアする際に渡すデータ */
@@ -131,11 +127,9 @@
   setupWebShareAPI();
 </code></pre>
 
+      </details>
     </details>
-  </details>
-
-  <br />
-  <br />
+  </section>
 
 </div>
 </body>

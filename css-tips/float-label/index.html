@@ -7,7 +7,7 @@
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
 
-  <link rel="stylesheet" href="/res/css/presentation.css" />
+  <link rel="stylesheet" href="/res/css/presentation.css?v=2" />
 
   <!-- ↓ フォームの入力時にフロートする入力欄のCSS指定 -->
   <style>
@@ -123,46 +123,46 @@
       <h2>CSSのみで実装したサンプル</h2>
     </header>
 
-    <br />
-
     <section>
+      <details open>
+        <summary>
+          <h2>DEMO <small>(CSSのみ)</small></h2>
+        </summary>
 
-      <h2>DEMO <small>(CSSのみ)</small></h2>
-
-      <fieldset>
-        <div class="input_wrapper">
-          <input class="input" type="text" id="name" name="name" placeholder="Name">
-          <label class="label" for="name">名前</label>
-        </div>
-        <div class="input_wrapper">
-          <input class="input" type="text" id="email" name="email" placeholder="Email">
-          <label class="label" for="email">メールアドレス</label>
-        </div>
-      </fieldset>
-
+        <fieldset>
+          <div class="input_wrapper">
+            <input class="input" type="text" id="name" name="name" placeholder="Name">
+            <label class="label" for="name">名前</label>
+          </div>
+          <div class="input_wrapper">
+            <input class="input" type="text" id="email" name="email" placeholder="Email">
+            <label class="label" for="email">メールアドレス</label>
+          </div>
+        </fieldset>
+      </details>
     </section>
 
-    <br />
-    <br />
-
     <section>
+      <details open>
+        <summary>
+          <h2>DEMO <small>(JSのクリアボタン有り)</small></h2>
 
-      <h2>DEMO <small>(JSのクリアボタン有り)</small></h2>
+          <fieldset>
+            <div class="input_wrapper">
+              <input class="input" type="text" id="name" name="name" placeholder="Name">
+              <label class="label" for="name">名前</label>
 
-      <fieldset>
-        <div class="input_wrapper">
-          <input class="input" type="text" id="name" name="name" placeholder="Name">
-          <label class="label" for="name">名前</label>
-
-          <button class="clear_button" aria-label="Clear input">
-            <!-- ↓クリアボタン用のSVG -->
-            <svg viewBox="0 0 16 16" width="12" height="12">
-              <path d="M 1 1 L 15 15 M 1 15 L 15 1" fill="none" stroke-width="2" stroke="currentColor" />
-            </svg>
-            <!-- ↑クリアボタン用のSVG -->
-          </button>
-        </div>
-      </fieldset>
+              <button class="clear_button" aria-label="Clear input">
+                <!-- ↓クリアボタン用のSVG -->
+                <svg viewBox="0 0 16 16" width="12" height="12">
+                  <path d="M 1 1 L 15 15 M 1 15 L 15 1" fill="none" stroke-width="2" stroke="currentColor" />
+                </svg>
+                <!-- ↑クリアボタン用のSVG -->
+              </button>
+            </div>
+          </fieldset>
+        </summary>
+      </details>
 
       <script>
         [...document.querySelectorAll('.input_wrapper .clear_button')].forEach(clearButtonElem => {
@@ -175,28 +175,29 @@
       </script>
     </section>
 
-    <br />
-    <br />
-
     <section>
-      <h2>仕組み</h2>
-      <ul>
-        <li>入力欄の枠要素上部に <code>margin</code> を持たせ、フォーカスした際と入力されている場合でプレースホルダーが表示されていなときに、ラベルを浮かせて小さく上部に <code>transform</code> と <code>transition</code> で表示してる</li>
-        <li>入力欄に値がない場合は <code>input:placeholder-shown</code></li>
-        <li>入力欄に値がある場合は <code>input:not(:placeholder-shown)</code></li>
-        <li>クリアボタンが必要な場合は、JavaScriptで入力内容をクリアする処理を別途実装</li>
-      </ul>
+      <details open>
+        <summary>
+          <h2>仕組み</h2>
+        </summary>
+        <ul>
+          <li>入力欄の枠要素上部に <code>margin</code> を持たせ、フォーカスした際と入力されている場合でプレースホルダーが表示されていなときに、ラベルを浮かせて小さく上部に <code>transform</code> と <code>transition</code> で表示してる</li>
+          <li>入力欄に値がない場合は <code>input:placeholder-shown</code></li>
+          <li>入力欄に値がある場合は <code>input:not(:placeholder-shown)</code></li>
+          <li>クリアボタンが必要な場合は、JavaScriptで入力内容をクリアする処理を別途実装</li>
+        </ul>
+      </details>
     </section>
 
-    <br />
-    <br />
-
     <section>
-      <h2>コード</h2>
+      <details>
+        <summary>
+          <h2>コード</h2>
+        </summary>
 
-      <details open>
-        <summary><h3>HTML</h3></summary>
-        <pre><code class="language-html">
+        <details open>
+          <summary><h3>HTML</h3></summary>
+          <pre><code class="language-html">
 &lt;div class="input_wrapper"&gt;
   &lt;input class="input" type="text" id="name" name="name" placeholder="Name"&gt;
   &lt;label class="label" for="name"&gt;名前&lt;/label&gt;
@@ -204,12 +205,12 @@
   &lt;button class="clear_button" aria-label="Clear input"&gt;✕&lt;/button&gt;
   &lt;!-- ↑クリアボタンを設置する場合のみ --&gt;
 &lt;/div&gt;
-        </code></pre>
-      </details>
+          </code></pre>
+        </details>
 
-      <details open>
-        <summary><h3>フロートする入力欄のラベルのCSS</h3></summary>
-        <pre><code class="language-css">
+        <details open>
+          <summary><h3>フロートする入力欄のラベルのCSS</h3></summary>
+          <pre><code class="language-css">
 /* 入力欄枠の指定 ======================= */
 .input_wrapper {
   position: relative;
@@ -261,13 +262,12 @@
   transform: translateY(-100%) scale(0.75);
   color: #000;
 }
-        </code></pre>
-      </details>
-      
+          </code></pre>
+        </details>
 
-      <details open>
-        <summary><h3>クリアボタンのCSS</h3></summary>
-        <pre><code class="language-css">
+        <details open>
+          <summary><h3>クリアボタンのCSS</h3></summary>
+          <pre><code class="language-css">
 /* クリアボタンの非表示指定 (※プレースホルダーが表示されている状態の場合) */
 .input_wrapper input:placeholder-shown + .label + .clear_button {
   display: none;
@@ -302,12 +302,12 @@
 .input_wrapper:has(.clear_button) input {
   padding-right: 24px;
 }
-        </code></pre>
-      </details>
+          </code></pre>
+        </details>
 
-      <details open>
-        <summary><h3>クリアボタンのJavaScript</h3></summary>
-        <pre><code class="language-js">
+        <details open>
+          <summary><h3>クリアボタンのJavaScript</h3></summary>
+          <pre><code class="language-js">
 [...document.querySelectorAll('.input_wrapper .clear_button')].forEach(clearButtonElem => {
   const $searchInput = clearButtonElem.parentElement.querySelector('.input');
   clearButtonElem.addEventListener('click', () => {
@@ -315,13 +315,11 @@
     $searchInput.focus();
   });
 });
-        </code></pre>
+          </code></pre>
+        </details>
+
       </details>
-
     </section>
-
-    <br />
-    <br />
 
   </div>
 </body>

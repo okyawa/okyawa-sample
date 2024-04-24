@@ -3,6 +3,7 @@
 body {
   font-family: sans-serif;
   font-size: 16px;
+  line-height: 1.6;
 }
 
 #container {
@@ -12,7 +13,7 @@ body {
 }
 
 header {
-  margin :128px 0 64px 0;
+  margin :192px 0 128px 0;
 }
 
 code {
@@ -55,4 +56,12 @@ hr {
   height: 1px;
   background-color: #ccc;
   border: none;
+}
+
+li {
+  margin-block: 1rem;
+}
+
+#container > section {
+  margin-block: 4rem;
 }

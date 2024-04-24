@@ -2,7 +2,7 @@
  * プレゼンテーション用にアコーディオンの動作となるモードにする
  */
 function switchPresentationMode() {
-  const detailsElements = document.querySelectorAll('details');
+  const detailsElements = document.querySelectorAll('section > details');
   detailsElements.forEach((detailsElement) => {
     // detailsの中で1つだけを開く指定
     detailsElement.name = 'section';
