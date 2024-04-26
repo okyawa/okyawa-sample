@@ -2,77 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>JavaScript tips Sample一覧</title>
+  <title>Notion 資料一覧</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
-
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .inner_container {
-      max-width: 1200px;
-      padding: 0 16px;
-      box-sizing: border-box;
-    }
-    a:link,
-    a:active,
-    a:hover,
-    a:visited {
-      color: #666;
-    }
-    @media (hover: hover) {
-      a:hover {
-        color: #444;
-      }
-    }
-    header {
-      margin-bottom: 32px;
-    }
-    nav {
-      margin: 32px 0;
-    }
-    nav li {
-      padding: 4px 0;
-    }
-    .breadcrumb ol {
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      list-style: none;
-    }
-    .breadcrumb li {
-      padding: 4px;
-      font-size: 0.7rem;
-    }
-    .breadcrumb li:not(:last-child):after {
-      padding-left: 4px;
-      content: "›";
-      vertical-align: .1em;
-    }
-    li time {
-      font-size: 0.72rem;
-      color: #999;
-    }
-    li time::before {
-      content: "[";
-    }
-    li time::after {
-      content: "]";
-    }
-    footer {
-      padding: 8px 16px;
-      text-align: center;
-    }
-  </style>
+  <link rel="stylesheet" href="/res/css/link-list.css?v=1" />
 </head>
 <body>
 <div class="container">
@@ -86,9 +20,13 @@
       </h2>
     </header>
 
-    <p>
-      <a href="/">Home</a>
-    </p>
+    <div class="breadcrumb">
+      <ol>
+        <li><a href="/">HOME</a></li>
+        <li>Notion 資料一覧</li>
+      </ol>
+    </div>
+
     <nav>
       <ul>
         <li>
