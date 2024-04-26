@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>JavaScript tips Sample一覧</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .inner_container {
+      max-width: 1200px;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    a:link,
+    a:active,
+    a:hover,
+    a:visited {
+      color: #666;
+    }
+    @media (hover: hover) {
+      a:hover {
+        color: #444;
+      }
+    }
+    header {
+      margin-bottom: 32px;
+    }
+    nav {
+      margin: 32px 0;
+    }
+    nav li {
+      padding: 4px 0;
+    }
+    .breadcrumb ol {
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+    }
+    .breadcrumb li {
+      padding: 4px;
+      font-size: 0.7rem;
+    }
+    .breadcrumb li:not(:last-child):after {
+      padding-left: 4px;
+      content: "›";
+      vertical-align: .1em;
+    }
+    li time {
+      font-size: 0.72rem;
+      color: #999;
+    }
+    li time::before {
+      content: "[";
+    }
+    li time::after {
+      content: "]";
+    }
+    footer {
+      padding: 8px 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="inner_container">
+
+    <header>
+      <h1>Notion 資料一覧</h1>
+      <h2>
+        <span class="fit_content">勉強会資料</span>
+      </h2>
+    </header>
+
+    <p>
+      <a href="/">Home</a>
+    </p>
+    <nav>
+      <ul>
+        <li>
+          <a href="https://okyawa.notion.site/Git-c413aa878d654be6be6221fc72b57250" ref="nofollow noreferrer noopener" target="_blank">
+            Gitサブモジュール
+            <time datetime="2023-09-19">2023/09/19</time>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.notion.so/okyawa/Tailwind-CSS-2374860e446f4e759f1878bd0c2a6936" ref="nofollow noreferrer noopener" target="_blank">
+            Tailwind CSS
+            <time datetime="2022-05-23">2022/05/23</time>
+          </a>
+        </li>
+        <li>
+          <a href="https://okyawa.notion.site/JSDoc-18c194f079a849ada789183f2b626123" ref="nofollow noreferrer noopener" target="_blank">
+            今すぐ使えるJSDoc
+            <time datetime="2023-02-27">2023/02/27</time>
+          </a>
+        </li>
+        <li>
+          <a href="https://okyawa.notion.site/ES-Modules-ee9d73fdf2be48b9a34b5e0d732cf1f0" ref="nofollow noreferrer noopener" target="_blank">
+            ES Modules
+            <time datetime="2022-11-14">2022/11/14</time>
+          </a>
+        </li>
+        <li>
+          <a href="https://okyawa.notion.site/Web-Components-32d1af57d9cb4eeda1df7ad26c405e8e" ref="nofollow noreferrer noopener" target="_blank">
+            Web Components入門
+            <time datetime="2022-08-01">2022/08/01</time>
+          </a>
+        </li>
+        <li>
+          <a href="https://okyawa.notion.site/Notion-a2c0bb91628e4d8596b190ebc57915d8" ref="nofollow noreferrer noopener" target="_blank">
+            Notionを使ったスライドの代用
+            <time datetime="2022-05-16">2022/05/16</time>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+
+  <footer>
+    <small>
+      &copy; 2020 <a href="https://twitter.com/okyawa" ref="nofollow noreferrer noopener" target="_blank">okyawa</a>
+    </small>
+  </footer>
+</div>
+</body>
+</html>

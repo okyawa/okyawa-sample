@@ -36,3 +36,7 @@ cp -r ./html-tips/ ./public/html-tips/
 # library-tips
 mkdir -p ./public/library-tips
 cp -r ./library-tips/ ./public/library-tips/
+
+# notion
+mkdir -p ./public/notion
+cp -r ./notion/ ./public/notion/
