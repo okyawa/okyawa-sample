@@ -60,31 +60,6 @@
 
     <section>
       <details open>
-        <summary><h2>Window関数のポイント</h2></summary>
-
-        <ul>
-          <li>特定カラムのグループとみなして集約関数が利用できる</li>
-          <li>集約関数の対象となった行はそのまま残る</li>
-          <li><code>SELECT</code> か <code>ORDER BY</code> 内でのみ利用可能</li>
-        </ul>
-
-      </details>
-    </section>
-
-    <section>
-      <details open>
-        <summary><h2>Window関数の動き</h2></summary>
-
-        <ul>
-          <li><code>OVER</code> 句の中で明確に条件を指定して、どのカラムをグループの単位とするのか、グループ内のソート順などを設定する</li>
-          <li>Window関数で定義したグループは「ウィンドウフレーム」と呼ばれ、その単位で <code>OVER</code> 句の前に定義した関数が実行される</li>
-        </ul>
-
-      </details>
-    </section>
-
-    <section>
-      <details open>
         <summary><h2>利用可能なWindow関数の一覧</h2></summary>
 
         <ul>
@@ -294,6 +269,31 @@ FROM empsalary
 WINDOW w AS (PARTITION BY depname ORDER BY salary DESC);
 </code></pre>
         </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数の動き</h2></summary>
+
+        <ul>
+          <li><code>OVER</code> 句の中で明確に条件を指定して、どのカラムをグループの単位とするのか、グループ内のソート順などを設定する</li>
+          <li>Window関数で定義したグループは「ウィンドウフレーム」と呼ばれ、その単位で <code>OVER</code> 句の前に定義した関数が実行される</li>
+        </ul>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数のポイント</h2></summary>
+
+        <ul>
+          <li>特定カラムのグループとみなして集約関数が利用できる</li>
+          <li>集約関数の対象となった行はそのまま残る</li>
+          <li><code>SELECT</code> か <code>ORDER BY</code> 内でのみ利用可能</li>
+        </ul>
 
       </details>
     </section>
