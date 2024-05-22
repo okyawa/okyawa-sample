@@ -37,6 +37,7 @@
         <summary><h2>Window関数とは</h2></summary>
 
         <ul>
+          <li>PostgreSQL 8.4から導入</li>
           <li><code>SELECT</code> の結果を維持したまま、集約関数の結果を後付けできる関数</li>
           <li>通常の集約関数( <code>GROUP BY</code> )とは異なり、Window関数では複数の行がまとめられることはなく、行それぞれが返却される</li>
           <li>常に集約関数の直後に <code>OVER</code> 句を含む</li>
