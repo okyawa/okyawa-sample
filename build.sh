@@ -40,3 +40,7 @@ cp -r ./library-tips/ ./public/library-tips/
 # sql-tips
 mkdir -p ./public/sql-tips
 cp -r ./sql-tips/ ./public/sql-tips/
+
+# notion
+mkdir -p ./public/notion
+cp -r ./notion/ ./public/notion/
