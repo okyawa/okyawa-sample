@@ -36,3 +36,7 @@ cp -r ./html-tips/ ./public/html-tips/
 # library-tips
 mkdir -p ./public/library-tips
 cp -r ./library-tips/ ./public/library-tips/
+
+# sql-tips
+mkdir -p ./public/sql-tips
+cp -r ./sql-tips/ ./public/sql-tips/

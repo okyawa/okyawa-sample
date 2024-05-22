@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>PostgreSQLのWindow関数</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=2" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>PostgreSQLのWindow関数</h1>
+    </header>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数とは</h2></summary>
+
+        <ul>
+          <li><code>SELECT</code> の結果を維持したまま、集約関数の結果を後付けできる関数</li>
+          <li>通常の集約関数( <code>GROUP BY</code> )とは異なり、Window関数では複数の行がまとめられることはなく、行それぞれが返却される</li>
+          <li>常に集約関数の直後に <code>OVER</code> 句を含む</li>
+        </ul>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数の構文</h2></summary>
+
+        <ul>
+          <li><code>関数(...) OVER (PARTITION BY ...)</code> : 区間に分割</li>
+          <li><code>関数(...) OVER (ORDER BY ...)</code> :  区間ごとに並び替え</li>
+          <li><code>PARTITION BY</code> と <code>ORDER BY</code> は同時に使用することも可能</li>
+        </ul>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数のポイント</h2></summary>
+
+        <ul>
+          <li>特定カラムのグループとみなして集約関数が利用できる</li>
+          <li>集約関数の対象となった行はそのまま残る</li>
+          <li><code>SELECT</code> か <code>ORDER BY</code> 内でのみ利用可能</li>
+        </ul>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数の動き</h2></summary>
+
+        <ul>
+          <li><code>OVER</code> 句の中で明確に条件を指定して、どのカラムをグループの単位とするのか、グループ内のソート順などを設定する</li>
+          <li>Window関数で定義したグループは「ウィンドウフレーム」と呼ばれ、その単位で <code>OVER</code> 句の前に定義した関数が実行される</li>
+        </ul>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>利用可能なWindow関数の一覧</h2></summary>
+
+        <ul>
+          <li>Window関数では、下記に列挙された関数と、通常の集約関数 ( <code>count</code> や <code>sum</code> など) が使用できる</li>
+        </ul>
+
+        <table>
+          <caption>利用可能なWindow関数リスト</caption>
+          <tbody>
+            <tr>
+              <th>関数</th>
+              <th>説明</th>
+            </tr>
+            <tr>
+              <td><code>row_number()</code></td>
+              <td>行番号</td>
+            </tr>
+            <tr>
+              <td><code>rank()</code></td>
+              <td>ランキング (同率で番号を飛ばす)</td>
+            </tr>
+            <tr>
+              <td><code>dense_rank()</code></td>
+              <td>ランキング (同率で番号を飛ばさない)</td>
+            </tr>
+            <tr>
+              <td><code>percent_rank()</code></td>
+              <td>ランキング (%で表示) : (rank - 1) / (全行数 - 1)</td>
+            </tr>
+            <tr>
+              <td><code>cume_dist()</code></td>
+              <td>percent_rank に類似 : (現在の行の位置) / (全行数)</td>
+            </tr>
+            <tr>
+              <td><code>ntile(N)</code></td>
+              <td>ランキング (1..N に分割)</td>
+            </tr>
+            <tr>
+              <td><code>lag(value, offset, default)</code></td>
+              <td>ソート状態での前の行の値</td>
+            </tr>
+            <tr>
+              <td><code>lead(value, offset, default)</code></td>
+              <td>ソート状態での後の行の値</td>
+            </tr>
+            <tr>
+              <td><code>first_value(value)</code></td>
+              <td>最初の値</td>
+            </tr>
+            <tr>
+              <td><code>last_value(value)</code></td>
+              <td>最後の値</td>
+            </tr>
+            <tr>
+              <td><code>nth_value(value, N)</code></td>
+              <td>N番目の値 (1から数える)</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Window関数を使ったクエリ例</h2></summary>
+
+        <details open>
+          <summary><h3>部署の平均給与とそれぞれの従業員の給与を使った例</h3></summary>
+
+          <h4>サンプルのテーブル</h4>
+          <div class="markdown_content">
+depname   | empno | salary |          avg          
+----------|-------|--------|-----------------------
+develop   |    11 |   5200 | 5020.0000000000000000
+develop   |     7 |   4200 | 5020.0000000000000000
+develop   |     9 |   4500 | 5020.0000000000000000
+develop   |     8 |   6000 | 5020.0000000000000000
+develop   |    10 |   5200 | 5020.0000000000000000
+personnel |     5 |   3500 | 3700.0000000000000000
+personnel |     2 |   3900 | 3700.0000000000000000
+sales     |     3 |   4800 | 4866.6666666666666667
+sales     |     1 |   5000 | 4866.6666666666666667
+sales     |     4 |   4800 | 4866.6666666666666667
+          </div>
+
+          <details open>
+            <summary><h4>rank関数の例</h4></summary>
+
+            <ul>
+              <li><code>rank()</code> 関数は、それぞれの明確な <code>ORDER BY</code>の値に対する現在行のパーティション内における順位を、 <code>ORDER BY</code> 句で定義された順序で生成する</li>
+              <li><code>depname</code> 毎に <code>salary</code> の高い順にランクを付ける場合のSQLクエリ例</li>
+            </ul>
+
+<pre><code class="language-sql">SELECT depname, empno, salary,
+  rank() OVER (PARTITION BY depname ORDER BY salary DESC)
+FROM empsalary;
+</code></pre>
+
+            <div class="markdown_content">
+depname   | empno | salary | rank 
+----------|-------|--------|------
+develop   |     8 |   6000 |    1
+develop   |    10 |   5200 |    2
+develop   |    11 |   5200 |    2
+develop   |     9 |   4500 |    4
+develop   |     7 |   4200 |    5
+personnel |     2 |   3900 |    1
+personnel |     5 |   3500 |    2
+sales     |     1 |   5000 |    1
+sales     |     4 |   4800 |    2
+sales     |     3 |   4800 |    2
+            </div>
+          </details>
+
+        </details>
+
+        <details open>
+          <summary><h3>連番付与</h3></summary>
+
+          <ul>
+            <li><code>row_number() OVER ()</code> を使って、連番付与のSQLクエリ例</li>
+            <li>ソートした後に番号をふるのがポイント</li>
+            <li><code>PARTITION BY</code> が無い場合は、テーブル全体が対象となる</li>
+          </ul>
+
+<pre><code class="language-sql">SELECT row_number() OVER (), *
+  FROM (SELECT * FROM tbl ORDER BY sortkey) AS t;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>全体に対する割合で取得</h3></summary>
+
+          <ul>
+            <li>上位10%を取得する場合ののSQLクエリ例</li>
+            <li>全体に対する割合を計算するには、結局は全体を取得する必要があることに注意</li>
+          </ul>
+
+<pre><code class="language-sql">SELECT ...
+FROM (SELECT *, cume_dist() OVER (ORDER BY i) AS rank FROM tbl) AS t
+WHERE rank &lt;= 0.1;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3><code>PARTITION BY</code> と <code>ORDER BY</code> の組み合わせ</h3></summary>
+
+          <ul>
+            <li><code>PARTITION BY</code> と <code>ORDER BY</code> は、同時に使用することも可能</li>
+            <li>地域ごとに身長の低い順に番号付けする場合のSQLクエリ例</li>
+          </ul>
+<pre><code class="language-sql">SELECT id, 地域, 身長,
+  rank() OVER (PARTITION BY 地域 ORDER BY 身長)
+FROM tbl;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>歯抜けIDの検索</h3></summary>
+
+          <ul>
+            <li>列 <code>id</code> でソートした際に1つ前の行と比較して、連番になっていない行を抜き出す場合のSQLクエリ例</li>
+            <li>前の行を取得する <code>lag()</code> 関数を使うと、ただ1回のテーブルスキャンで処理することが可能</li>
+            <li><code>NOT IN</code> や <code>NOT EXISTS</code> などコストの高いSQLを使う必要がなくなる</li>
+          </ul>
+
+<pre><code class="language-sql">SELECT id, prev_id
+FROM (
+  SELECT id,
+    lag(id, 1, 0) OVER (ORDER BY id) AS prev_id
+  FROM tbl
+) AS t
+WHERE id &lt;&gt; prev_id + 1;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>Window演算が行われた後、行にフィルタ処理を行ったりグループ化を行う場合</h3></summary>
+
+          <ul>
+            <li>Window演算が行われた後、行にフィルタ処理を行ったりグループ化を行う必要が生じた場合、副問い合わせを使用する</li>
+            <li><code>3</code> より小さい <code>rank</code> を持った内部問い合わせからの行のみを表示するSQLクエリ例</li>
+          </ul>
+
+<pre><code class="language-sql">SELECT depname, empno, salary, enroll_date
+FROM (
+  SELECT depname, empno, salary, enroll_date,
+    rank() OVER (PARTITION BY depname ORDER BY salary DESC, empno) AS pos
+  FROM empsalary
+) AS ss
+WHERE pos &lt; 3;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>複数の関数で同じWindow処理動作が必要な場合</h3></summary>
+
+          <ul>
+            <li><code>WINDOW</code> 句でWindow処理動作に名前を付け、これを <code>OVER</code> 内で参照することが可能</li>
+          </ul>
+
+<pre><code class="language-sql">SELECT sum(salary) OVER w, avg(salary) OVER w
+FROM empsalary
+WINDOW w AS (PARTITION BY depname ORDER BY salary DESC);
+</code></pre>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://www.postgresql.jp/document/9.6/html/tutorial-window.html" ref="nofollow noreferrer noopener" target="_blank">
+              3.5 ウィンドウ関数 | PostgreSQL 9.4.5文書
+            </a>
+          </li>
+          <li>
+            <a href="https://www.postgresql.jp/docs/9.4/functions-window.html" ref="nofollow noreferrer noopener" target="_blank">
+              9.21. 汎用ウィンドウ関数 | PostgreSQL 9.4.5文書
+            </a>
+          </li>
+          <li>
+            <a href="https://lets.postgresql.jp/documents/technical/window_functions/1" ref="nofollow noreferrer noopener" target="_blank">
+              Window関数 | Let's POSTGRES
+            </a>
+          </li>
+          <li>
+            <a href="https://qiita.com/watame/items/a17b72b5833d5dde4b30" ref="nofollow noreferrer noopener" target="_blank">
+              【PostgreSQL】ウィンドウ関数使い方メモ | Qiita
+            </a>
+          </li>
+        </ul>
+
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
