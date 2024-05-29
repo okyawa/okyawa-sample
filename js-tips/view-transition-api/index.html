@@ -1,0 +1,247 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>View Transition APIによるスムーズな遷移</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>[WIP] View Transition APIによるスムーズな遷移のサンプル</h1>
+    </header>
+
+    <section>
+      <details open>
+        <summary><h2>View Transition APIとは</h2></summary>
+
+        <div class="markdown_content">
+- `View Transition API` を使用すると、WEBサイトのさまざまなView間でシームレスな視覚的な遷移を作成できる
+- マルチページ アプリケーション (`MPA`) とシングルページ アプリケーション (`SPA`)、どちらでも対応可能
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>View遷移の動き</h2></summary>
+
+        <div class="markdown_content">
+1. ブラウザが、新旧の状態のスナップショットを作成
+2. レンダリングが抑制されている間にDOMが更新される
+3. 遷移にCSSアニメーションを利用
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>SPAでの同一ドキュメントView遷移</h2></summary>
+
+        <div class="markdown_content">
+1. 同じドキュメント ビューの移行をトリガーするには、`document.startViewTransition` を呼び出す
+2. ブラウザを呼び出すと、`view-transition-name` CSS プロパティが宣言されている全ての要素のスナップショットが自動的にキャプチャされる
+    - スナップショットは疑似要素のツリーに配置され、CSSアニメーションの機能を使用してアニメーション化される
+3. 渡されたコールバックを実行してDOMを更新する
+4. 新しい状態のスナップショットを取得する
+    - 元の状態と新しい状態のスナップショットのペアは、コンテンツがクロスフェードしている間、以前の位置とサイズから新しい場所にスムーズに移行する
+    - 必要に応じて、CSSを使用してアニメーションをカスタマイズ可能
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>クロスフェード: デフォルトの遷移</h2></summary>
+
+        <div class="markdown_content">
+- デフォルトのView遷移は「クロスフェード」
+- `.startViewTransition()` が呼び出されると、API はページの現在の状態を取得する
+    - スナップショットの取得も含まれる
+        </div>
+
+<pre><code class="language-js">function spaNavigate(data) {
+  // View Transition APIに未対応なブラウザ用のFallback
+  if (!document.startViewTransition) {
+    updateTheDOMSomehow(data);
+    return;
+  }
+
+  // View Transition APIを使った遷移
+  document.startViewTransition(() => updateTheDOMSomehow(data));
+}
+</code></pre>
+
+        <details open>
+          <summary><h3>新しい状態が取り込まれると構築される擬似要素ツリー</h3></summary>
+
+<pre><code class="language-css">::view-transition
+└─ ::view-transition-group(root)
+    └─ ::view-transition-image-pair(root)
+      ├─ ::view-transition-old(root)
+      └─ ::view-transition-new(root)
+</code></pre>
+          <div class="markdown_content">
+- `::view-transition` は、ページ上のすべての要素の上にオーバーレイとして配置される
+    - 遷移の背景色を設定する場合に便利
+- `::view-transition-old(root)` は古いビューのスクリーンショットで、`::view-transition-new(root)` は新しいビューのライブ表現
+    - どちらもCSSの「置換コンテンツ」(`<img>` など) としてレンダリングされる
+- 古いビューは `opacity: 1` から `opacity: 0` にアニメーション化され、新しいビューは `opacity: 0` から `opacity: 1` にアニメーション化され、クロスフェードが作成される
+    - 全てのアニメーションは、CSSアニメーションを使用して実行されるため、CSSでカスタマイズが可能
+          </div>
+        </details>
+
+        <details open>
+          <summary><h3>CSSで遷移をカスタマイズ</h3></summary>
+
+          <div class="markdown_content">
+- フェードを遅くする例
+          </div>
+
+<pre><code class="language-css">::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 5s;
+}
+</code></pre>
+          <div class="markdown_content">
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>複数の要素の遷移</h2></summary>
+
+        <div class="markdown_content">
+- ページの残りの部分からヘッダーを抽出して、個別にアニメーション化するには、要素に `view-transition-name` を割り当てる
+- `view-transition-name` の値には任意の値を使用できる
+    - ただし、遷移名がない `none` は除く
+    - 遷移全体で、要素を一意に識別するために使用される
+        </div>
+
+<pre><code class="language-css">.main-header {
+  view-transition-name: main-header;
+}
+</code></pre>
+
+        <div class="markdown_content">
+- 上記のCSS指定でヘッダーは固定され、クロスフェードされる
+        </div>
+
+        <details open>
+          <summary><h3>`view-transition-class` を使用して同じ方法で複数の擬似要素をアニメーション化</h3></summary>
+
+          <div class="markdown_content">
+- 複数のカードを使用するビュー遷移があり、ページ上にタイトルもある場合、タイトルを除く全てのカードをアニメーション化するには、全てのカードをターゲットとするセレクタを作成する必要がある
+- ビュー遷移疑似要素で `view-transition-class` を使用して、同じスタイルルールを適用可能
+- キャプチャが機能するためには、全ての要素に一意の `view-transition-name` を指定する必要がある
+    - `view-transition-class` は、アニメーション スタイルの重複を除去する
+          </div>
+
+<pre><code class="language-css">#card1 { view-transition-name: card1; }
+#card2 { view-transition-name: card2; }
+#card3 { view-transition-name: card3; }
+#card4 { view-transition-name: card4; }
+#card5 { view-transition-name: card5; }
+…
+#card20 { view-transition-name: card20; }
+
+#cards-wrapper > div {
+  view-transition-class: card;
+}
+html::view-transition-group(.card) {
+  animation-timing-function: var(--bounce);
+}
+</code></pre>
+
+          <ul>
+            <li>
+              <a href="https://view-transitions.netlify.app/cards/spa/" ref="nofollow noreferrer noopener" target="_blank">
+                カードを追加/削除する際にView Transition APIの遷移を適用するデモ
+              </a>
+              <ul>
+                <li>新しく追加したカードも含め、全てのカードに同じタイミング (<code>html::view-transition-group(.card)</code>) が適用される</li>
+              </ul>
+            </li>
+          </ul>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>遷移をデバッグ</h2></summary>
+
+        <div class="markdown_content">
+- View遷移はCSSアニメーションの上に作成されるため、遷移のデバッグにはChrome DevToolsの `[Animations]` パネルが最適
+    - Chrome DevToolsを開いて `ESC` を押すと出てくる部分の `︙` をクリックすると、`[Animations]` パネルを表示可能
+    - `[Animations]` パネルで、次のアニメーションを一時停止してから、アニメーション内を前後にスクラブできる
+        - この間、遷移の疑似要素は [要素] パネルに表示される
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.mozilla.org/ja/docs/Web/API/View_Transitions_API" ref="nofollow noreferrer noopener" target="_blank">
+              ビュートランジション API | MDN
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/docs/web-platform/view-transitions?hl=ja" ref="nofollow noreferrer noopener" target="_blank">
+              View Transition API によるスムーズな遷移 | Chrome for Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/docs/web-platform/view-transitions/same-document?hl=ja" ref="nofollow noreferrer noopener" target="_blank">
+              シングルページ アプリケーションでの同一ドキュメント ビュー遷移 | Chrome for Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=View%20Transition%20API" ref="nofollow noreferrer noopener" target="_blank">
+              View Transition API | Can I use
+            </a>
+          </li>
+          <li>
+            <a href="https://webstatus.dev/features/view-transitions?q=View+Transition" ref="nofollow noreferrer noopener" target="_blank">
+              View Transition API | Web Platform Status
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
