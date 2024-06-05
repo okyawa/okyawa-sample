@@ -59,6 +59,11 @@
 - このページに適用中で、DevTools等を使い、この画面の幅を変更することで、動作を確認できる
         </div>
 
+        <div style="margin-bottom: 4rem;">
+          <h3>現在のこの画面のviewport指定</h3>
+          <code id="result" class="language-html" style="display: block; padding: 1rem;"></code>
+        </div>
+
         <details open>
           <summary><h3>JavaScriptコード</h3></summary>
 <pre><code class="language-js">/**
@@ -117,6 +122,11 @@ function adjustViewport() {
     ? `width=${TRIGGER_WIDTH}, target-densitydpi=device-dpi`
     : 'width=device-width, initial-scale=1';
   viewport.setAttribute('content', value);
+
+  // Debug用
+  const resultElement = document.getElementById('result');
+  resultElement.textContent = viewport.outerHTML;
+  hljs.highlightElement(resultElement)
 }
 
 /**
