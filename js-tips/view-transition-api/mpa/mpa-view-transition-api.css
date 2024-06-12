@@ -1,0 +1,10 @@
+/* View Transitions APIの有効化 */
+@view-transition {
+  navigation: auto;
+}
+
+/* アニメーションを付けたい要素 */
+#sample_image01 {
+  /* ページ遷移の前後で同じ view-transition-name の要素同士がアニメーションされる */
+  view-transition-name: image01;
+}

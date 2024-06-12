@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>MPAでView Transition APIによるスムーズな遷移</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このサンプル用のCSS -->
+  <link rel="stylesheet" href="/js-tips/view-transition-api/mpa/mpa-view-transition-api.css?v=1" />
+  <!-- ↑このサンプル用のCSS -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>MPAで View Transition APIによるスムーズな遷移のサンプル</h1>
+    </header>
+
+    <section>
+      <details open>
+        <summary><h2>MPAでの View Transition API</h2></summary>
+
+        <div class="markdown_content">
+- MPA (Multi-Page-Application) で構築されているWebサイトで View Transition API を利用
+- 2024/06/04 現在、Chromeのみ対応
+- 利用可能なのは、同一オリジンのサイト間の遷移のみ
+- MPAのページ遷移で View Transitions API を有効化するには、CSSで `@view-transition { navigation: auto; }` を記載するのみ
+- 特定の要素にCSSで `view-transition-name` を指定すると、ページ遷移の前後で同じ `view-transition-name` の要素同士がアニメーションされる
+  - 1つのページ内で `view-transition-name` の値を重複させることはできず、ページ内で一意になる必要あり
+  - JavaScriptで実現するためには、 `pageswap` イベントと `pagereveal` イベントを使う
+  - PHP等のサーバーサイドで `view-transition-name` の値を割り振る場合、 `style="view-transition-name: article-<?php echo $article.id ?>"` のようなstyle属性指定を使う
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div class="markdown_content">
+- [サンプルA](/js-tips/view-transition-api/mpa/sample-a.html)
+- [サンプルB](/js-tips/view-transition-api/mpa/sample-b.html)
+- [サンプルC](/js-tips/view-transition-api/mpa/sample-c.html)
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">/* View Transitions APIの有効化 */
+@view-transition {
+  navigation: auto;
+}
+</code></pre>
+
+<pre><code class="language-css">/* アニメーションを付けたい要素 */
+#sample_image01 {
+  /* ページ遷移の前後で同じ view-transition-name の要素同士がアニメーションされる */
+  view-transition-name: image01;
+}
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML | サンプルA</h3></summary>
+
+<pre><code class="language-html">&lt;img src="sample.jpg" width="160" height="160" alt="" id="sample_image01" /&gt;
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML | サンプルB</h3></summary>
+
+<pre><code class="language-html">&lt;img src="sample.jpg" width="320" height="320" alt="" id="sample_image01" /&gt;
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML | サンプルC</h3></summary>
+
+<pre><code class="language-html">&lt;img src="sample.jpg" width="640" height="640" alt="" id="sample_image01" /&gt;
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.chrome.com/docs/web-platform/view-transitions/cross-document?hl=ja" ref="nofollow noreferrer noopener" target="_blank">
+              マルチページ アプリケーションのドキュメント間のビュー遷移 | Chrome for Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://qiita.com/access3151fq/items/a057c9b6398afae43670" ref="nofollow noreferrer noopener" target="_blank">
+              [JSなし] パワーアップしたView Transitions APIでMPAをSPAみたいにする | Qiita
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
