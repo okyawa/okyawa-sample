@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>border-imageを使った背景画像上のオーバーレイのサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このサンプル用のCSS -->
+  <style>
+    /* オーバーレイの指定 */
+    .bg_overlay {
+      border-image: fill 0 linear-gradient(#0003, #000);
+    }
+    /* マウスオーバーした際にだけオーバーレイの指定 */
+    @media (any-hover: hover) {
+      .hover_overlay:hover {
+        border-image: fill 0 linear-gradient(#0003, #000);
+      }
+      .hover_overlay:hover::after {
+        content: attr(data-label);
+      }
+    }
+    /* 背景画像表示とテキスト配置の指定 */
+    .banner_container {
+      width: 320px;
+      height: 320px;
+      max-width: 100%;
+      background: url(/img/cocktails/w640/fantasia_02.jpeg) center/cover;
+      display: grid;
+      place-items:center;
+      text-align: center;
+      font-family: sans-serif;
+      font-size: 1.5rem;
+      color: #fff;
+    }
+  </style>
+  <!-- ↑このサンプル用のCSS -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>border-imageを使った背景画像上のオーバーレイのサンプル</h1>
+    </header>
+
+    <section>
+      <details open>
+        <summary><h2></h2></summary>
+
+        <div class="markdown_content">
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ1</h2></summary>
+
+        <div style="display: flex; flex-wrap: wrap;">
+          <section>
+            <h3>オーバーレイなし</h3>
+            <div class="banner_container">
+              <p>without Overlay</p>
+            </div>
+          </section>
+
+          <section>
+            <h3>オーバーレイあり</h3>
+            <div class="bg_overlay banner_container">
+              <p>with Overlay</p>
+            </div>
+          </section>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ1のコード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">/* オーバーレイの指定 */
+.bg_overlay {
+  border-image: fill 0 linear-gradient(#0003, #000);
+}
+/* 背景画像表示とテキスト配置の指定 */
+.banner_container {
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+  background: url(/img/cocktails/w640/fantasia_02.jpeg) center/cover;
+  display: grid;
+  place-items:center;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+}
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div class="bg_overlay banner_container"&gt;
+  &lt;p&gt;with Overlay&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ2</h2></summary>
+
+        <section>
+          <h3>マウスオーバー時にオーバーレイ表示</h3>
+
+          <div class="hover_overlay banner_container" data-label="with Overlay"></div>
+
+        </section>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ2のコード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">/* マウスオーバーした際にだけオーバーレイの指定 */
+@media (any-hover: hover) {
+  .hover_overlay:hover {
+    border-image: fill 0 linear-gradient(#0003, #000);
+  }
+  .hover_overlay:hover::after {
+    content: attr(data-label);
+  }
+}
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div class="bg_overlay banner_container" data-label="with Overlay"&gt;&lt;/div&gt;
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://frontendmasters.com/blog/quick-trick-using-border-image-to-apply-and-overlay-gradient/" ref="nofollow noreferrer noopener" target="_blank">
+              Quick Trick: Using border-image to Apply and Overlay Gradient.
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
