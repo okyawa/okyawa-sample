@@ -35,7 +35,7 @@
       scrollbar-gutter: stable;
     }
 
-    /* 拡大画像 */
+    /* 表示画像 */
     dialog .image_preview img {
       max-width: calc(100dvw - 60px);
       max-height: calc(100dvh - 60px);
@@ -43,12 +43,16 @@
     }
 
     /* 拡大表示 */
-    dialog .image_preview.zoom {
-      max-width: calc(100dvw - 60px);
-      max-height: calc(100dvh - 60px);
+    dialog.zoom {
+      max-width: 100dvw;
+      max-height: 100dvh;
+    }
+    dialog.zoom .image_preview {
+      max-width: 100dvw;
+      max-height: 100dvh;
       overflow: auto;
     }
-    dialog .image_preview.zoom img {
+    dialog.zoom .image_preview img {
       max-width: none;
       max-height: none;
     }
@@ -227,12 +231,6 @@
             openLink?.addEventListener('click', async (event) => {
               event.preventDefault();
 
-              // ズーム指定とコントロール表示を初期
-              const imagePreviewElem = modalDialog.querySelector('.image_preview');
-              const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
-              imagePreviewElem.classList.remove('zoom');
-              imagePreviewWrapperElem.classList.remove('controls_hidden');
-
               // 拡大画像表示の処理
               const targetElem = event.currentTarget;
               const url = targetElem.getAttribute('href');
@@ -271,12 +269,15 @@
               await waitDialogAnimation(dialog);
               // dialog要素のstyle指定で非表示にする
               dialog.style.display = 'none';
+              // ズーム指定とコントロール表示を初期化
+              const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
+              modalDialog.classList.remove('zoom');
+              imagePreviewWrapperElem.classList.remove('controls_hidden');
               // 背景スクロールを防ぐために追加したスタイルを削除
               document.documentElement.style.overflow = '';
             });
             modalDialog.querySelector('.zoom_button')?.addEventListener('click', (event) => {
-              const imagePreview = modalDialog.querySelector('.image_preview');
-              imagePreview.classList.toggle('zoom');
+              modalDialog.classList.toggle('zoom');
             });
           })
         </script>
