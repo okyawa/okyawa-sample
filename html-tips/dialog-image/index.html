@@ -45,6 +45,27 @@
       max-height: calc(100dvh - 60px);
       vertical-align: middle;
     }
+    dialog.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
+      max-height: calc(100dvh - 60px - 30px);
+    }
+
+    /* キャプション */
+    dialog .image_caption {
+      position: relative;
+    }
+    dialog .caption_text {
+      width: 100%;
+      padding: 9px 10px;
+      position: absolute;
+      bottom: 0;
+      box-sizing: border-box;
+      background-color: #ffffff66;
+      text-align: center;
+      font-size: 0.76rem;
+    }
+    dialog.has_caption .image_caption {
+      height: 30px;
+    }
 
     /* 拡大表示 */
     dialog.zoom {
@@ -61,6 +82,9 @@
       max-width: none;
       max-height: none;
     }
+    dialog.zoom .image_caption {
+      display: none;
+    }
 
     /* 右上の操作ボタン */
     dialog .image_preview_wrapper {
@@ -68,15 +92,20 @@
     }
     dialog .image_preview_wrapper .preview_controls {
       position: absolute;
-      top: 0;
-      right: 0;
-      padding: 0.5em;
+      top: 8px;
+      right: 8px;
+      padding: 8px;
       display: flex;
       gap: 8px;
     }
+    dialog.zoom .image_preview_wrapper .preview_controls {
+      top: 0;
+      right: 0;
+    }
 
-    /* 右上の操作ボタンを非表示 */
-    dialog .image_preview_wrapper.controls_hidden .preview_controls {
+    /* 右上の操作ボタンとキャプションを非表示 */
+    dialog.controls_hidden .preview_controls,
+    dialog.controls_hidden .image_caption {
       display: none;
     }
 
@@ -221,6 +250,7 @@
         <dialog style="display: none;">
           <div class="image_preview_wrapper">
             <div class="image_preview"></div>
+            <div class="image_caption"></div>
             <div class="preview_controls">
               <button
                 type="button"
@@ -286,6 +316,16 @@
               // 拡大画像表示の処理
               imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
 
+              // キャプションのテキスト
+              const captionElem = modalDialog.querySelector('.image_caption');
+              if (caption) {
+                captionElem.innerHTML = `<div class="caption_text">${caption}</div>`;
+                modalDialog.classList.add('has_caption');
+              } else {
+                captionElem.innerHTML = '';
+                modalDialog.classList.remove('has_caption');
+              }
+
               // 表示画像自体のクリック
               modalDialog.querySelector('.image_preview img')?.addEventListener('click', (event) => {
                 if (modalDialog.classList.contains('zoom')) {
@@ -294,8 +334,7 @@
                   return;
                 }
                 // コントロール表示を切り替え
-                const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
-                imagePreviewWrapperElem.classList.toggle('controls_hidden');
+                modalDialog.classList.toggle('controls_hidden');
               });
 
               // dialog要素の開くアニメーションがすべて終了するまで待つ
@@ -340,11 +379,11 @@
               await waitDialogAnimation(dialog);
               // dialog要素のstyle指定で非表示にする
               dialog.style.display = 'none';
-              // ズーム指定とコントロール表示を初期化
-              const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
+              // 判定用に付与したクラス名を初期化
               modalDialog.classList.remove('zoom');
               modalDialog.classList.remove('zoom_disabled');
-              imagePreviewWrapperElem.classList.remove('controls_hidden');
+              modalDialog.classList.remove('has_caption');
+              modalDialog.classList.remove('controls_hidden');
               // 背景スクロールを防ぐために追加したスタイルを削除
               document.documentElement.style.overflow = '';
             });
