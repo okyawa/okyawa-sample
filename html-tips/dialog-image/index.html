@@ -66,6 +66,11 @@
       gap: 8px;
     }
 
+    /* 右上の操作ボタンを非表示 */
+    dialog .image_preview_wrapper.controls_hidden .preview_controls {
+      display: none;
+    }
+
     /* 拡大ボタン */
     dialog .image_preview_wrapper .zoom_button {
       width: 30px;
@@ -222,14 +227,23 @@
             openLink?.addEventListener('click', async (event) => {
               event.preventDefault();
 
-              // ズーム指定を初期化
-              const imagePreview = modalDialog.querySelector('.image_preview');
-              imagePreview.classList.remove('zoom');
+              // ズーム指定とコントロール表示を初期
+              const imagePreviewElem = modalDialog.querySelector('.image_preview');
+              const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
+              imagePreviewElem.classList.remove('zoom');
+              imagePreviewWrapperElem.classList.remove('controls_hidden');
 
               // 拡大画像表示の処理
               const targetElem = event.currentTarget;
               const url = targetElem.getAttribute('href');
               modalDialog.querySelector('.image_preview').innerHTML = `<img src="${url}" alt="" />`;
+
+              // 画像自体のクリックでコントロール表示を切り替え
+              const imageElem = modalDialog.querySelector('.image_preview img');
+              imageElem.addEventListener('click', (event) => {
+                const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
+                imagePreviewWrapperElem.classList.toggle('controls_hidden');
+              });
 
               // dialog要素の開くアニメーションがすべて終了するまで待つ
               await waitDialogAnimation(modalDialog);
