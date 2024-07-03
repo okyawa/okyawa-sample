@@ -75,13 +75,23 @@
       display: none;
     }
 
-    /* 拡大ボタン */
-    dialog .image_preview_wrapper .zoom_button {
+    /* 拡大・縮小ボタン */
+    dialog .image_preview_wrapper .zoom_in_button,
+    dialog .image_preview_wrapper .zoom_out_button {
       width: 30px;
       height: 30px;
       background-color: rgba(255, 255, 255, 0.5);
       border: none;
       cursor: pointer;
+    }
+    dialog.zoom .image_preview_wrapper .zoom_in_button {
+      display: none;
+    }
+    dialog .image_preview_wrapper .zoom_out_button {
+      display: none;
+    }
+    dialog.zoom .image_preview_wrapper .zoom_out_button {
+      display: block;
     }
 
     /* 閉じるボタン */
@@ -200,13 +210,22 @@
             <div class="preview_controls">
               <button
                 type="button"
-                class="zoom_button"
+                class="zoom_in_button"
+                title="Zoom in"
               >
                 🔍
               </button>
               <button
                 type="button"
+                class="zoom_out_button"
+                title="Zoom out"
+              >
+                🔎
+              </button>
+              <button
+                type="button"
                 class="close_button"
+                title="Close"
                 onclick="this.closest('dialog').close();"
               >
                 x
@@ -223,17 +242,31 @@
               // dialog要素ではない場合は中断
               return;
             }
-            // dialog要素のアニメーションがすべて終了するのを待つ関数
-            const waitDialogAnimation = (dialog) => Promise.allSettled(
-              dialog.getAnimations().map((animation) => animation.finished)
-            );
-            // 開くボタンのイベント登録
+            /**
+             * 開くボタンのイベント登録
+             */
             openLink?.addEventListener('click', async (event) => {
               event.preventDefault();
 
-              // 拡大画像表示の処理
+              // ダイアログで表示する画像のURL
               const targetElem = event.currentTarget;
               const url = targetElem.getAttribute('href');
+              const caption = targetElem.dataset.caption ?? '';
+              openImagePreviewDialog(url, caption);
+            });
+
+            /**
+             * dialog要素のアニメーションがすべて終了するのを待つ関数
+             */
+            function waitDialogAnimation(dialog) {
+              return Promise.allSettled(dialog.getAnimations().map((animation) => animation.finished));
+            }
+
+            /**
+             * 画像拡大表示ダイアログを開く
+             */
+            async function openImagePreviewDialog(url, caption) {
+              // 拡大画像表示の処理
               modalDialog.querySelector('.image_preview').innerHTML = `<img src="${url}" alt="" />`;
 
               // 画像自体のクリックでコントロール表示を切り替え
@@ -251,14 +284,20 @@
               modalDialog.showModal();
               // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
               document.documentElement.style.overflow = 'hidden';
-            });
-            // ダイアログの枠外をクリックした際にダイアログを閉じる
+            }
+
+            /**
+             * ダイアログの枠外をクリックした際にダイアログを閉じる
+             */
             modalDialog.addEventListener('click', (event) => {
               if (event.target === event.currentTarget) {
                 modalDialog.close();
               }
             });
-            // 閉じる際に実行するイベントを登録
+
+            /**
+             * ダイアログを閉じる際に実行するイベントを登録
+             */
             modalDialog.addEventListener('close', async (event) => {
               const dialog = event.currentTarget;
               if (!(dialog instanceof HTMLDialogElement)) {
@@ -276,8 +315,19 @@
               // 背景スクロールを防ぐために追加したスタイルを削除
               document.documentElement.style.overflow = '';
             });
-            modalDialog.querySelector('.zoom_button')?.addEventListener('click', (event) => {
-              modalDialog.classList.toggle('zoom');
+
+            /**
+             * 拡大ボタンのイベント登録
+             */
+            modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', (event) => {
+              modalDialog.classList.add('zoom');
+            });
+
+            /**
+             * 縮小ボタンのイベント登録
+             */
+            modalDialog.querySelector('.zoom_out_button')?.addEventListener('click', (event) => {
+              modalDialog.classList.remove('zoom');
             });
           })
         </script>
