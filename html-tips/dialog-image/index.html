@@ -93,6 +93,10 @@
     dialog.zoom .image_preview_wrapper .zoom_out_button {
       display: block;
     }
+    dialog.zoom_disabled .image_preview_wrapper .zoom_in_button,
+    dialog.zoom_disabled .image_preview_wrapper .zoom_out_button {
+      display: none;
+    }
 
     /* 閉じるボタン */
     dialog .image_preview_wrapper .close_button {
@@ -199,7 +203,12 @@
         <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
           <li>
             <a href="/img/cocktails/w1440/strawberry_field.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1">
-              <img src="/img/cocktails/w640/strawberry_field.jpeg" width="160" height="160" alt="サンプル画像1" />
+              <img src="/img/cocktails/w640/strawberry_field.jpeg" width="160" height="160" alt="大きいサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/sol_cubano.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像2">
+              <img src="/img/cocktails/w640/sol_cubano.jpeg" width="160" height="160" alt="小さめのサンプル画像" />
             </a>
           </li>
         </ul>
@@ -237,7 +246,7 @@
         <script>
           window.addEventListener('DOMContentLoaded', () => {
             const modalDialog = document.querySelector('#sample01 dialog');
-            const openLink = document.querySelector('#sample01 .popup_img');
+            const openLinkElements = document.querySelectorAll('#sample01 .popup_img');
             if (!(modalDialog instanceof HTMLDialogElement)) {
               // dialog要素ではない場合は中断
               return;
@@ -245,15 +254,17 @@
             /**
              * 開くボタンのイベント登録
              */
-            openLink?.addEventListener('click', async (event) => {
-              event.preventDefault();
+            openLinkElements.forEach((linkElem) => {
+              linkElem.addEventListener('click', async (event) => {
+                event.preventDefault();
 
-              // ダイアログで表示する画像のURL
-              const targetElem = event.currentTarget;
-              const url = targetElem.getAttribute('href');
-              const caption = targetElem.dataset.caption ?? '';
-              openImagePreviewDialog(url, caption);
-            });
+                // ダイアログで表示する画像のURL
+                const targetElem = event.currentTarget;
+                const url = targetElem.getAttribute('href');
+                const caption = targetElem.dataset.caption ?? '';
+                openImagePreviewDialog(url, caption);
+              });
+            })
 
             /**
              * dialog要素のアニメーションがすべて終了するのを待つ関数
@@ -266,24 +277,40 @@
              * 画像拡大表示ダイアログを開く
              */
             async function openImagePreviewDialog(url, caption) {
+              const imagePreviewElem = modalDialog.querySelector('.image_preview');
               // 拡大画像表示の処理
-              modalDialog.querySelector('.image_preview').innerHTML = `<img src="${url}" alt="" />`;
+              imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
 
-              // 画像自体のクリックでコントロール表示を切り替え
-              const imageElem = modalDialog.querySelector('.image_preview img');
-              imageElem.addEventListener('click', (event) => {
+              // 表示画像自体のクリック
+              modalDialog.querySelector('.image_preview img')?.addEventListener('click', (event) => {
+                if (modalDialog.classList.contains('zoom')) {
+                  // ズーム中の場合は縮小表示に戻す
+                  modalDialog.classList.remove('zoom');
+                  return;
+                }
+                // コントロール表示を切り替え
                 const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
                 imagePreviewWrapperElem.classList.toggle('controls_hidden');
               });
 
               // dialog要素の開くアニメーションがすべて終了するまで待つ
               await waitDialogAnimation(modalDialog);
+
               // dialog要素にデフォルトで付与していたdisplayのstyle指定を削除
               modalDialog.style.display = '';
               // モーダルダイアログを開く
               modalDialog.showModal();
               // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
               document.documentElement.style.overflow = 'hidden';
+
+              // 表示する画像に拡大ボタンが必要かを判定
+              const { width, height } = await readImageSize(url);
+              const zoomEnabled = width > imagePreviewElem.clientWidth || height > imagePreviewElem.clientHeight
+              if (zoomEnabled) {
+                modalDialog.classList.remove('zoom_disabled');
+              } else {
+                modalDialog.classList.add('zoom_disabled');
+              }
             }
 
             /**
@@ -311,6 +338,7 @@
               // ズーム指定とコントロール表示を初期化
               const imagePreviewWrapperElem = modalDialog.querySelector('.image_preview_wrapper');
               modalDialog.classList.remove('zoom');
+              modalDialog.classList.remove('zoom_disabled');
               imagePreviewWrapperElem.classList.remove('controls_hidden');
               // 背景スクロールを防ぐために追加したスタイルを削除
               document.documentElement.style.overflow = '';
@@ -329,6 +357,31 @@
             modalDialog.querySelector('.zoom_out_button')?.addEventListener('click', (event) => {
               modalDialog.classList.remove('zoom');
             });
+
+            /**
+             * 画像ファイルのサイズを取得
+             */
+            async function readImageSize(url) {
+              return new Promise((resolve, reject) => {
+                const img = new Image();
+
+                img.onload = () => {
+                  const size = {
+                    width: img.naturalWidth,
+                    height: img.naturalHeight,
+                  };
+
+                  URL.revokeObjectURL(img.src);
+                  resolve(size);
+                };
+
+                img.onerror = (error) => {
+                  reject(error);
+                };
+
+                img.src = url;
+              });
+            }
           })
         </script>
       </details>
