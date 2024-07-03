@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>dialog要素を使った画像拡大Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <style>
+    /* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
+    html:has(dialog[open]) {
+      /* overflow: hidden; */
+      scrollbar-gutter: stable;
+    }
+
+    /* 拡大画像 */
+    dialog .image_preview img {
+      max-width: calc(100dvw - 60px);
+      max-height: calc(100dvh - 60px);
+      vertical-align: middle;
+    }
+
+    /* 拡大表示 */
+    dialog .image_preview.zoom {
+      max-width: calc(100dvw - 60px);
+      max-height: calc(100dvh - 60px);
+      overflow: auto;
+    }
+    dialog .image_preview.zoom img {
+      max-width: none;
+      max-height: none;
+    }
+
+    /* 右上の操作ボタン */
+    dialog .image_preview_wrapper {
+      position: relative;
+    }
+    dialog .image_preview_wrapper .preview_controls {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0.5em;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 拡大ボタン */
+    dialog .image_preview_wrapper .zoom_button {
+      width: 30px;
+      height: 30px;
+      background-color: rgba(255, 255, 255, 0.5);
+      border: none;
+      cursor: pointer;
+    }
+
+    /* 閉じるボタン */
+    dialog .image_preview_wrapper .close_button {
+      width: 30px;
+      height: 30px;
+      background-color: rgba(255, 255, 255, 0.5);
+      border: none;
+      cursor: pointer;
+    }
+
+    /* dialog背景のぼかし */
+    :root {
+      --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
+    }
+    dialog {
+      box-shadow: var(--dialog-shadow);
+    }
+    dialog::backdrop {
+      backdrop-filter: blur(8px);
+      /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        /* フェード・インのアニメーション*/
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        /* ズーム・インのアニメーション */
+        @keyframes zoomIn {
+          from {
+            transform: scale(0.6);
+          }
+          to {
+            transform: scale(1);
+          }
+        }
+        /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
+        dialog[open] {
+          /* @keyframesで作成したアニメーション名 */
+          animation-name: fadeIn, zoomIn;
+          /* アニメーションの進行状況 */
+          animation-fill-mode: forwards;
+          /* アニメーションの実行時間 */
+          animation-duration: 200ms;
+          /* アニメーションの進行状況 */
+          animation-timing-function: ease-out;
+        }
+        /* フェード・アウトのアニメーション */
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
+        }
+        /* ズーム・アウトのアニメーション */
+        @keyframes zoomOut {
+          from {
+            transform: scale(1);
+          }
+          to {
+            transform: scale(0.6);
+          }
+        }
+        /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
+        dialog {
+          animation-name: fadeOut, zoomOut;
+          animation-fill-mode: forwards;
+          animation-duration: 200ms;
+          animation-timing-function: ease-out;
+        }
+      }
+      dialog {
+        padding: 0;
+        display: block;
+        position: fixed;
+        inset-inline: 0;
+        inset-block: 0;
+        border: none;
+      }
+  </style>
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>dialog要素を使った画像拡大Sample</h1>
+    </header>
+
+    <br />
+
+    <section id="sample01">
+      <details open>
+        <summary>デモ</summary>
+
+        <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
+          <li>
+            <a href="/img/cocktails/w1440/strawberry_field.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1">
+              <img src="/img/cocktails/w640/strawberry_field.jpeg" width="160" height="160" alt="サンプル画像1" />
+            </a>
+          </li>
+        </ul>
+
+        <dialog style="display: none;">
+          <div class="image_preview_wrapper">
+            <div class="image_preview"></div>
+            <div class="preview_controls">
+              <button
+                type="button"
+                class="zoom_button"
+              >
+                🔍
+              </button>
+              <button
+                type="button"
+                class="close_button"
+                onclick="this.closest('dialog').close();"
+              >
+                x
+              </button>
+            </div>
+          </div>
+        </dialog>
+
+        <script>
+          window.addEventListener('DOMContentLoaded', () => {
+            const modalDialog = document.querySelector('#sample01 dialog');
+            const openLink = document.querySelector('#sample01 .popup_img');
+            if (!(modalDialog instanceof HTMLDialogElement)) {
+              // dialog要素ではない場合は中断
+              return;
+            }
+            // dialog要素のアニメーションがすべて終了するのを待つ関数
+            const waitDialogAnimation = (dialog) => Promise.allSettled(
+              dialog.getAnimations().map((animation) => animation.finished)
+            );
+            // 開くボタンのイベント登録
+            openLink?.addEventListener('click', async (event) => {
+              event.preventDefault();
+
+              // ズーム指定を初期化
+              const imagePreview = modalDialog.querySelector('.image_preview');
+              imagePreview.classList.remove('zoom');
+
+              // 拡大画像表示の処理
+              const targetElem = event.currentTarget;
+              const url = targetElem.getAttribute('href');
+              modalDialog.querySelector('.image_preview').innerHTML = `<img src="${url}" alt="" />`;
+
+              // dialog要素の開くアニメーションがすべて終了するまで待つ
+              await waitDialogAnimation(modalDialog);
+              // dialog要素にデフォルトで付与していたdisplayのstyle指定を削除
+              modalDialog.style.display = '';
+              // モーダルダイアログを開く
+              modalDialog.showModal();
+              // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
+              document.documentElement.style.overflow = 'hidden';
+            });
+            // ダイアログの枠外をクリックした際にダイアログを閉じる
+            modalDialog.addEventListener('click', (event) => {
+              if (event.target === event.currentTarget) {
+                modalDialog.close();
+              }
+            });
+            // 閉じる際に実行するイベントを登録
+            modalDialog.addEventListener('close', async (event) => {
+              const dialog = event.currentTarget;
+              if (!(dialog instanceof HTMLDialogElement)) {
+                // dialog要素ではない場合は中断
+                return;
+              }
+              // dialog要素の閉じるアニメーションがすべて終了するまで待つ
+              await waitDialogAnimation(dialog);
+              // dialog要素のstyle指定で非表示にする
+              dialog.style.display = 'none';
+              // 背景スクロールを防ぐために追加したスタイルを削除
+              document.documentElement.style.overflow = '';
+            });
+            modalDialog.querySelector('.zoom_button')?.addEventListener('click', (event) => {
+              const imagePreview = modalDialog.querySelector('.image_preview');
+              imagePreview.classList.toggle('zoom');
+            });
+          })
+        </script>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
