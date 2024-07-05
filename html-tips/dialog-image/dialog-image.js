@@ -2,6 +2,15 @@
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 
+/** キャプションが含まれる場合にdialog要素へ付与されるクラス名 */
+const DIALOG_HAS_CAPTION_CLASS_NAME = 'has_caption';
+/** 画像を拡大中の場合にdialog要素へ付与されるクラス名 */
+const DIALOG_ZOOM_CLASS_NAME = 'zoom';
+/** 拡大/縮小ボタンが不要な場合にdialog要素へ付与されるクラス名 */
+const DIALOG_ZOOM_DISABLED_CLASS_NAME = 'zoom_disabled';
+/** ダイアログ内のコントロールボタンとキャプションを非表示にした際にdialog要素へ付与されるクラス名 */
+const DIALOG_CONTROLS_HIDDEN_CLASS_NAME = 'controls_hidden';
+
 /**
  * dialog要素を使った画像拡大
  */
@@ -135,10 +144,10 @@ class DialogImage {
     const captionElem = this.modalDialog.querySelector('.image_caption');
     if (caption) {
       captionElem.innerHTML = `<div class="caption_text">${caption}</div>`;
-      this.modalDialog.classList.add('has_caption');
+      this.modalDialog.classList.add(DIALOG_HAS_CAPTION_CLASS_NAME);
     } else {
       captionElem.innerHTML = '';
-      this.modalDialog.classList.remove('has_caption');
+      this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
     }
   }
 
@@ -148,13 +157,13 @@ class DialogImage {
    */
   setupImageClick() {
     this.modalDialog.querySelector('.image_preview img')?.addEventListener('click', (event) => {
-      if (this.modalDialog.classList.contains('zoom')) {
+      if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
         // ズーム中の場合は縮小表示に戻す
-        this.modalDialog.classList.remove('zoom');
+        this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
         return;
       }
       // コントロール表示を切り替え
-      this.modalDialog.classList.toggle('controls_hidden');
+      this.modalDialog.classList.toggle(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
     });
   }
 
@@ -179,9 +188,9 @@ class DialogImage {
     const { width, height } = await readImageSize(url);
     const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight
     if (zoomEnabled) {
-      this.modalDialog.classList.remove('zoom_disabled');
+      this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
     } else {
-      this.modalDialog.classList.add('zoom_disabled');
+      this.modalDialog.classList.add(DIALOG_ZOOM_DISABLED_CLASS_NAME);
     }
   }
 
@@ -213,10 +222,10 @@ class DialogImage {
       // dialog要素のstyle指定で非表示にする
       dialog.style.display = 'none';
       // 判定用に付与したクラス名を初期化
-      this.modalDialog.classList.remove('zoom');
-      this.modalDialog.classList.remove('zoom_disabled');
-      this.modalDialog.classList.remove('has_caption');
-      this.modalDialog.classList.remove('controls_hidden');
+      this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
+      this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
+      this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
+      this.modalDialog.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
       // 背景スクロールを防ぐために追加したスタイルを削除
       document.documentElement.style.overflow = '';
     });
@@ -228,7 +237,7 @@ class DialogImage {
    */
   setupZoomInButton() {
     this.modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', (event) => {
-      this.modalDialog.classList.add('zoom');
+      this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
     }); 
   }
 
@@ -238,7 +247,7 @@ class DialogImage {
    */
   setupZoomOutButton() {
     this.modalDialog.querySelector('.zoom_out_button')?.addEventListener('click', (event) => {
-      this.modalDialog.classList.remove('zoom');
+      this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
     });
   }
 }
