@@ -65,37 +65,6 @@
           </li>
         </ul>
 
-        <dialog id="dialog_image" style="display: none;">
-          <div class="image_preview_wrapper">
-            <div class="image_preview"></div>
-            <div class="image_caption"></div>
-            <div class="preview_controls">
-              <button
-                type="button"
-                class="zoom_in_button"
-                title="Zoom in"
-              >
-                🔍
-              </button>
-              <button
-                type="button"
-                class="zoom_out_button"
-                title="Zoom out"
-              >
-                🔎
-              </button>
-              <button
-                type="button"
-                class="close_button"
-                title="Close"
-                onclick="this.closest('dialog').close();"
-              >
-                x
-              </button>
-            </div>
-          </div>
-        </dialog>
-
         <script>
           window.addEventListener('DOMContentLoaded', () => {
             (new DialogImage({
@@ -112,29 +81,39 @@
       <details open>
         <summary><h2>直接、dialogを開く処理を叩く</h2></summary>
 
-        <div>
+        <div style="display: flex; gap: 8px;">
           <button
-            id="dialog_open_button"
             type="button"
+            class="dialog_open_button"
             data-url="/img/cocktails/w1440/port_flip.jpeg"
-            data-caption="直接、dialogを開く処理を叩く処理を通りました"
+            data-caption="直接、dialogを開く処理を叩く処理を通りました 01"
           >
-            Open Dialog
+            Open Dialog Button 01
+          </button>
+          <button
+            type="button"
+            class="dialog_open_button"
+            data-url="/img/cocktails/w640/piti_81.jpeg"
+            data-caption="直接、dialogを開く処理を叩く処理を通りました 02"
+          >
+            Open Dialog Button 02
           </button>
         </div>
 
         <script>
           window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('dialog_open_button').addEventListener('click', (event) => {
-              const targetElem = event.currentTarget;
-              const param = {
-                url: targetElem.dataset.url,
-                caption: targetElem.dataset.caption,
-              };
-              (new DialogImage({
-                dialogId: 'dialog_image',
-              })).open(param);
-            })
+            document.querySelectorAll('#sample02 .dialog_open_button').forEach((elem) => {
+              elem.addEventListener('click', (event) => {
+                const targetElem = event.currentTarget;
+                const param = {
+                  url: targetElem.dataset.url,
+                  caption: targetElem.dataset.caption,
+                };
+                (new DialogImage({
+                  dialogId: 'dialog_image',
+                })).open(param);
+              });
+            });
           });
         </script>
 

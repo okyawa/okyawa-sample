@@ -14,11 +14,17 @@ class DialogImage {
     /** @type {DialogImageOptionType} オプション */
     this.options = { ...this.defaults, ...config };
 
+    // dialog要素
+    const modalDialog = document.querySelector(`#${this.options.dialogId}`);
+    const existsDialog = modalDialog !== null && modalDialog instanceof HTMLDialogElement;
     /** @type {HTMLDialogElement} 画像拡大表示するdialog要素 */
-    this.modalDialog = document.querySelector(`#${this.options.dialogId}`);
-    if (!(this.modalDialog instanceof HTMLDialogElement)) {
-      // dialog要素ではない場合は中断
-      throw new Error('ERROR :: Invalid dialog element');
+    this.modalDialog = existsDialog
+      ? modalDialog
+      : createDialogImageElement(this.options.dialogId);
+
+    if (!existsDialog) {
+      // 最初にdialog要素へセットするイベントを初期化
+      this.setupInitialEvent();
     }
 
     const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
@@ -27,9 +33,6 @@ class DialogImage {
     }
     /** @type {HTMLElement} 画像を囲む枠要素 */
     this.imagePreviewElem = imagePreviewElem;
-
-    // 最初にdialog要素へセットするイベントを初期化
-    this.setupInitialEvent();
   }
 
   /**
@@ -279,4 +282,57 @@ async function readImageSize(url) {
 
     img.src = url;
   });
+}
+
+/**
+ * 画像拡大に使うdialog要素を生成
+ * @param {string} id dialog要素のid値
+ * @returns 
+ */
+function createDialogImageElement(id) {
+  const modalDialog = document.querySelector(`#${id}`);
+  if (modalDialog !== null && modalDialog instanceof HTMLDialogElement) {
+    // HTML上に規定のdialog要素ある場合は、それを使う
+    return modalDialog;
+  }
+
+  // 必要なdialog要素を生成
+  const dialogElem = document.createElement('dialog');
+  dialogElem.id = id;
+  dialogElem.style.display = 'none';
+  const contentHtml = `
+    <div class="image_preview_wrapper">
+      <div class="image_preview"></div>
+      <div class="image_caption"></div>
+      <div class="preview_controls">
+        <button
+          type="button"
+          class="zoom_in_button"
+          title="Zoom in"
+        >
+          🔍
+        </button>
+        <button
+          type="button"
+          class="zoom_out_button"
+          title="Zoom out"
+        >
+          🔎
+        </button>
+        <button
+          type="button"
+          class="close_button"
+          title="Close"
+          onclick="this.closest('dialog').close();"
+        >
+          x
+        </button>
+      </div>
+    </div>
+  `;
+  dialogElem.innerHTML = contentHtml;
+  // 生成したdialog要素をbody要素の末尾に追加
+  document.querySelector('body').appendChild(dialogElem);
+
+  return dialogElem;
 }
