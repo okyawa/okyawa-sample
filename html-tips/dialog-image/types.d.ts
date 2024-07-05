@@ -6,6 +6,12 @@ export type DialogImageOptionType = {
     dialogId: string,
     /** 開くリンクのセレクターか要素 */
     openLink?: string | HTMLElement[],
+    /* グループ化するセレクター */
+    groupSelector: string | null,
+    /** グループ化したセレクターから画像URLを取得する際の属性名 */
+    groupUrlAttr: string,
+    /** グループ化したセレクターから画像タイトルを取得する際の属性名 */
+    groupTitleAttr: string,
     /** 拡大ボタンのbutton要素内HTML */
     zoomInButtonInnerHTML: sting,
     /** 拡大ボタンのbutton要素のtitle属性値 */

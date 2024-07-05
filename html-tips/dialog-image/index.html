@@ -59,7 +59,7 @@
             </a>
           </li>
           <li>
-            <a href="/img/cocktails/w640/port_splash.jpeg" class="popup_img" target="_blank"">
+            <a href="/img/cocktails/w640/port_splash.jpeg" class="popup_img" target="_blank">
               <img src="/img/cocktails/w640/port_splash.jpeg" width="160" height="160" alt="キャプションなし画像" />
             </a>
           </li>
@@ -119,6 +119,42 @@
 
       </details>
     </section>
+
+    <section id="sample03">
+      <details open>
+        <summary><h2>[WIP] グループ化</h2></summary>
+
+        <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
+          <li>
+            <a href="/img/cocktails/w640/marie_amour.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1" data-dialog-group="sample03">
+              <img src="/img/cocktails/w1440/marie_amour.jpeg" width="160" height="160" alt="大きいサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/irish_flag_shooter.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像2" data-dialog-group="sample03">
+              <img src="/img/cocktails/w640/irish_flag_shooter.jpeg" width="160" height="160" alt="小さめのサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/fantasia_01.jpeg" class="popup_img" target="_blank" data-dialog-group="sample03">
+              <img src="/img/cocktails/w640/fantasia_01.jpeg" width="160" height="160" alt="キャプションなし画像" />
+            </a>
+          </li>
+        </ul>
+
+        <script>
+
+          window.addEventListener('DOMContentLoaded', () => {
+            (new DialogImage({
+              dialogId: 'dialog_image',
+              openLink: '#sample03 .popup_img',
+              groupSelector: '[data-dialog-group="sample03"]',
+            })).init();
+          });
+
+        </script>
+
+      </details>
 
   </div>
 </body>

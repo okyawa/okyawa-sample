@@ -42,6 +42,9 @@ class DialogImage {
     }
     /** @type {HTMLElement} 画像を囲む枠要素 */
     this.imagePreviewElem = imagePreviewElem;
+
+    /** @type {HTMLElement[]} グループ化して表示する画像URLのリスト */
+    this.groupElements = [];
   }
 
   /**
@@ -56,6 +59,9 @@ class DialogImage {
     const values = {
       dialogId: 'dialog_image',
       openLink: '.popup_img',
+      groupSelector: null,
+      groupUrlAttr: 'href',
+      groupTitleAttr: 'data-caption',
       zoomInButtonInnerHTML: '🔍',
       zoomInButtonTitle: 'Zoom in',
       zoomOutButtonInnerHTML: '🔎',
@@ -113,10 +119,17 @@ class DialogImage {
       linkElem.addEventListener('click', (event) => {
         event.preventDefault();
 
-        // ダイアログで表示する画像のURL
+        // ダイアログで表示する画像のURLとキャプション
         const targetElem = event.currentTarget;
         const url = targetElem.getAttribute('href');
         const caption = targetElem.dataset.caption ?? '';
+
+        // グループ化の指定
+        if (this.options.groupSelector) {
+          this.groupElements = document.querySelectorAll(this.options.groupSelector);
+        }
+
+        // 画像拡大表示ダイアログを開く
         this.openImagePreviewDialog(url, caption).then(() => {});
       });
     })
@@ -139,6 +152,10 @@ class DialogImage {
     this.showModal();
     // 表示する画像に拡大ボタンが必要かを判定
     await this.setupDialogZoomVisible(url)
+  }
+
+  setupNextPrevButton() {
+    // TODO: this.groupElements がある場合、前後のボタンを表示できるようにし、クリックで画像送りができるようにする
   }
 
   /**
