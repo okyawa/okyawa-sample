@@ -1,21 +1,36 @@
+'use strict';
+
+/** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
+
 /**
  * dialog要素を使った画像拡大
  */
 class DialogImage {
   constructor(config) {
-    this.options = { ...DialogImage.defaults, ...config };
+    /** @type {DialogImageOptionType} オプション */
+    this.options = { ...this.defaults, ...config };
   }
 
-  static defaults = {
-    /** @type {string} 画像拡大表示に使うdialog要素のID値 */
-    dialogId: 'dialog_image',
-    /** @type {string|HTMLElement[]} 開くリンクのセレクターか要素 */
-    openLink: '.popup_img',
-  };
+  /**
+   * オプションの初期値
+   * @type {DialogImageOptionType}
+   */
+  get defaults() {
+    // ※PHPStormでツールチップ表示やジャンプが動作するよう、敢えて一旦変数へ格納し、型指定を当てている
+    // ※これをしないと、PHPStormでツールチップ表示やジャンプが動作しない
+    /** @type {DialogImageOptionType} */
+    const values = {
+      dialogId: 'dialog_image',
+      openLink: '.popup_img',
+    };
+    return values;
+  }
 
   init() {
     const modalDialog = document.querySelector(`#${this.options.dialogId}`);
-    const openLinkElements = document.querySelectorAll(this.options.openLink);
+    const openLinkElements = typeof this.options.openLink === 'string'
+      ? document.querySelectorAll(this.options.openLink)
+      : this.options.openLink;
     if (!(modalDialog instanceof HTMLDialogElement)) {
       // dialog要素ではない場合は中断
       return;
