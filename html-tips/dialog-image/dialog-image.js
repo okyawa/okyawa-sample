@@ -29,7 +29,7 @@ class DialogImage {
     /** @type {HTMLDialogElement} 画像拡大表示するdialog要素 */
     this.modalDialog = existsDialog
       ? modalDialog
-      : createDialogImageElement(this.options.dialogId);
+      : createDialogImageElement(this.options);
 
     if (!existsDialog) {
       // 最初にdialog要素へセットするイベントを初期化
@@ -56,6 +56,12 @@ class DialogImage {
     const values = {
       dialogId: 'dialog_image',
       openLink: '.popup_img',
+      zoomInButtonInnerHTML: '🔍',
+      zoomInButtonTitle: 'Zoom in',
+      zoomOutButtonInnerHTML: '🔎',
+      zoomOutButtonTitle: 'Zoom out',
+      closeButtonInnerHTML: 'x',
+      closeButtonTitle: 'Close',
     };
     return values;
   }
@@ -294,12 +300,26 @@ async function readImageSize(url) {
 }
 
 /**
- * 画像拡大に使うdialog要素を生成
- * @param {string} id dialog要素のid値
+ * 文字列をHTMLエスケープ
+ * @param {string} value 
  * @returns 
  */
-function createDialogImageElement(id) {
-  const modalDialog = document.querySelector(`#${id}`);
+function htmlEscape(value) {
+  return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+}
+
+/**
+ * 画像拡大に使うdialog要素を生成
+ * @param {DialogImageOptionType} options
+ * @returns 
+ */
+function createDialogImageElement(options) {
+  const modalDialog = document.querySelector(`#${options.dialogId}`);
   if (modalDialog !== null && modalDialog instanceof HTMLDialogElement) {
     // HTML上に規定のdialog要素ある場合は、それを使う
     return modalDialog;
@@ -307,7 +327,7 @@ function createDialogImageElement(id) {
 
   // 必要なdialog要素を生成
   const dialogElem = document.createElement('dialog');
-  dialogElem.id = id;
+  dialogElem.id = options.dialogId;
   dialogElem.style.display = 'none';
   const contentHtml = `
     <div class="image_preview_wrapper">
@@ -317,24 +337,24 @@ function createDialogImageElement(id) {
         <button
           type="button"
           class="zoom_in_button"
-          title="Zoom in"
+          title="${htmlEscape(options.zoomInButtonTitle)}"
         >
-          🔍
+          ${options.zoomInButtonInnerHTML}
         </button>
         <button
           type="button"
           class="zoom_out_button"
-          title="Zoom out"
+          title="${htmlEscape(options.zoomOutButtonTitle)}"
         >
-          🔎
+          ${options.zoomOutButtonInnerHTML}
         </button>
         <button
           type="button"
           class="close_button"
-          title="Close"
+          title="${htmlEscape(options.closeButtonTitle)}"
           onclick="this.closest('dialog').close();"
         >
-          x
+          ${options.closeButtonInnerHTML}
         </button>
       </div>
     </div>
