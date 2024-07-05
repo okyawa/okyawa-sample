@@ -45,7 +45,7 @@
 
     <section id="sample01">
       <details open>
-        <summary>デモ</summary>
+        <summary><h2>対象のリンク要素をクリックすると、画像拡大のダイアログを表示</h2></summary>
 
         <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
           <li>
@@ -102,6 +102,39 @@
               dialogId: 'dialog_image',
               openLink: '#sample01 .popup_img',
             })).init();
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <section id="sample02">
+      <details open>
+        <summary><h2>直接、dialogを開く処理を叩く</h2></summary>
+
+        <div>
+          <button
+            id="dialog_open_button"
+            type="button"
+            data-url="/img/cocktails/w1440/port_flip.jpeg"
+            data-caption="直接、dialogを開く処理を叩く処理を通りました"
+          >
+            Open Dialog
+          </button>
+        </div>
+
+        <script>
+          window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('dialog_open_button').addEventListener('click', (event) => {
+              const targetElem = event.currentTarget;
+              const param = {
+                url: targetElem.dataset.url,
+                caption: targetElem.dataset.caption,
+              };
+              (new DialogImage({
+                dialogId: 'dialog_image',
+              })).open(param);
+            })
           });
         </script>
 

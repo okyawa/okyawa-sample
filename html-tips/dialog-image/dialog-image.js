@@ -60,7 +60,7 @@ class DialogImage {
    * 直接ダイアログを開く
    * @param {{url: string, caption?: string}} param0 
    */
-  open() {
+  open({ url, caption = ''}) {
     // 拡大画像のダイアログを開く
     this.openImagePreviewDialog(url, caption);
   }
@@ -85,6 +85,9 @@ class DialogImage {
    * @private
    */
   setupOpenLink() {
+    if (!this.options.openLink) {
+      return;
+    }
     const openLinkElements = typeof this.options.openLink === 'string'
       ? document.querySelectorAll(this.options.openLink)
       : this.options.openLink;
