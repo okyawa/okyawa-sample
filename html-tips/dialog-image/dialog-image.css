@@ -1,0 +1,194 @@
+/**
+ * dialog要素を使った画像拡大用のCSS
+ */
+
+/* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
+html:has(dialog#dialog_image[open]) {
+  /* overflow: hidden; */
+  scrollbar-gutter: stable;
+}
+
+#dialog_image .image_preview {
+  padding: 10px;
+}
+
+/* 表示画像 */
+#dialog_image .image_preview img {
+  max-width: calc(100dvw - 60px);
+  max-height: calc(100dvh - 60px);
+  vertical-align: middle;
+}
+#dialog_image.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-height: calc(100dvh - 60px - 30px);
+}
+
+/* キャプション */
+#dialog_image .image_caption {
+  position: relative;
+}
+#dialog_image .caption_text {
+  width: 100%;
+  padding: 9px 10px;
+  position: absolute;
+  bottom: 0;
+  box-sizing: border-box;
+  background-color: #ffffff66;
+  text-align: center;
+  font-size: 0.76rem;
+}
+#dialog_image.has_caption .image_caption {
+  height: 30px;
+}
+
+/* 拡大表示 */
+#dialog_image.zoom {
+  max-width: 100dvw;
+  max-height: 100dvh;
+}
+#dialog_image.zoom .image_preview {
+  padding: 0;
+  max-width: 100dvw;
+  max-height: 100dvh;
+  overflow: auto;
+}
+#dialog_image.zoom .image_preview img {
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+#dialog_image.zoom .image_caption {
+  display: none;
+}
+
+/* 右上の操作ボタン */
+#dialog_image .image_preview_wrapper {
+  position: relative;
+}
+#dialog_image .image_preview_wrapper .preview_controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+}
+#dialog_image.zoom .image_preview_wrapper .preview_controls {
+  top: 0;
+  right: 0;
+}
+
+/* 右上の操作ボタンとキャプションを非表示 */
+#dialog_image.controls_hidden .preview_controls,
+#dialog_image.controls_hidden .image_caption {
+  display: none;
+}
+
+/* 拡大・縮小ボタン */
+#dialog_image .image_preview_wrapper .zoom_in_button,
+#dialog_image .image_preview_wrapper .zoom_out_button {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+}
+#dialog_image.zoom .image_preview_wrapper .zoom_in_button {
+  display: none;
+}
+#dialog_image .image_preview_wrapper .zoom_out_button {
+  display: none;
+}
+#dialog_image.zoom .image_preview_wrapper .zoom_out_button {
+  display: block;
+}
+#dialog_image.zoom_disabled .image_preview_wrapper .zoom_in_button,
+#dialog_image.zoom_disabled .image_preview_wrapper .zoom_out_button {
+  display: none;
+}
+
+/* 閉じるボタン */
+#dialog_image .image_preview_wrapper .close_button {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+}
+
+/* dialog背景のぼかし */
+:root {
+  --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
+}
+#dialog_image{
+  box-shadow: var(--dialog-shadow);
+}
+dialog::backdrop {
+  backdrop-filter: blur(8px);
+  /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    /* フェード・インのアニメーション*/
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    /* ズーム・インのアニメーション */
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.6);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+    /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
+    dialog#dialog_image[open] {
+      /* @keyframesで作成したアニメーション名 */
+      animation-name: fadeIn, zoomIn;
+      /* アニメーションの進行状況 */
+      animation-fill-mode: forwards;
+      /* アニメーションの実行時間 */
+      animation-duration: 200ms;
+      /* アニメーションの進行状況 */
+      animation-timing-function: ease-out;
+    }
+    /* フェード・アウトのアニメーション */
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    /* ズーム・アウトのアニメーション */
+    @keyframes zoomOut {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(0.6);
+      }
+    }
+    /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
+    #dialog_image{
+      animation-name: fadeOut, zoomOut;
+      animation-fill-mode: forwards;
+      animation-duration: 200ms;
+      animation-timing-function: ease-out;
+    }
+  }
+  #dialog_image{
+    padding: 0;
+    display: block;
+    position: fixed;
+    inset-inline: 0;
+    inset-block: 0;
+    border: none;
+  }
