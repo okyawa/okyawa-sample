@@ -16,6 +16,10 @@ class DialogImage {
 
     /** @type {HTMLDialogElement} 画像拡大表示するdialog要素 */
     this.modalDialog = document.querySelector(`#${this.options.dialogId}`);
+    if (!(this.modalDialog instanceof HTMLDialogElement)) {
+      // dialog要素ではない場合は中断
+      throw new Error('ERROR :: Invalid dialog element');
+    }
 
     const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
     if (!imagePreviewElem) {
@@ -23,6 +27,9 @@ class DialogImage {
     }
     /** @type {HTMLElement} 画像を囲む枠要素 */
     this.imagePreviewElem = imagePreviewElem;
+
+    // 最初にdialog要素へセットするイベントを初期化
+    this.setupInitialEvent();
   }
 
   /**
@@ -42,17 +49,27 @@ class DialogImage {
   }
 
   /**
-   * 初期化処理
+   * 指定したリンク要素をクリックすると画像拡大のダイアログを開くように初期化
    */
   init() {
-    if (!(this.modalDialog instanceof HTMLDialogElement)) {
-      // dialog要素ではない場合は中断
-      return;
-    }
-
     // 開くボタンのイベント登録
     this.setupOpenLink();
+  }
 
+  /**
+   * 直接ダイアログを開く
+   * @param {{url: string, caption?: string}} param0 
+   */
+  open() {
+    // 拡大画像のダイアログを開く
+    this.openImagePreviewDialog(url, caption);
+  }
+
+  /**
+   * 最初にdialog要素へセットするイベントを初期化
+   * @private
+   */
+  setupInitialEvent() {
     // ダイアログの枠外をクリックした際にダイアログを閉じるイベントをセット
     this.setupDialogOuterClose();
     // ダイアログを閉じる際に実行するイベントを登録
@@ -72,7 +89,7 @@ class DialogImage {
       ? document.querySelectorAll(this.options.openLink)
       : this.options.openLink;
     openLinkElements.forEach((linkElem) => {
-      linkElem.addEventListener('click', async (event) => {
+      linkElem.addEventListener('click', (event) => {
         event.preventDefault();
 
         // ダイアログで表示する画像のURL
