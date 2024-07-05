@@ -13,8 +13,16 @@ class DialogImage {
   constructor(config) {
     /** @type {DialogImageOptionType} オプション */
     this.options = { ...this.defaults, ...config };
+
     /** @type {HTMLDialogElement} 画像拡大表示するdialog要素 */
     this.modalDialog = document.querySelector(`#${this.options.dialogId}`);
+
+    const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
+    if (!imagePreviewElem) {
+      throw new Error('ERROR :: Not Found ".image_preview" element');
+    }
+    /** @type {HTMLElement} 画像を囲む枠要素 */
+    this.imagePreviewElem = imagePreviewElem;
   }
 
   /**
@@ -44,6 +52,7 @@ class DialogImage {
 
     // 開くボタンのイベント登録
     this.setupOpenLink();
+
     // ダイアログの枠外をクリックした際にダイアログを閉じるイベントをセット
     this.setupDialogOuterClose();
     // ダイアログを閉じる際に実行するイベントを登録
@@ -80,11 +89,26 @@ class DialogImage {
    * @private
    */
   async openImagePreviewDialog(url, caption) {
-    const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
-    // 拡大画像表示の処理
-    imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
+    // 拡大画像をセット
+    this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
+    // キャプションのテキストを初期化
+    this.setupCaption(caption);
+    // 表示画像自体のクリックした際のイベントをセット
+    this.setupImageClick();
+    // dialog要素の開くアニメーションがすべて終了するまで待つ
+    await waitDialogAnimation(this.modalDialog);
+    // dialog要素を開く
+    this.showModal();
+    // 表示する画像に拡大ボタンが必要かを判定
+    await this.setupDialogZoomVisible(url)
+  }
 
-    // キャプションのテキスト
+  /**
+   * キャプションのテキストを初期化
+   * @param {string} caption キャプションのテキスト
+   * @private
+   */
+  setupCaption(caption) {
     const captionElem = this.modalDialog.querySelector('.image_caption');
     if (caption) {
       captionElem.innerHTML = `<div class="caption_text">${caption}</div>`;
@@ -93,8 +117,13 @@ class DialogImage {
       captionElem.innerHTML = '';
       this.modalDialog.classList.remove('has_caption');
     }
+  }
 
-    // 表示画像自体のクリック
+  /**
+   * 表示画像自体のクリックした際のイベントをセット
+   * @private
+   */
+  setupImageClick() {
     this.modalDialog.querySelector('.image_preview img')?.addEventListener('click', (event) => {
       if (this.modalDialog.classList.contains('zoom')) {
         // ズーム中の場合は縮小表示に戻す
@@ -104,20 +133,28 @@ class DialogImage {
       // コントロール表示を切り替え
       this.modalDialog.classList.toggle('controls_hidden');
     });
+  }
 
-    // dialog要素の開くアニメーションがすべて終了するまで待つ
-    await waitDialogAnimation(this.modalDialog);
-
+  /**
+   * dialog要素を開く
+   */
+  showModal() {
     // dialog要素にデフォルトで付与していたdisplayのstyle指定を削除
     this.modalDialog.style.display = '';
     // モーダルダイアログを開く
     this.modalDialog.showModal();
     // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
     document.documentElement.style.overflow = 'hidden';
+  }
 
-    // 表示する画像に拡大ボタンが必要かを判定
+  /**
+   * 表示する画像に拡大ボタンが必要かを判定
+   * @param {string} url 画像ファイルのURL
+   * @private
+   */
+  async setupDialogZoomVisible(url) {
     const { width, height } = await readImageSize(url);
-    const zoomEnabled = width > imagePreviewElem.clientWidth || height > imagePreviewElem.clientHeight
+    const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight
     if (zoomEnabled) {
       this.modalDialog.classList.remove('zoom_disabled');
     } else {
