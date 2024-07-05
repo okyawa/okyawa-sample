@@ -16,8 +16,8 @@ const DIALOG_CONTROLS_HIDDEN_CLASS_NAME = 'controls_hidden';
  */
 class DialogImage {
   /**
-   * コンストラクタ 
-   * @param @type {DialogImageOptionType} config オプション指定
+   * コンストラクタ
+   * @param {DialogImageOptionType} config オプション指定
    */
   constructor(config) {
     /** @type {DialogImageOptionType} オプション */
@@ -80,7 +80,7 @@ class DialogImage {
    */
   open({ url, caption = ''}) {
     // 拡大画像のダイアログを開く
-    this.openImagePreviewDialog(url, caption);
+    this.openImagePreviewDialog(url, caption).then(() => {});
   }
 
   /**
@@ -117,7 +117,7 @@ class DialogImage {
         const targetElem = event.currentTarget;
         const url = targetElem.getAttribute('href');
         const caption = targetElem.dataset.caption ?? '';
-        this.openImagePreviewDialog(url, caption);
+        this.openImagePreviewDialog(url, caption).then(() => {});
       });
     })
   }
@@ -162,7 +162,7 @@ class DialogImage {
    * @private
    */
   setupImageClick() {
-    this.modalDialog.querySelector('.image_preview img')?.addEventListener('click', (event) => {
+    this.modalDialog.querySelector('.image_preview img')?.addEventListener('click', () => {
       if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
         // ズーム中の場合は縮小表示に戻す
         this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
@@ -242,7 +242,7 @@ class DialogImage {
    * @private
    */
   setupZoomInButton() {
-    this.modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', (event) => {
+    this.modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', () => {
       this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
     }); 
   }
@@ -252,7 +252,7 @@ class DialogImage {
    * @private
    */
   setupZoomOutButton() {
-    this.modalDialog.querySelector('.zoom_out_button')?.addEventListener('click', (event) => {
+    this.modalDialog.querySelector('.zoom_out_button')?.addEventListener('click', () => {
       this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
     });
   }
@@ -329,7 +329,7 @@ function createDialogImageElement(options) {
   const dialogElem = document.createElement('dialog');
   dialogElem.id = options.dialogId;
   dialogElem.style.display = 'none';
-  const contentHtml = `
+  dialogElem.innerHTML = `
     <div class="image_preview_wrapper">
       <div class="image_preview"></div>
       <div class="image_caption"></div>
@@ -359,7 +359,6 @@ function createDialogImageElement(options) {
       </div>
     </div>
   `;
-  dialogElem.innerHTML = contentHtml;
   // 生成したdialog要素をbody要素の末尾に追加
   document.querySelector('body').appendChild(dialogElem);
 
