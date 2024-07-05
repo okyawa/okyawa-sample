@@ -30,30 +30,30 @@
 
   <style>
     /* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
-    html:has(dialog[open]) {
+    html:has(dialog#dialog_image[open]) {
       /* overflow: hidden; */
       scrollbar-gutter: stable;
     }
 
-    dialog .image_preview {
+    #dialog_image .image_preview {
       padding: 10px;
     }
 
     /* 表示画像 */
-    dialog .image_preview img {
+    #dialog_image .image_preview img {
       max-width: calc(100dvw - 60px);
       max-height: calc(100dvh - 60px);
       vertical-align: middle;
     }
-    dialog.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
+    #dialog_image.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
       max-height: calc(100dvh - 60px - 30px);
     }
 
     /* キャプション */
-    dialog .image_caption {
+    #dialog_image .image_caption {
       position: relative;
     }
-    dialog .caption_text {
+    #dialog_image .caption_text {
       width: 100%;
       padding: 9px 10px;
       position: absolute;
@@ -63,35 +63,35 @@
       text-align: center;
       font-size: 0.76rem;
     }
-    dialog.has_caption .image_caption {
+    #dialog_image.has_caption .image_caption {
       height: 30px;
     }
 
     /* 拡大表示 */
-    dialog.zoom {
+    #dialog_image.zoom {
       max-width: 100dvw;
       max-height: 100dvh;
     }
-    dialog.zoom .image_preview {
+    #dialog_image.zoom .image_preview {
       padding: 0;
       max-width: 100dvw;
       max-height: 100dvh;
       overflow: auto;
     }
-    dialog.zoom .image_preview img {
+    #dialog_image.zoom .image_preview img {
       max-width: none;
       max-height: none;
       cursor: zoom-out;
     }
-    dialog.zoom .image_caption {
+    #dialog_image.zoom .image_caption {
       display: none;
     }
 
     /* 右上の操作ボタン */
-    dialog .image_preview_wrapper {
+    #dialog_image .image_preview_wrapper {
       position: relative;
     }
-    dialog .image_preview_wrapper .preview_controls {
+    #dialog_image .image_preview_wrapper .preview_controls {
       position: absolute;
       top: 8px;
       right: 8px;
@@ -99,42 +99,42 @@
       display: flex;
       gap: 8px;
     }
-    dialog.zoom .image_preview_wrapper .preview_controls {
+    #dialog_image.zoom .image_preview_wrapper .preview_controls {
       top: 0;
       right: 0;
     }
 
     /* 右上の操作ボタンとキャプションを非表示 */
-    dialog.controls_hidden .preview_controls,
-    dialog.controls_hidden .image_caption {
+    #dialog_image.controls_hidden .preview_controls,
+    #dialog_image.controls_hidden .image_caption {
       display: none;
     }
 
     /* 拡大・縮小ボタン */
-    dialog .image_preview_wrapper .zoom_in_button,
-    dialog .image_preview_wrapper .zoom_out_button {
+    #dialog_image .image_preview_wrapper .zoom_in_button,
+    #dialog_image .image_preview_wrapper .zoom_out_button {
       width: 30px;
       height: 30px;
       background-color: rgba(255, 255, 255, 0.5);
       border: none;
       cursor: pointer;
     }
-    dialog.zoom .image_preview_wrapper .zoom_in_button {
+    #dialog_image.zoom .image_preview_wrapper .zoom_in_button {
       display: none;
     }
-    dialog .image_preview_wrapper .zoom_out_button {
+    #dialog_image .image_preview_wrapper .zoom_out_button {
       display: none;
     }
-    dialog.zoom .image_preview_wrapper .zoom_out_button {
+    #dialog_image.zoom .image_preview_wrapper .zoom_out_button {
       display: block;
     }
-    dialog.zoom_disabled .image_preview_wrapper .zoom_in_button,
-    dialog.zoom_disabled .image_preview_wrapper .zoom_out_button {
+    #dialog_image.zoom_disabled .image_preview_wrapper .zoom_in_button,
+    #dialog_image.zoom_disabled .image_preview_wrapper .zoom_out_button {
       display: none;
     }
 
     /* 閉じるボタン */
-    dialog .image_preview_wrapper .close_button {
+    #dialog_image .image_preview_wrapper .close_button {
       width: 30px;
       height: 30px;
       background-color: rgba(255, 255, 255, 0.5);
@@ -146,7 +146,7 @@
     :root {
       --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
     }
-    dialog {
+    #dialog_image{
       box-shadow: var(--dialog-shadow);
     }
     dialog::backdrop {
@@ -175,7 +175,7 @@
           }
         }
         /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
-        dialog[open] {
+        dialog#dialog_image[open] {
           /* @keyframesで作成したアニメーション名 */
           animation-name: fadeIn, zoomIn;
           /* アニメーションの進行状況 */
@@ -204,14 +204,14 @@
           }
         }
         /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
-        dialog {
+        #dialog_image{
           animation-name: fadeOut, zoomOut;
           animation-fill-mode: forwards;
           animation-duration: 200ms;
           animation-timing-function: ease-out;
         }
       }
-      dialog {
+      #dialog_image{
         padding: 0;
         display: block;
         position: fixed;
@@ -248,7 +248,7 @@
           </li>
         </ul>
 
-        <dialog style="display: none;">
+        <dialog id="dialog_image" style="display: none;">
           <div class="image_preview_wrapper">
             <div class="image_preview"></div>
             <div class="image_caption"></div>
@@ -281,7 +281,7 @@
 
         <script>
           window.addEventListener('DOMContentLoaded', () => {
-            const modalDialog = document.querySelector('#sample01 dialog');
+            const modalDialog = document.querySelector('#dialog_image');
             const openLinkElements = document.querySelectorAll('#sample01 .popup_img');
             if (!(modalDialog instanceof HTMLDialogElement)) {
               // dialog要素ではない場合は中断
