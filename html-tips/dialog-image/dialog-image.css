@@ -18,8 +18,17 @@ html:has(dialog#dialog_image[open]) {
   max-height: calc(100dvh - 60px);
   vertical-align: middle;
 }
+/* キャプションあり */
 #dialog_image.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
   max-height: calc(100dvh - 60px - 30px);
+}
+/* キャプションと画像サイズあり */
+#dialog_image.has_caption.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-height: calc(100dvh - 60px - 18px - 26px);
+}
+/* 画像サイズあり*/
+#dialog_image.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-height: calc(100dvh - 60px - 26px);
 }
 
 /* キャプション */
@@ -28,16 +37,36 @@ html:has(dialog#dialog_image[open]) {
 }
 #dialog_image .caption_text {
   width: 100%;
-  padding: 9px 10px;
+  padding: 10px;
   position: absolute;
   bottom: 0;
   box-sizing: border-box;
   background-color: #ffffff66;
+  color: #333;
   text-align: center;
   font-size: 0.76rem;
+  line-height: 1.4;
 }
+/* キャプションあり */
 #dialog_image.has_caption .image_caption {
-  height: 30px;
+  height: 26px;
+}
+/* キャプションと画像サイズあり */
+#dialog_image.has_caption.image_size_enabled .image_caption {
+  height: 18px;
+}
+#dialog_image.has_caption.image_size_enabled .caption_text {
+  padding-bottom: 0;
+}
+
+/* 画像の幅と高さのサイズ表示 */
+#dialog_image.image_size_enabled .image_size_text {
+  text-align: center;
+  font-size: 0.63rem;
+  color: #888;
+}
+#dialog_image.image_size_enabled .image_size {
+  height: 26px;
 }
 
 /* 拡大表示 */

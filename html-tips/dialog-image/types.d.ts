@@ -12,6 +12,8 @@ export type DialogImageOptionType = {
     groupUrlAttr: string,
     /** グループ化したセレクターから画像タイトルを取得する際の属性名 */
     groupTitleAttr: string,
+    /** 画像の幅と高さを表示するかどうか */
+    imageSizeVisible: boolean,
     /** 拡大ボタンのbutton要素内HTML */
     zoomInButtonInnerHTML: sting,
     /** 拡大ボタンのbutton要素のtitle属性値 */

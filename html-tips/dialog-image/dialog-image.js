@@ -10,6 +10,8 @@ const DIALOG_ZOOM_CLASS_NAME = 'zoom';
 const DIALOG_ZOOM_DISABLED_CLASS_NAME = 'zoom_disabled';
 /** ダイアログ内のコントロールボタンとキャプションを非表示にした際にdialog要素へ付与されるクラス名 */
 const DIALOG_CONTROLS_HIDDEN_CLASS_NAME = 'controls_hidden';
+/** ダイアログ内に画像の幅と高さを表示する場合にdialog要素へ付与されるクラス名 */
+const DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME = 'image_size_enabled';
 
 /**
  * dialog要素を使った画像拡大
@@ -62,6 +64,7 @@ class DialogImage {
       groupSelector: null,
       groupUrlAttr: 'href',
       groupTitleAttr: 'data-caption',
+      imageSizeVisible: false,
       zoomInButtonInnerHTML: '🔍',
       zoomInButtonTitle: 'Zoom in',
       zoomOutButtonInnerHTML: '🔎',
@@ -143,17 +146,25 @@ class DialogImage {
     // 拡大画像をセット
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
     // キャプションのテキストを初期化
-    this.setupCaption(caption);
+    this.setupCaptionView(caption);
     // 表示画像自体のクリックした際のイベントをセット
     this.setupImageClick();
     // dialog要素の開くアニメーションがすべて終了するまで待つ
     await waitDialogAnimation(this.modalDialog);
     // dialog要素を開く
     this.showModal();
+    // 表示する画像の幅と高さを取得
+    const { width, height } = await readImageSize(url);
+    // キャプションの下部に画像の幅と高さを表示
+    this.setupImageSizeView(width, height);
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(url)
+    await this.setupDialogZoomVisible(url, width, height);
   }
 
+  /**
+   * 画像送りボタンの初期化
+   * @private
+   */
   setupNextPrevButton() {
     // TODO: this.groupElements がある場合、前後のボタンを表示できるようにし、クリックで画像送りができるようにする
   }
@@ -163,15 +174,36 @@ class DialogImage {
    * @param {string} caption キャプションのテキスト
    * @private
    */
-  setupCaption(caption) {
+  setupCaptionView(caption) {
     const captionElem = this.modalDialog.querySelector('.image_caption');
     if (caption) {
-      captionElem.innerHTML = `<div class="caption_text">${caption}</div>`;
+      // TODO: textContent と outerHTML を使う形式に変更
+      captionElem.innerHTML = `<div class="caption_text">${htmlEscape(caption)}</div>`;
       this.modalDialog.classList.add(DIALOG_HAS_CAPTION_CLASS_NAME);
     } else {
       captionElem.innerHTML = '';
       this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
     }
+  }
+
+  /**
+   * 画像の幅と高さの表示を初期化
+   * @param {number} width 画像の幅
+   * @param {number} height 画像の高さ
+   * @private
+   */
+  setupImageSizeView(width, height) {
+    if (this.options.imageSizeVisible !== true) {
+      return;
+    }
+    const imageSizeElem = this.modalDialog.querySelector('.image_size');
+
+    const divElem = document.createElement('div');
+    divElem.classList.add('image_size_text');
+    divElem.textContent = `(${width}x${height})`;
+
+    imageSizeElem.innerHTML = divElem.outerHTML;
+    this.modalDialog.classList.add(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
   }
 
   /**
@@ -205,10 +237,11 @@ class DialogImage {
   /**
    * 表示する画像に拡大ボタンが必要かを判定
    * @param {string} url 画像ファイルのURL
+   * @param {number} width 画像の幅
+   * @param {number} height 画像の高さ
    * @private
    */
-  async setupDialogZoomVisible(url) {
-    const { width, height } = await readImageSize(url);
+  async setupDialogZoomVisible(url, width, height) {
     const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight
     if (zoomEnabled) {
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
@@ -249,6 +282,7 @@ class DialogImage {
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
+      this.modalDialog.classList.remove(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
       // 背景スクロールを防ぐために追加したスタイルを削除
       document.documentElement.style.overflow = '';
     });
@@ -350,6 +384,7 @@ function createDialogImageElement(options) {
     <div class="image_preview_wrapper">
       <div class="image_preview"></div>
       <div class="image_caption"></div>
+      <div class="image_size"></div>
       <div class="preview_controls">
         <button
           type="button"
