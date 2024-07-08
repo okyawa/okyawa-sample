@@ -126,8 +126,8 @@
 
         <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
           <li>
-            <a href="/img/cocktails/w640/marie_amour.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1" data-dialog-group="sample03">
-              <img src="/img/cocktails/w1440/marie_amour.jpeg" width="160" height="160" alt="大きいサンプル画像" />
+            <a href="/img/cocktails/w1440/marie_amour.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1" data-dialog-group="sample03">
+              <img src="/img/cocktails/w640/marie_amour.jpeg" width="160" height="160" alt="大きいサンプル画像" />
             </a>
           </li>
           <li>
@@ -149,6 +149,8 @@
               dialogId: 'dialog_image',
               openLink: '#sample03 .popup_img',
               groupSelector: '[data-dialog-group="sample03"]',
+              groupUrlAttr: 'href',
+              groupCaptionAttr: 'data-caption',
               imageSizeVisible: true,
             })).init();
           });

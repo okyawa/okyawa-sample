@@ -1,6 +1,7 @@
 'use strict';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
+/** @typedef { import('./types').GroupImageType } GroupImageType */
 
 /** キャプションが含まれる場合にdialog要素へ付与されるクラス名 */
 const DIALOG_HAS_CAPTION_CLASS_NAME = 'has_caption';
@@ -45,8 +46,8 @@ class DialogImage {
     /** @type {HTMLElement} 画像を囲む枠要素 */
     this.imagePreviewElem = imagePreviewElem;
 
-    /** @type {HTMLElement[]} グループ化して表示する画像URLのリスト */
-    this.groupElements = [];
+    /** @type {GroupImageType[]} グループ化した画像の情報 */
+    this.groupImages = [];
   }
 
   /**
@@ -61,7 +62,7 @@ class DialogImage {
       openLink: '.popup_img',
       groupSelector: null,
       groupUrlAttr: 'href',
-      groupTitleAttr: 'data-caption',
+      groupCaptionAttr: 'data-caption',
       imageSizeVisible: false,
       zoomInButtonInnerHTML: '🔍',
       zoomInButtonTitle: 'Zoom in',
@@ -118,17 +119,10 @@ class DialogImage {
     openLinkElements.forEach((linkElem) => {
       linkElem.addEventListener('click', (event) => {
         event.preventDefault();
-
         // ダイアログで表示する画像のURLとキャプション
         const targetElem = event.currentTarget;
         const url = targetElem.getAttribute('href');
         const caption = targetElem.dataset.caption ?? '';
-
-        // グループ化の指定
-        if (this.options.groupSelector) {
-          this.groupElements = document.querySelectorAll(this.options.groupSelector);
-        }
-
         // 画像拡大表示ダイアログを開く
         this.openImagePreviewDialog(url, caption).then(() => {});
       });
@@ -137,6 +131,8 @@ class DialogImage {
 
   /**
    * 画像拡大表示ダイアログを開く
+   * @param {string} url 画像ファイルのURL
+   * @param {string} caption 画像のキャプション
    * @private
    */
   async openImagePreviewDialog(url, caption) {
@@ -146,6 +142,10 @@ class DialogImage {
     this.setupCaptionView(caption);
     // 表示画像自体のクリックした際のイベントをセット
     this.setupImageClick();
+    // グループ化した画像の情報を初期化
+    this.setupGroupImages();
+    // 画像送りボタンの初期化
+    this.setupNextPrevButton();
     // dialog要素の開くアニメーションがすべて終了するまで待つ
     await waitDialogAnimation(this.modalDialog);
     // dialog要素を開く
@@ -159,11 +159,33 @@ class DialogImage {
   }
 
   /**
+   * グループ化した画像の情報を初期化
+   * @private 
+   */
+  setupGroupImages() {
+    if (!this.options.groupSelector) {
+      // グループ化指定なし
+      return;
+    }
+    const groupElements = document.querySelectorAll(this.options.groupSelector);
+    if (groupElements.length <= 1) {
+      // グループ化で一致する要素なし
+      return;
+    }
+    // グループ化した画像の情報をセット
+    this.groupImages = Array.from(groupElements).map((elem) => {
+      return {
+        url: elem.getAttribute(this.options.groupUrlAttr) ?? '',
+        caption: elem.getAttribute(this.options.groupCaptionAttr) ?? '',
+      };
+    });
+  }
+
+  /**
    * 画像送りボタンの初期化
    * @private
    */
   setupNextPrevButton() {
-    // TODO: this.groupElements がある場合、前後のボタンを表示できるようにし、クリックで画像送りができるようにする
   }
 
   /**
