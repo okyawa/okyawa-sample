@@ -100,6 +100,19 @@ html:has(dialog#dialog_image[open]) {
   display: none;
 }
 
+/* グループ化 */
+#dialog_image.image_group_enabled .image_preview_wrapper {
+  display: flex;
+}
+#dialog_image .prev_button_area,
+#dialog_image .next_button_area {
+  display: none;
+}
+#dialog_image.image_group_enabled .prev_button_area,
+#dialog_image.image_group_enabled .next_button_area {
+  display: block;
+}
+
 /* 右上の操作ボタン */
 #dialog_image .image_preview_wrapper {
   position: relative;

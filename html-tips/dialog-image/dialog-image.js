@@ -13,6 +13,8 @@ const DIALOG_ZOOM_DISABLED_CLASS_NAME = 'zoom_disabled';
 const DIALOG_CONTROLS_HIDDEN_CLASS_NAME = 'controls_hidden';
 /** ダイアログ内に画像の幅と高さを表示する場合にdialog要素へ付与されるクラス名 */
 const DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME = 'image_size_enabled';
+/** 画像のグループ化が有効な場合にdialog要素へ付与されるクラス名 */
+const DIALOG_GROUP_IMAGES_ENABLED = 'image_group_enabled';
 
 /**
  * dialog要素を使った画像拡大
@@ -179,6 +181,8 @@ class DialogImage {
         caption: elem.getAttribute(this.options.groupCaptionAttr) ?? '',
       };
     });
+    // 枠にグループ化が使われていることを示すクラス名を付与
+    this.modalDialog.classList.add(DIALOG_GROUP_IMAGES_ENABLED);
   }
 
   /**
@@ -186,6 +190,25 @@ class DialogImage {
    * @private
    */
   setupNextPrevButton() {
+    // 前へボタン
+    const prevButtonElem = document.createElement('button');
+    prevButtonElem.type = 'button';
+    prevButtonElem.classList.add('prev_button');
+    prevButtonElem.title = 'Previous';
+    prevButtonElem.innerHTML = '<';
+
+    // 次へボタン
+    const nextButtonElem = document.createElement('button');
+    nextButtonElem.type = 'button';
+    nextButtonElem.classList.add('next_button');
+    nextButtonElem.title = 'Next';
+    nextButtonElem.innerHTML = '>';
+
+    // DOMにボタンを追加
+    const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
+    const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
+    prevAreaElem.appendChild(prevButtonElem);
+    nextAreaElem.appendChild(nextButtonElem); 
   }
 
   /**
@@ -301,12 +324,16 @@ class DialogImage {
       // 表示テキストを全てクリア
       this.modalDialog.querySelector('.image_caption').innerHTML = '';
       this.modalDialog.querySelector('.image_size').innerHTML = '';
+      // 画像送りボタンをクリア
+      this.modalDialog.querySelector('.prev_button_area').innerHTML = '';
+      this.modalDialog.querySelector('.next_button_area').innerHTML = '';
       // 判定用に付与したクラス名を初期化
       this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
+      this.modalDialog.classList.remove(DIALOG_GROUP_IMAGES_ENABLED);
       // 背景スクロールを防ぐために追加したスタイルを削除
       document.documentElement.style.overflow = '';
     });
@@ -406,33 +433,37 @@ function createDialogImageElement(options) {
   dialogElem.style.display = 'none';
   dialogElem.innerHTML = `
     <div class="image_preview_wrapper">
-      <div class="image_preview"></div>
-      <div class="image_caption"></div>
-      <div class="image_size"></div>
-      <div class="preview_controls">
-        <button
-          type="button"
-          class="zoom_in_button"
-          title="${htmlEscape(options.zoomInButtonTitle)}"
-        >
-          ${options.zoomInButtonInnerHTML}
-        </button>
-        <button
-          type="button"
-          class="zoom_out_button"
-          title="${htmlEscape(options.zoomOutButtonTitle)}"
-        >
-          ${options.zoomOutButtonInnerHTML}
-        </button>
-        <button
-          type="button"
-          class="close_button"
-          title="${htmlEscape(options.closeButtonTitle)}"
-          onclick="this.closest('dialog').close();"
-        >
-          ${options.closeButtonInnerHTML}
-        </button>
+      <div class="prev_button_area"></div>
+      <div class="image_main_area">
+        <div class="image_preview"></div>
+        <div class="image_caption"></div>
+        <div class="image_size"></div>
+        <div class="preview_controls">
+          <button
+            type="button"
+            class="zoom_in_button"
+            title="${htmlEscape(options.zoomInButtonTitle)}"
+          >
+            ${options.zoomInButtonInnerHTML}
+          </button>
+          <button
+            type="button"
+            class="zoom_out_button"
+            title="${htmlEscape(options.zoomOutButtonTitle)}"
+          >
+            ${options.zoomOutButtonInnerHTML}
+          </button>
+          <button
+            type="button"
+            class="close_button"
+            title="${htmlEscape(options.closeButtonTitle)}"
+            onclick="this.closest('dialog').close();"
+          >
+            ${options.closeButtonInnerHTML}
+          </button>
+        </div>
       </div>
+      <div class="next_button_area"></div>
     </div>
   `;
   // 生成したdialog要素をbody要素の末尾に追加
