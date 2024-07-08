@@ -96,6 +96,9 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image.zoom .image_caption {
   display: none;
 }
+#dialog_image.zoom .image_size {
+  display: none;
+}
 
 /* 右上の操作ボタン */
 #dialog_image .image_preview_wrapper {
@@ -114,9 +117,10 @@ html:has(dialog#dialog_image[open]) {
   right: 0;
 }
 
-/* 右上の操作ボタンとキャプションを非表示 */
+/* 右上の操作ボタンとキャプションと画像サイズを非表示 */
 #dialog_image.controls_hidden .preview_controls,
-#dialog_image.controls_hidden .image_caption {
+#dialog_image.controls_hidden .image_caption,
+#dialog_image.controls_hidden .image_size {
   display: none;
 }
 
