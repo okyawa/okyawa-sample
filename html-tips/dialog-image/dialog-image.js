@@ -277,6 +277,9 @@ class DialogImage {
       await waitDialogAnimation(dialog);
       // dialog要素のstyle指定で非表示にする
       dialog.style.display = 'none';
+      // 表示テキストを全てクリア
+      this.modalDialog.querySelector('.image_caption').innerHTML = '';
+      this.modalDialog.querySelector('.image_size').innerHTML = '';
       // 判定用に付与したクラス名を初期化
       this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
