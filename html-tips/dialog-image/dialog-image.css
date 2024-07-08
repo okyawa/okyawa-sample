@@ -111,6 +111,7 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image.image_group_enabled .prev_button_area,
 #dialog_image.image_group_enabled .next_button_area {
   display: block;
+  align-self: center;
 }
 
 /* 右上の操作ボタン */

@@ -172,29 +172,11 @@ class DialogImage {
 
   /**
    * 画像送りで画像とキャプションを切り替え
-   * @param {'prev' | 'next'} direction 画像ファイルのURL
+   * @param {string} url 画像ファイルのURL
+   * @param {string} caption 画像のキャプション
    * @private
    */
-  async changeImagePreview(direction) {
-    // 現在表示中の画像URL
-    const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
-    const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
-    if (
-      (direction === 'prev' && this.groupImages[currentIndex - 1] === undefined)
-      || (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
-    ) {
-      // 表示する画像なし
-      return;
-    }
-    // 次に表示する画像URL
-    const url = direction === 'prev'
-      ? this.groupImages[currentIndex - 1].url
-      : this.groupImages[currentIndex + 1].url;
-    // 次に表示するキャプション
-    const caption = direction === 'prev'
-      ? this.groupImages[currentIndex - 1].caption
-      : this.groupImages[currentIndex + 1].caption;
-
+  async changeImagePreview(url, caption) {
     // 拡大画像をセット
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
     // キャプションのテキストを初期化
@@ -268,7 +250,8 @@ class DialogImage {
     prevButtonElem.title = 'Previous';
     prevButtonElem.innerHTML = '<';
     prevButtonElem.addEventListener('click', async () => {
-      await this.changeImagePreview('prev');
+      const { url, caption } = this.readNextImageData('prev');
+      await this.changeImagePreview(url, caption);
     });
 
     // 次へボタン
@@ -278,7 +261,8 @@ class DialogImage {
     nextButtonElem.title = 'Next';
     nextButtonElem.innerHTML = '>';
     nextButtonElem.addEventListener('click', async () => {
-      await this.changeImagePreview('next');
+      const { url, caption } = this.readNextImageData('next');
+      await this.changeImagePreview(url, caption);
     });
 
     // DOMにボタンを追加
@@ -287,6 +271,38 @@ class DialogImage {
     prevAreaElem.appendChild(prevButtonElem);
     nextAreaElem.appendChild(nextButtonElem); 
   }
+
+  /**
+   * 画像送りで画像とキャプションを切り替え
+   * @param {'prev' | 'next'} direction 画像ファイルのURL
+   * @returns {GroupImageType}
+   * @private
+   */
+  readNextImageData(direction) {
+    // 現在表示中の画像URL
+    const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
+    const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
+
+    if (
+      (direction === 'prev' && this.groupImages[currentIndex - 1] === undefined)
+      || (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
+    ) {
+      // 表示する画像なし
+      return;
+    }
+
+    // 次に表示する画像URL
+    const url = direction === 'prev'
+      ? this.groupImages[currentIndex - 1].url
+      : this.groupImages[currentIndex + 1].url;
+    // 次に表示するキャプション
+    const caption = direction === 'prev'
+      ? this.groupImages[currentIndex - 1].caption
+      : this.groupImages[currentIndex + 1].caption;
+
+    return { url, caption };
+  }
+
 
   /**
    * キャプションのテキストを初期化
