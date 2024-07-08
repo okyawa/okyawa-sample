@@ -88,6 +88,11 @@ class DialogImage {
    * @param {{url: string, caption?: string}} param0
    */
   open({ url, caption = ''}) {
+    // グループ化した画像の情報を初期化
+    this.setupGroupImages();
+    // 画像送りボタンの初期化
+    this.setupNextPrevButton();
+
     // 拡大画像のダイアログを開く
     this.openImagePreviewDialog(url, caption).then(() => {});
   }
@@ -121,10 +126,17 @@ class DialogImage {
     openLinkElements.forEach((linkElem) => {
       linkElem.addEventListener('click', (event) => {
         event.preventDefault();
+
         // ダイアログで表示する画像のURLとキャプション
         const targetElem = event.currentTarget;
         const url = targetElem.getAttribute('href');
         const caption = targetElem.dataset.caption ?? '';
+
+        // グループ化した画像の情報を初期化
+        this.setupGroupImages();
+        // 画像送りボタンの初期化
+        this.setupNextPrevButton();
+
         // 画像拡大表示ダイアログを開く
         this.openImagePreviewDialog(url, caption).then(() => {});
       });
@@ -144,10 +156,6 @@ class DialogImage {
     this.setupCaptionView(caption);
     // 表示画像自体のクリックした際のイベントをセット
     this.setupImageClick();
-    // グループ化した画像の情報を初期化
-    this.setupGroupImages();
-    // 画像送りボタンの初期化
-    this.setupNextPrevButton();
     // dialog要素の開くアニメーションがすべて終了するまで待つ
     await waitDialogAnimation(this.modalDialog);
     // dialog要素を開く
@@ -158,7 +166,70 @@ class DialogImage {
     this.setupImageSizeView(width, height);
     // 表示する画像に拡大ボタンが必要かを判定
     await this.setupDialogZoomVisible(url, width, height);
+    // グループ化しているときの前後の画像を先読み
+    this.preloadPrevNextImages(url);
   }
+
+  /**
+   * 画像送りで画像とキャプションを切り替え
+   * @param {'prev' | 'next'} direction 画像ファイルのURL
+   * @private
+   */
+  async changeImagePreview(direction) {
+    // 現在表示中の画像URL
+    const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
+    const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
+    if (
+      (direction === 'prev' && this.groupImages[currentIndex - 1] === undefined)
+      || (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
+    ) {
+      // 表示する画像なし
+      return;
+    }
+    // 次に表示する画像URL
+    const url = direction === 'prev'
+      ? this.groupImages[currentIndex - 1].url
+      : this.groupImages[currentIndex + 1].url;
+    // 次に表示するキャプション
+    const caption = direction === 'prev'
+      ? this.groupImages[currentIndex - 1].caption
+      : this.groupImages[currentIndex + 1].caption;
+
+    // 拡大画像をセット
+    this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
+    // キャプションのテキストを初期化
+    this.setupCaptionView(caption);
+    // 表示する画像の幅と高さを取得
+    const { width, height } = await readImageSize(url);
+    // キャプションの下部に画像の幅と高さを表示
+    this.setupImageSizeView(width, height);
+    // 表示する画像に拡大ボタンが必要かを判定
+    await this.setupDialogZoomVisible(url, width, height);
+    // グループ化しているときの前後の画像を先読み
+    this.preloadPrevNextImages(url);
+  }
+
+  /**
+   * グループ化しているときの前後の画像を先読み
+   * @param {string} currentUrl 現在表示中の画像のURL
+   * @returns 
+   */
+  preloadPrevNextImages(currentUrl) {
+    if (this.groupImages.length === 0) {
+      // プリロードする画像なし
+      return;
+    }
+    const urlList = this.groupImages.map((image) => image.url);
+    const currentIndex = urlList.indexOf(currentUrl);
+    if (this.groupImages[currentIndex - 1]) {
+      // 前の画像をプリロード
+      (new Image()).src = this.groupImages[currentIndex - 1].url;
+    }
+    if (this.groupImages[currentIndex + 1]) {
+      // 次の画像をプリロード
+      (new Image()).src = this.groupImages[currentIndex + 1].url;
+    }
+  } 
 
   /**
    * グループ化した画像の情報を初期化
@@ -196,6 +267,9 @@ class DialogImage {
     prevButtonElem.classList.add('prev_button');
     prevButtonElem.title = 'Previous';
     prevButtonElem.innerHTML = '<';
+    prevButtonElem.addEventListener('click', async () => {
+      await this.changeImagePreview('prev');
+    });
 
     // 次へボタン
     const nextButtonElem = document.createElement('button');
@@ -203,6 +277,9 @@ class DialogImage {
     nextButtonElem.classList.add('next_button');
     nextButtonElem.title = 'Next';
     nextButtonElem.innerHTML = '>';
+    nextButtonElem.addEventListener('click', async () => {
+      await this.changeImagePreview('next');
+    });
 
     // DOMにボタンを追加
     const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
