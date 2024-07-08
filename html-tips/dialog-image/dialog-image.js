@@ -55,10 +55,8 @@ class DialogImage {
    * @private
    */
   get defaults() {
-    // ※PHPStormでツールチップ表示やジャンプが動作するよう、敢えて一旦変数へ格納し、型指定を当てている
-    // ※これをしないと、PHPStormでツールチップ表示やジャンプが動作しない
     /** @type {DialogImageOptionType} */
-    const values = {
+    return {
       dialogId: 'dialog_image',
       openLink: '.popup_img',
       groupSelector: null,
@@ -72,7 +70,6 @@ class DialogImage {
       closeButtonInnerHTML: 'x',
       closeButtonTitle: 'Close',
     };
-    return values;
   }
 
   /**
@@ -85,7 +82,7 @@ class DialogImage {
 
   /**
    * 直接ダイアログを開く
-   * @param {{url: string, caption?: string}} param0 
+   * @param {{url: string, caption?: string}} param0
    */
   open({ url, caption = ''}) {
     // 拡大画像のダイアログを開く
@@ -135,7 +132,7 @@ class DialogImage {
         // 画像拡大表示ダイアログを開く
         this.openImagePreviewDialog(url, caption).then(() => {});
       });
-    })
+    });
   }
 
   /**
@@ -244,7 +241,7 @@ class DialogImage {
    * @private
    */
   async setupDialogZoomVisible(url, width, height) {
-    const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight
+    const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight;
     if (zoomEnabled) {
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
     } else {
@@ -300,7 +297,7 @@ class DialogImage {
   setupZoomInButton() {
     this.modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', () => {
       this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
-    }); 
+    });
   }
 
   /**
@@ -324,7 +321,7 @@ window.DialogImage = DialogImage;
 function waitDialogAnimation(dialog) {
   return Promise.allSettled(
     dialog.getAnimations()
-      .map((animation) => animation.finished)
+      .map((animation) => animation.finished),
   );
 }
 
@@ -357,22 +354,22 @@ async function readImageSize(url) {
 
 /**
  * 文字列をHTMLエスケープ
- * @param {string} value 
- * @returns 
+ * @param {string} value
+ * @returns
  */
 function htmlEscape(value) {
   return value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 /**
  * 画像拡大に使うdialog要素を生成
  * @param {DialogImageOptionType} options
- * @returns 
+ * @returns
  */
 function createDialogImageElement(options) {
   const modalDialog = document.querySelector(`#${options.dialogId}`);
