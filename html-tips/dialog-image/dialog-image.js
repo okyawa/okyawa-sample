@@ -194,7 +194,7 @@ class DialogImage {
   /**
    * グループ化しているときの前後の画像を先読み
    * @param {string} currentUrl 現在表示中の画像のURL
-   * @returns 
+   * @returns
    */
   preloadPrevNextImages(currentUrl) {
     if (this.groupImages.length === 0) {
@@ -211,11 +211,11 @@ class DialogImage {
       // 次の画像をプリロード
       (new Image()).src = this.groupImages[currentIndex + 1].url;
     }
-  } 
+  }
 
   /**
    * グループ化した画像の情報を初期化
-   * @private 
+   * @private
    */
   setupGroupImages() {
     if (!this.options.groupSelector) {
@@ -269,7 +269,7 @@ class DialogImage {
     const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
     const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
     prevAreaElem.appendChild(prevButtonElem);
-    nextAreaElem.appendChild(nextButtonElem); 
+    nextAreaElem.appendChild(nextButtonElem);
   }
 
   /**

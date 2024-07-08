@@ -36,4 +36,4 @@ export type GroupImageType = {
   url: string,
   /** 画像のキャプション */
   caption: string,
-}
+};
