@@ -177,8 +177,10 @@ class DialogImage {
   setupCaptionView(caption) {
     const captionElem = this.modalDialog.querySelector('.image_caption');
     if (caption) {
-      // TODO: textContent と outerHTML を使う形式に変更
-      captionElem.innerHTML = `<div class="caption_text">${htmlEscape(caption)}</div>`;
+      const divElem = document.createElement('div');
+      divElem.classList.add('caption_text');
+      divElem.textContent = caption;
+      captionElem.innerHTML = divElem.outerHTML;
       this.modalDialog.classList.add(DIALOG_HAS_CAPTION_CLASS_NAME);
     } else {
       captionElem.innerHTML = '';
