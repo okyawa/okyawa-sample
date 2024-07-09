@@ -185,6 +185,8 @@ class DialogImage {
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
     // キャプションのテキストを初期化
     this.setupCaptionView(caption);
+    // 表示画像自体のクリックした際のイベントをセット
+    this.setupImageClick();
     // 表示する画像の幅と高さを取得
     const { width, height } = await readImageSize(url);
     // キャプションの下部に画像の幅と高さを表示
@@ -358,7 +360,8 @@ class DialogImage {
    * @private
    */
   setupImageClick() {
-    this.modalDialog.querySelector('.image_preview img')?.addEventListener('click', () => {
+    const imgElem = this.modalDialog.querySelector('.image_preview img');
+    imgElem?.addEventListener('click', () => {
       if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
         // ズーム中の場合は縮小表示に戻す
         this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
