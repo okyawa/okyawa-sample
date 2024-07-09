@@ -122,10 +122,14 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image .next_button {
   width: var(--dialog-image-next-prev-button-width);
   height: 60px;
+  padding: 0;
   background-color: #f5f5f5;
+  color: #333;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 #dialog_image .prev_button:disabled,
 #dialog_image .next_button:disabled {
@@ -181,9 +185,13 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image .image_preview_wrapper .zoom_out_button {
   width: 30px;
   height: 30px;
+  padding: 0;
   background-color: rgba(255, 255, 255, 0.5);
+  color: 333;
   border: none;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 @media (any-hover: hover) {
   #dialog_image .image_preview_wrapper .zoom_in_button:hover,
@@ -209,10 +217,14 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image .image_preview_wrapper .close_button {
   width: 30px;
   height: 30px;
+  padding: 0;
   background-color: rgba(255, 255, 255, 0.5);
   background-image: none;
+  color: #333;
   border: none;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 /* dialog背景のぼかし */

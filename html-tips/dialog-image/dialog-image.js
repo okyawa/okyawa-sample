@@ -539,13 +539,6 @@ function createDialogImageElement(options) {
   dialogElem.style.display = 'none';
   dialogElem.innerHTML = `
     <div class="image_preview_wrapper">
-      <div class="image_main_area">
-        <div class="prev_button_area"></div>
-        <div class="image_preview"></div>
-        <div class="next_button_area"></div>
-      </div>
-      <div class="image_caption"></div>
-      <div class="image_size"></div>
       <div class="preview_controls">
         <button
           type="button"
@@ -570,6 +563,13 @@ function createDialogImageElement(options) {
           ${options.closeButtonInnerHTML}
         </button>
       </div>
+      <div class="image_main_area">
+        <div class="prev_button_area"></div>
+        <div class="image_preview"></div>
+        <div class="next_button_area"></div>
+      </div>
+      <div class="image_caption"></div>
+      <div class="image_size"></div>
     </div>
   `;
   // 生成したdialog要素をbody要素の末尾に追加
