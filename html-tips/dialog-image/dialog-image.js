@@ -249,6 +249,14 @@ class DialogImage {
    * @private
    */
   setupNextPrevButton() {
+    // 画像送りボタンの枠要素
+    const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
+    const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
+
+    // 一旦中身をクリア
+    prevAreaElem.innerHTML = '';
+    nextAreaElem.innerHTML = '';
+
     // 前へボタン
     const prevButtonElem = document.createElement('button');
     prevButtonElem.type = 'button';
@@ -278,8 +286,6 @@ class DialogImage {
     });
 
     // DOMにボタンを追加
-    const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
-    const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
     prevAreaElem.appendChild(prevButtonElem);
     nextAreaElem.appendChild(nextButtonElem);
   }
