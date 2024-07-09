@@ -8,6 +8,7 @@
   --dialog-image-height-caption: 29px;
   --dialog-image-height-caption-image-size: 18px;
   --dialog-image-height-image-size: 26px;
+  --dialog-image-next-prev-button-width: 30px;
 }
 
 /* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
@@ -37,6 +38,10 @@ html:has(dialog#dialog_image[open]) {
 /* 画像サイズあり*/
 #dialog_image.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
   max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-image-size));
+}
+/* 画像送りあり */
+#dialog_image.image_group_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-width: calc(100dvw - var(--dialog-image-outer-size) - (var(--dialog-image-next-prev-button-width) * 2));
 }
 
 /* キャプション */
@@ -100,18 +105,46 @@ html:has(dialog#dialog_image[open]) {
   display: none;
 }
 
-/* グループ化 */
-#dialog_image.image_group_enabled .image_preview_wrapper {
+/* グループ化で画像送りボタン表示 */
+#dialog_image.image_group_enabled .image_main_area {
   display: flex;
 }
 #dialog_image .prev_button_area,
 #dialog_image .next_button_area {
   display: none;
 }
-#dialog_image.image_group_enabled .prev_button_area,
-#dialog_image.image_group_enabled .next_button_area {
+#dialog_image.image_group_enabled:not(.zoom) .prev_button_area,
+#dialog_image.image_group_enabled:not(.zoom) .next_button_area {
   display: block;
   align-self: center;
+}
+#dialog_image .prev_button,
+#dialog_image .next_button {
+  width: var(--dialog-image-next-prev-button-width);
+  height: 60px;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#dialog_image .prev_button:disabled,
+#dialog_image .next_button:disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+@media (any-hover: hover) {
+  #dialog_image .prev_button:hover,
+  #dialog_image .next_button:hover {
+    opacity: 0.8;
+  }
+}
+#dialog_image .prev_button {
+  margin-left: 5px;
+  margin-right: -5px;
+}
+#dialog_image .next_button {
+  margin-left: -5px;
+  margin-right: 5px;
 }
 
 /* 右上の操作ボタン */
