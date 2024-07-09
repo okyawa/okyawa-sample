@@ -163,6 +163,9 @@ html:has(dialog#dialog_image[open]) {
   top: 0;
   right: 0;
 }
+#dialog_image.image_group_enabled:not(.zoom) .image_preview_wrapper .preview_controls {
+  right: calc(var(--dialog-image-next-prev-button-width) + 10px);
+}
 
 /* ボタン系とキャプションと画像サイズを非表示 */
 #dialog_image.controls_hidden .preview_controls,
