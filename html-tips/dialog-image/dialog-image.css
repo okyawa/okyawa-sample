@@ -131,10 +131,12 @@ html:has(dialog#dialog_image[open]) {
   right: 0;
 }
 
-/* 右上の操作ボタンとキャプションと画像サイズを非表示 */
+/* ボタン系とキャプションと画像サイズを非表示 */
 #dialog_image.controls_hidden .preview_controls,
 #dialog_image.controls_hidden .image_caption,
-#dialog_image.controls_hidden .image_size {
+#dialog_image.controls_hidden .image_size,
+#dialog_image.image_group_enabled.controls_hidden .prev_button_area,
+#dialog_image.image_group_enabled.controls_hidden .next_button_area {
   display: none;
 }
 
