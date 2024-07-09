@@ -6,10 +6,12 @@ export type DialogImageOptionType = {
   dialogId: string,
   /** 開くリンクのセレクターか要素 */
   openLink?: string | HTMLElement[],
+
   /* グループ化するセレクター */
   groupSelector: string | null,
   /** グループ化したセレクターから画像URLを取得する際の属性名 */
   groupUrlAttr: string,
+
   /** 前へボタンのbutton要素内HTML */
   prevButtonInnerHTML: string,
   /** 前へボタンのbutton要素のtitle属性値 */
@@ -18,10 +20,18 @@ export type DialogImageOptionType = {
   nextButtonInnerHTML: string,
   /** 次へボタンのbutton要素のtitle属性値 */
   nextButtonTitle: string,
+
+  // ※ "groupCaptionAttr" と "groupCaptionWrapSelector" と "groupCaptionElemSelector" は全てセットで指定
   /** グループ化したセレクターから画像キャプションを取得する際の属性名 */
   groupCaptionAttr: string,
+  /** グループ化した画像のキャプションを含む要素を囲う要素のセレクター */
+  groupCaptionWrapSelector: string | null,
+  /** グループ化した画像のキャプションを含む要素のセレクター */
+  groupCaptionElemSelector: string | null,
+
   /** 画像の幅と高さを表示するかどうか */
   imageSizeVisible: boolean,
+
   /** 拡大ボタンのbutton要素内HTML */
   zoomInButtonInnerHTML: sting,
   /** 拡大ボタンのbutton要素のtitle属性値 */
@@ -30,6 +40,7 @@ export type DialogImageOptionType = {
   zoomOutButtonInnerHTML: string,
   /** 縮小ボタンのbutton要素のtitle属性値 */
   zoomOutButtonTitle: string,
+
   /** 閉じるボタンのbutton要素内HTML */
   closeButtonInnerHTML: string,
   /** 閉じるボタンのbutton要素のtitle属性値 */

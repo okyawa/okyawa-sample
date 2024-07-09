@@ -65,6 +65,8 @@ class DialogImage {
       groupSelector: null,
       groupUrlAttr: 'href',
       groupCaptionAttr: 'data-caption',
+      groupCaptionWrapSelector: null,
+      groupCaptionElemSelector: null,
       prevButtonInnerHTML: '&lt;',
       prevButtonTitle: 'Previous',
       nextButtonTitle: 'Next',
@@ -233,6 +235,7 @@ class DialogImage {
       // グループ化で一致する要素なし
       return;
     }
+
     // グループ化した画像の情報をセット
     this.groupImages = Array.from(groupElements).map((elem) => {
       return {
@@ -240,6 +243,36 @@ class DialogImage {
         caption: elem.getAttribute(this.options.groupCaptionAttr) ?? '',
       };
     });
+
+    // グループ化した画像のキャプションが別の要素で指定されている場合
+    if (
+      this.options.groupCaptionAttr
+      && this.options.groupCaptionWrapSelector
+      && this.options.groupCaptionElemSelector
+    ) {
+      this.groupImages = this.groupImages.map((item) => {
+        const activeElem = document.querySelector(
+          `${this.options.groupSelector}[${this.options.groupUrlAttr}="${item.url}"]`,
+        );
+        // グループ化した画像のキャプションが指定されている要素からキャプション情報を取り出す
+        const captionElem = activeElem
+          .closest(this.options.groupCaptionWrapSelector)
+          ?.querySelector(this.options.groupCaptionElemSelector);
+        let caption = '';
+        if (captionElem) {
+          if (this.options.groupCaptionAttr === 'value') {
+            caption = captionElem.value;
+          } else {
+            caption = captionElem.getAttribute(this.options.groupCaptionAttr);
+          }
+        }
+        return {
+          url: item.url,
+          caption: caption ?? '',
+        };
+      });
+    }
+
     // 枠にグループ化が使われていることを示すクラス名を付与
     this.modalDialog.classList.add(DIALOG_GROUP_IMAGES_ENABLED);
   }
