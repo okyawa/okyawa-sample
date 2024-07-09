@@ -10,6 +10,14 @@ export type DialogImageOptionType = {
   groupSelector: string | null,
   /** グループ化したセレクターから画像URLを取得する際の属性名 */
   groupUrlAttr: string,
+  /** 前へボタンのbutton要素内HTML */
+  prevButtonInnerHTML: string,
+  /** 前へボタンのbutton要素のtitle属性値 */
+  prevButtonTitle: string,
+  /** 次へボタンのbutton要素内HTML */
+  nextButtonInnerHTML: string,
+  /** 次へボタンのbutton要素のtitle属性値 */
+  nextButtonTitle: string,
   /** グループ化したセレクターから画像キャプションを取得する際の属性名 */
   groupCaptionAttr: string,
   /** 画像の幅と高さを表示するかどうか */

@@ -65,6 +65,10 @@ class DialogImage {
       groupSelector: null,
       groupUrlAttr: 'href',
       groupCaptionAttr: 'data-caption',
+      prevButtonInnerHTML: '&lt;',
+      prevButtonTitle: 'Previous',
+      nextButtonTitle: 'Next',
+      nextButtonInnerHTML: '&gt;',
       imageSizeVisible: false,
       zoomInButtonInnerHTML: '🔍',
       zoomInButtonTitle: 'Zoom in',
@@ -247,22 +251,28 @@ class DialogImage {
     const prevButtonElem = document.createElement('button');
     prevButtonElem.type = 'button';
     prevButtonElem.classList.add('prev_button');
-    prevButtonElem.title = 'Previous';
-    prevButtonElem.innerHTML = '<';
+    prevButtonElem.title = this.options.prevButtonTitle;
+    prevButtonElem.innerHTML = this.options.prevButtonInnerHTML;
     prevButtonElem.addEventListener('click', async () => {
-      const { url, caption } = this.readNextImageData('prev');
-      await this.changeImagePreview(url, caption);
+      const imageData = this.readNextImageData('prev');
+      if (imageData === null) {
+        return;
+      }
+      await this.changeImagePreview(imageData.url, imageData.caption);
     });
 
     // 次へボタン
     const nextButtonElem = document.createElement('button');
     nextButtonElem.type = 'button';
     nextButtonElem.classList.add('next_button');
-    nextButtonElem.title = 'Next';
-    nextButtonElem.innerHTML = '>';
+    nextButtonElem.title = this.options.nextButtonTitle;
+    nextButtonElem.innerHTML = this.options.nextButtonInnerHTML;
     nextButtonElem.addEventListener('click', async () => {
-      const { url, caption } = this.readNextImageData('next');
-      await this.changeImagePreview(url, caption);
+      const imageData = this.readNextImageData('next');
+      if (imageData === null) {
+        return;
+      }
+      await this.changeImagePreview(imageData.url, imageData.caption);
     });
 
     // DOMにボタンを追加
@@ -275,7 +285,7 @@ class DialogImage {
   /**
    * 画像送りで画像とキャプションを切り替え
    * @param {'prev' | 'next'} direction 画像ファイルのURL
-   * @returns {GroupImageType}
+   * @returns {GroupImageType | null}
    * @private
    */
   readNextImageData(direction) {
@@ -288,7 +298,7 @@ class DialogImage {
       || (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
     ) {
       // 表示する画像なし
-      return;
+      return null;
     }
 
     // 次に表示する画像URL
