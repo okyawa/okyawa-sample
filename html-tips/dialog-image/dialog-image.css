@@ -273,66 +273,66 @@ dialog#dialog_image::backdrop {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    /* フェード・インのアニメーション*/
-    @keyframes dialogImageFadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+  /* フェード・インのアニメーション*/
+  @keyframes dialogImageFadeIn {
+    from {
+      opacity: 0;
     }
-    /* ズーム・インのアニメーション */
-    @keyframes dialogImageZoomIn {
-      from {
-        transform: scale(0.6);
-      }
-      to {
-        transform: scale(1);
-      }
-    }
-    /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
-    dialog#dialog_image[open] {
-      /* @keyframesで作成したアニメーション名 */
-      animation-name: dialogImageFadeIn, dialogImageZoomIn;
-      /* アニメーションの進行状況 */
-      animation-fill-mode: forwards;
-      /* アニメーションの実行時間 */
-      animation-duration: 200ms;
-      /* アニメーションの進行状況 */
-      animation-timing-function: ease-out;
-    }
-    /* フェード・アウトのアニメーション */
-    @keyframes dialogImageFadeOut {
-      from {
-        opacity: 1;
-      }
-      to {
-        opacity: 0;
-      }
-    }
-    /* ズーム・アウトのアニメーション */
-    @keyframes dialogImageZoomOut {
-      from {
-        transform: scale(1);
-      }
-      to {
-        transform: scale(0.6);
-      }
-    }
-    /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
-    #dialog_image {
-      animation-name: dialogImageFadeOut, dialogImageZoomOut;
-      animation-fill-mode: forwards;
-      animation-duration: 200ms;
-      animation-timing-function: ease-out;
+    to {
+      opacity: 1;
     }
   }
+  /* ズーム・インのアニメーション */
+  @keyframes dialogImageZoomIn {
+    from {
+      transform: scale(0.6);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
+  dialog#dialog_image[open] {
+    /* @keyframesで作成したアニメーション名 */
+    animation-name: dialogImageFadeIn, dialogImageZoomIn;
+    /* アニメーションの進行状況 */
+    animation-fill-mode: forwards;
+    /* アニメーションの実行時間 */
+    animation-duration: 200ms;
+    /* アニメーションの進行状況 */
+    animation-timing-function: ease-out;
+  }
+  /* フェード・アウトのアニメーション */
+  @keyframes dialogImageFadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  /* ズーム・アウトのアニメーション */
+  @keyframes dialogImageZoomOut {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(0.6);
+    }
+  }
+  /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
   #dialog_image {
-    padding: 0;
-    display: block;
-    position: fixed;
-    inset-inline: 0;
-    inset-block: 0;
-    border: none;
+    animation-name: dialogImageFadeOut, dialogImageZoomOut;
+    animation-fill-mode: forwards;
+    animation-duration: 200ms;
+    animation-timing-function: ease-out;
   }
+}
+#dialog_image {
+  padding: 0;
+  display: block;
+  position: fixed;
+  inset-inline: 0;
+  inset-block: 0;
+  border: none;
+}
