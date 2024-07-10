@@ -101,7 +101,7 @@ class DialogImage {
     // グループ化した画像の情報を初期化
     this.setupGroupImages();
     // 画像送りボタンの初期化
-    this.setupNextPrevButton();
+    this.setupNextPrevButton(url);
 
     // 拡大画像のダイアログを開く
     this.openImagePreviewDialog(url, caption).then(() => {});
@@ -145,7 +145,7 @@ class DialogImage {
         // グループ化した画像の情報を初期化
         this.setupGroupImages();
         // 画像送りボタンの初期化
-        this.setupNextPrevButton();
+        this.setupNextPrevButton(url);
 
         // 画像拡大表示ダイアログを開く
         this.openImagePreviewDialog(url, caption).then(() => {});
@@ -288,9 +288,10 @@ class DialogImage {
 
   /**
    * 画像送りボタンの初期化
+   * @param {string} url 最初に表示する画像ファイルのURL
    * @private
    */
-  setupNextPrevButton() {
+  setupNextPrevButton(url) {
     // 画像送りボタンの枠要素
     const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
     const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
@@ -307,6 +308,9 @@ class DialogImage {
     // DOMに生成したボタンを追加
     prevAreaElem.appendChild(prevButtonElem);
     nextAreaElem.appendChild(nextButtonElem);
+
+    // 画像送りできないボタンをdisabledにする
+    this.managePrevNextButtonDisabled(url);
   }
 
   /**
@@ -365,10 +369,6 @@ class DialogImage {
 
     // 画像送りできないボタンをdisabledにする
     this.managePrevNextButtonDisabled(imageData.url);
-/*     const prevUrl = this.readNextImageData('prev', imageData.url);
-    const nextUrl = this.readNextImageData('next', imageData.url);
-    this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`).disabled = prevUrl === null;
-    this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`).disabled = nextUrl === null; */
   }
 
   /**
@@ -546,6 +546,11 @@ class DialogImage {
       await waitDialogAnimation(dialog);
       // dialog要素のstyle指定で非表示にする
       dialog.style.display = 'none';
+      // image_preview内の画像を削除
+      const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
+      if (imagePreviewElem) {
+        imagePreviewElem.innerHTML = '';
+      }
       // キーボードイベントを削除
       this.removeKeyboardEvent();
       // body要素のdata属性にdialog要素のIDを削除
