@@ -50,10 +50,6 @@ class DialogImage {
 
     /** @type {GroupImageType[]} グループ化した画像の情報 */
     this.groupImages = [];
-
-    // イベントハンドラーのthisを固定
-    /** @type {async (event: KeyboardEvent) => Promise<void>} */
-    this.boundKeyboardEventHandler = this.keyboardEventHandler.bind(this);
   }
 
   /**
@@ -168,6 +164,8 @@ class DialogImage {
     this.setupImageClick();
     // キーボードイベントを追加
     this.addKeyboardEvent();
+    // body要素のdata属性にdialog要素のIDをセット (※キーボードイベント用)
+    document.body.dataset.dialogId = this.options.dialogId;
     // dialog要素の開くアニメーションがすべて終了するまで待つ
     await waitDialogAnimation(this.modalDialog);
     // dialog要素を開く
@@ -348,6 +346,10 @@ class DialogImage {
    * @private
    */
   async switchImage(direction) {
+    if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
+      // ズーム時は画像送りしない
+      return;
+    }
     const imageData = this.readNextImageData(direction);
     if (imageData === null) {
       return;
@@ -480,7 +482,7 @@ class DialogImage {
       // グループ化を使っていない場合は、キーボードイベントの登録は不要
       return;
     }
-    document.addEventListener('keydown', this.boundKeyboardEventHandler);
+    document.addEventListener('keydown', handleKeyboardEvent);
   }
 
   /**
@@ -488,38 +490,7 @@ class DialogImage {
    * @private
    */
   removeKeyboardEvent() {
-    document.removeEventListener('keydown', this.boundKeyboardEventHandler);
-  }
-
-
-  /**
-   * キーボードイベントのイベントハンドラー
-   * @param {KeyboardEvent} event キーボードイベント
-   * @returns {Promise<void>}
-   * @private
-   */
-  async keyboardEventHandler(event) {
-    if (event.key === 'ArrowLeft') {
-      // 右矢印きー: 前へ
-      if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
-        // ズーム時は画像送りしない
-        return;
-      }
-      await this.switchImage('prev');
-      this.modalDialog.querySelector('.prev_button')?.focus();
-      return;
-    }
-
-    if (event.key === 'ArrowRight') {
-      // 右矢印キー: 次へ
-      if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
-        // ズーム時は画像送りしない
-        return;
-      }
-      await this.switchImage('next');
-      this.modalDialog.querySelector('.next_button')?.focus();
-      return;
-    }
+    document.removeEventListener('keydown', handleKeyboardEvent);
   }
 
   /**
@@ -551,6 +522,10 @@ class DialogImage {
       dialog.style.display = 'none';
       // キーボードイベントを削除
       this.removeKeyboardEvent();
+      // body要素のdata属性にdialog要素のIDを削除
+      delete document.body.dataset.dialogId;
+      // グループ化した画像の情報を初期化
+      this.groupImages = [];
       // 表示テキストを全てクリア
       this.modalDialog.querySelector('.image_caption').innerHTML = '';
       this.modalDialog.querySelector('.image_size').innerHTML = '';
@@ -646,6 +621,37 @@ function htmlEscape(value) {
 }
 
 /**
+ * キーボードイベントのイベントハンドラー
+ * @param {KeyboardEvent} event キーボードイベント
+ * @private
+ */
+function handleKeyboardEvent(event) {
+  /** dialog要素のid値 */
+  const dialogId = document.querySelector('body')?.dataset.dialogId;
+  if (!dialogId) {
+    return;
+  }
+
+  if (event.key === 'ArrowLeft') {
+    // 右矢印きー: 前へ
+    const prevButtonElem = document.querySelector(`#${dialogId}`)
+      ?.querySelector('dialog .prev_button');
+    prevButtonElem?.dispatchEvent(new Event('click'));
+    prevButtonElem?.focus();
+    return;
+  }
+
+  if (event.key === 'ArrowRight') {
+    // 右矢印キー: 次へ
+    const nextButtonElem = document.querySelector(`#${dialogId}`)
+      ?.querySelector('dialog .next_button');
+    nextButtonElem?.dispatchEvent(new Event('click'));
+    nextButtonElem?.focus();
+    return;
+  }
+}
+
+/**
  * 画像拡大に使うdialog要素を生成
  * @param {DialogImageOptionType} options
  * @returns
@@ -696,6 +702,7 @@ function createDialogImageElement(options) {
       <div class="image_size"></div>
     </div>
   `;
+
   // 生成したdialog要素をbody要素の末尾に追加
   document.querySelector('body').appendChild(dialogElem);
 
