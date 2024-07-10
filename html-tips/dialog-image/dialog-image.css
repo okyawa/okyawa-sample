@@ -254,6 +254,11 @@ html:has(dialog#dialog_image[open]) {
   user-select: none;
 }
 
+/* 画像送り中 */
+#dialog_image.switching {
+  display: none;
+}
+
 /* dialog背景のぼかし */
 #dialog_image {
   --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);

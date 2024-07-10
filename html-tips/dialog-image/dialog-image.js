@@ -19,6 +19,8 @@ const DIALOG_GROUP_IMAGES_ENABLED = 'image_group_enabled';
 const DIALOG_NEXT_BUTTON_CLASS_NAME = 'next_button';
 /** 次へボタン要素のクラス名 */
 const DIALOG_PREV_BUTTON_CLASS_NAME = 'prev_button';
+/** 画像送り中にdialog要素へ付与されるクラス名 */
+const DIALOG_SWITCHING_CLASS_NAME = 'switching';
 
 /**
  * dialog要素を使った画像拡大
@@ -358,17 +360,23 @@ class DialogImage {
       // ズーム時は画像送りしない
       return;
     }
+    // 画像送り開始
+    this.modalDialog.classList.add(DIALOG_SWITCHING_CLASS_NAME);
 
     // 現在表示中の画像URL
     const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
     const imageData = this.readNextImageData(direction, currentUrl);
     if (imageData === null) {
+      this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
       return;
     }
     await this.changeImagePreview(imageData.url, imageData.caption);
 
     // 画像送りできないボタンをdisabledにする
     this.managePrevNextButtonDisabled(imageData.url);
+
+    // 画像送り完了
+    this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
   }
 
   /**
