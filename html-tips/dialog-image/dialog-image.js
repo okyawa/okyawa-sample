@@ -506,7 +506,7 @@ class DialogImage {
         return;
       }
       await this.switchImage('prev');
-      this.modalDialog.querySelector('.prev_button').focus();
+      this.modalDialog.querySelector('.prev_button')?.focus();
       return;
     }
 
@@ -517,7 +517,7 @@ class DialogImage {
         return;
       }
       await this.switchImage('next');
-      this.modalDialog.querySelector('.next_button').focus();
+      this.modalDialog.querySelector('.next_button')?.focus();
       return;
     }
   }
