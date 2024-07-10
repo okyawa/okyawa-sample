@@ -149,7 +149,7 @@ html:has(dialog#dialog_image[open]) {
 @media (any-hover: hover) {
   #dialog_image .prev_button:hover,
   #dialog_image .next_button:hover {
-    opacity: 0.9;
+    opacity: 0.8;
   }
 }
 #dialog_image .prev_button {
@@ -165,7 +165,7 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image .image_preview_wrapper {
   position: relative;
 }
-#dialog_image .image_preview_wrapper .preview_controls {
+#dialog_image .preview_controls {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -173,11 +173,11 @@ html:has(dialog#dialog_image[open]) {
   display: flex;
   gap: 8px;
 }
-#dialog_image.zoom .image_preview_wrapper .preview_controls {
+#dialog_image.zoom .preview_controls {
   top: 0;
   right: 0;
 }
-#dialog_image.image_group_enabled:not(.zoom) .image_preview_wrapper .preview_controls {
+#dialog_image.image_group_enabled:not(.zoom) .preview_controls {
   right: calc(var(--dialog-image-next-prev-button-width) + 10px);
 }
 
@@ -191,8 +191,8 @@ html:has(dialog#dialog_image[open]) {
 }
 
 /* 拡大・縮小ボタン */
-#dialog_image .image_preview_wrapper .zoom_in_button,
-#dialog_image .image_preview_wrapper .zoom_out_button {
+#dialog_image .zoom_in_button,
+#dialog_image .zoom_out_button {
   width: 30px;
   height: 30px;
   padding: 0;
@@ -201,32 +201,33 @@ html:has(dialog#dialog_image[open]) {
   backdrop-filter: blur(2px);
   color: #333;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
 }
 @media (any-hover: hover) {
-  #dialog_image .image_preview_wrapper .zoom_in_button:hover,
-  #dialog_image .image_preview_wrapper .zoom_out_button:hover {
-    opacity: 0.9;
+  #dialog_image .zoom_in_button:hover,
+  #dialog_image .zoom_out_button:hover {
+    opacity: 0.8;
   }
 }
-#dialog_image.zoom .image_preview_wrapper .zoom_in_button {
+#dialog_image.zoom .zoom_in_button {
   display: none;
 }
-#dialog_image .image_preview_wrapper .zoom_out_button {
+#dialog_image .zoom_out_button {
   display: none;
 }
-#dialog_image.zoom .image_preview_wrapper .zoom_out_button {
+#dialog_image.zoom .zoom_out_button {
   display: block;
 }
-#dialog_image.zoom_disabled .image_preview_wrapper .zoom_in_button,
-#dialog_image.zoom_disabled .image_preview_wrapper .zoom_out_button {
+#dialog_image.zoom_disabled .zoom_in_button,
+#dialog_image.zoom_disabled .zoom_out_button {
   display: none;
 }
 
 /* 閉じるボタン */
-#dialog_image .image_preview_wrapper .close_button {
+#dialog_image .close_button {
   width: 30px;
   height: 30px;
   padding: 0;
@@ -236,19 +237,31 @@ html:has(dialog#dialog_image[open]) {
   background-image: none;
   color: #333;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
 }
+@media (any-hover: hover) {
+  #dialog_image .close_button:hover {
+    opacity: 0.8;
+  }
+}
+
+/* ダイアログ内のボタン全般 */
+#dialog_image button {
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /* dialog背景のぼかし */
-:root {
+#dialog_image {
   --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
 }
 #dialog_image {
   box-shadow: var(--dialog-shadow);
 }
-dialog::backdrop {
+dialog#dialog_image::backdrop {
   backdrop-filter: blur(8px);
   /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
   -webkit-backdrop-filter: blur(8px);
@@ -256,7 +269,7 @@ dialog::backdrop {
 
 @media (prefers-reduced-motion: no-preference) {
     /* フェード・インのアニメーション*/
-    @keyframes fadeIn {
+    @keyframes dialogImageFadeIn {
       from {
         opacity: 0;
       }
@@ -265,7 +278,7 @@ dialog::backdrop {
       }
     }
     /* ズーム・インのアニメーション */
-    @keyframes zoomIn {
+    @keyframes dialogImageZoomIn {
       from {
         transform: scale(0.6);
       }
@@ -276,7 +289,7 @@ dialog::backdrop {
     /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
     dialog#dialog_image[open] {
       /* @keyframesで作成したアニメーション名 */
-      animation-name: fadeIn, zoomIn;
+      animation-name: dialogImageFadeIn, dialogImageZoomIn;
       /* アニメーションの進行状況 */
       animation-fill-mode: forwards;
       /* アニメーションの実行時間 */
@@ -285,7 +298,7 @@ dialog::backdrop {
       animation-timing-function: ease-out;
     }
     /* フェード・アウトのアニメーション */
-    @keyframes fadeOut {
+    @keyframes dialogImageFadeOut {
       from {
         opacity: 1;
       }
@@ -294,7 +307,7 @@ dialog::backdrop {
       }
     }
     /* ズーム・アウトのアニメーション */
-    @keyframes zoomOut {
+    @keyframes dialogImageZoomOut {
       from {
         transform: scale(1);
       }
@@ -304,7 +317,7 @@ dialog::backdrop {
     }
     /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
     #dialog_image {
-      animation-name: fadeOut, zoomOut;
+      animation-name: dialogImageFadeOut, dialogImageZoomOut;
       animation-fill-mode: forwards;
       animation-duration: 200ms;
       animation-timing-function: ease-out;

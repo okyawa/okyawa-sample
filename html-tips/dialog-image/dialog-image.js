@@ -15,6 +15,10 @@ const DIALOG_CONTROLS_HIDDEN_CLASS_NAME = 'controls_hidden';
 const DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME = 'image_size_enabled';
 /** 画像のグループ化が有効な場合にdialog要素へ付与されるクラス名 */
 const DIALOG_GROUP_IMAGES_ENABLED = 'image_group_enabled';
+/** 前へボタン要素のクラス名 */
+const DIALOG_NEXT_BUTTON_CLASS_NAME = 'next_button';
+/** 次へボタン要素のクラス名 */
+const DIALOG_PREV_BUTTON_CLASS_NAME = 'prev_button';
 
 /**
  * dialog要素を使った画像拡大
@@ -313,7 +317,7 @@ class DialogImage {
   createPrevButtonElement() {
     const prevButtonElem = document.createElement('button');
     prevButtonElem.type = 'button';
-    prevButtonElem.classList.add('prev_button');
+    prevButtonElem.classList.add(DIALOG_PREV_BUTTON_CLASS_NAME);
     prevButtonElem.title = this.options.prevButtonTitle;
     prevButtonElem.innerHTML = this.options.prevButtonInnerHTML;
     prevButtonElem.addEventListener('click', async () => {
@@ -330,7 +334,7 @@ class DialogImage {
   createNextButtonElement() {
     const nextButtonElem = document.createElement('button');
     nextButtonElem.type = 'button';
-    nextButtonElem.classList.add('next_button');
+    nextButtonElem.classList.add(DIALOG_NEXT_BUTTON_CLASS_NAME);
     nextButtonElem.title = this.options.nextButtonTitle;
     nextButtonElem.innerHTML = this.options.nextButtonInnerHTML;
     nextButtonElem.addEventListener('click', async () => {
@@ -350,22 +354,44 @@ class DialogImage {
       // ズーム時は画像送りしない
       return;
     }
-    const imageData = this.readNextImageData(direction);
+
+    // 現在表示中の画像URL
+    const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
+    const imageData = this.readNextImageData(direction, currentUrl);
     if (imageData === null) {
       return;
     }
     await this.changeImagePreview(imageData.url, imageData.caption);
+
+    // 画像送りできないボタンをdisabledにする
+    this.managePrevNextButtonDisabled(imageData.url);
+/*     const prevUrl = this.readNextImageData('prev', imageData.url);
+    const nextUrl = this.readNextImageData('next', imageData.url);
+    this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`).disabled = prevUrl === null;
+    this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`).disabled = nextUrl === null; */
+  }
+
+  /**
+   * 画像送りできないボタンをdisabledにする
+   * @param {string} currentUrl 現在表示中の画像のURL
+   */
+  managePrevNextButtonDisabled(currentUrl) {
+    const prevUrl = this.readNextImageData('prev', currentUrl);
+    const nextUrl = this.readNextImageData('next', currentUrl);
+    this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`).disabled = prevUrl === null;
+    this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`).disabled = nextUrl === null;
   }
 
   /**
    * 画像送りで画像とキャプションを切り替え
    * @param {'prev' | 'next'} direction 画像を送る方向
+   * @param {string} currentUrl 現在表示中の画像のURL
    * @returns {GroupImageType | null}
    * @private
    */
-  readNextImageData(direction) {
+  readNextImageData(direction, currentUrl) {
     // 現在表示中の画像URL
-    const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
+    // const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
     const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
 
     if (
@@ -635,7 +661,7 @@ function handleKeyboardEvent(event) {
   if (event.key === 'ArrowLeft') {
     // 右矢印きー: 前へ
     const prevButtonElem = document.querySelector(`#${dialogId}`)
-      ?.querySelector('dialog .prev_button');
+      ?.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
     prevButtonElem?.dispatchEvent(new Event('click'));
     prevButtonElem?.focus();
     return;
@@ -644,7 +670,7 @@ function handleKeyboardEvent(event) {
   if (event.key === 'ArrowRight') {
     // 右矢印キー: 次へ
     const nextButtonElem = document.querySelector(`#${dialogId}`)
-      ?.querySelector('dialog .next_button');
+      ?.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
     nextButtonElem?.dispatchEvent(new Event('click'));
     nextButtonElem?.focus();
     return;
