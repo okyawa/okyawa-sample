@@ -17,8 +17,18 @@ html:has(dialog#dialog_image[open]) {
   scrollbar-gutter: stable;
 }
 
+/* 画像の枠 */
 #dialog_image .image_preview {
   padding: 10px;
+  min-height: 100px;
+  min-width: 100px;
+  display: grid;
+  place-content: center;
+}
+/* コントロールボタンを表示しない場合、最小のサイズ指定を外す */
+#dialog_image.controls_hidden .image_preview {
+  min-width: auto;
+  min-height: 0;
 }
 
 /* 表示画像 */
