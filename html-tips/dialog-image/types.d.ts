@@ -33,7 +33,7 @@ export type DialogImageOptionType = {
   imageSizeVisible: boolean,
 
   /** 拡大ボタンのbutton要素内HTML */
-  zoomInButtonInnerHTML: sting,
+  zoomInButtonInnerHTML: string,
   /** 拡大ボタンのbutton要素のtitle属性値 */
   zoomInButtonTitle: string,
   /** 縮小ボタンのbutton要素内HTML */
