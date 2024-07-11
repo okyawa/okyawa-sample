@@ -101,10 +101,9 @@ class DialogImage {
    */
   open({ url, caption = ''}) {
     // グループ化した画像の情報を初期化
-    this.setupGroupImages();
+    this.setupGroupImages(url);
     // 画像送りボタンの初期化
     this.setupNextPrevButton(url);
-
     // 拡大画像のダイアログを開く
     this.openImagePreviewDialog(url, caption).then(() => {});
   }
@@ -145,7 +144,7 @@ class DialogImage {
         const caption = targetElem.dataset.caption ?? '';
 
         // グループ化した画像の情報を初期化
-        this.setupGroupImages();
+        this.setupGroupImages(url);
         // 画像送りボタンの初期化
         this.setupNextPrevButton(url);
 
@@ -234,9 +233,10 @@ class DialogImage {
 
   /**
    * グループ化した画像の情報を初期化
+   * @param {string} url 画像ファイルのURL
    * @private
    */
-  setupGroupImages() {
+  setupGroupImages(url) {
     if (!this.options.groupSelector) {
       // グループ化指定なし
       return;
@@ -284,8 +284,30 @@ class DialogImage {
       });
     }
 
+    // カウンター表示を初期化
+    this.setupImageCounterView(url);
+
     // 枠にグループ化が使われていることを示すクラス名を付与
     this.modalDialog.classList.add(DIALOG_GROUP_IMAGES_ENABLED);
+  }
+
+  /**
+   * 画像送りのカウンター表示を初期化
+   * @param {string} currentUrl 現在表示中のURL
+   * @private
+   */
+  setupImageCounterView(currentUrl) {
+    const counterElem = this.modalDialog.querySelector('.image_counter');
+    if (counterElem === null) {
+      return;
+    }
+    // 現在表示中の画像の並び順
+    const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
+    if (currentIndex === -1) {
+      return;
+    }
+    // カウンター表示に反映
+    counterElem.innerHTML = `<span className="counter_value">${currentIndex + 1}<span class="slash">/</span>${this.groupImages.length}</span>`;
   }
 
   /**
@@ -374,6 +396,8 @@ class DialogImage {
 
     // 画像送りできないボタンをdisabledにする
     this.managePrevNextButtonDisabled(imageData.url);
+    // 画像送りのカウンター表示を更新
+    this.setupImageCounterView(imageData.url);
 
     // 画像送り完了
     this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
@@ -392,10 +416,10 @@ class DialogImage {
    * @param {string} currentUrl 現在表示中の画像のURL
    */
   managePrevNextButtonDisabled(currentUrl) {
-    const prevUrl = this.readNextImageData('prev', currentUrl);
-    const nextUrl = this.readNextImageData('next', currentUrl);
-    this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`).disabled = prevUrl === null;
-    this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`).disabled = nextUrl === null;
+    const prevImageData = this.readNextImageData('prev', currentUrl);
+    const nextImageData = this.readNextImageData('next', currentUrl);
+    this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`).disabled = prevImageData === null;
+    this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`).disabled = nextImageData === null;
   }
 
   /**
@@ -580,6 +604,8 @@ class DialogImage {
       // 画像送りボタンをクリア
       this.modalDialog.querySelector('.prev_button_area').innerHTML = '';
       this.modalDialog.querySelector('.next_button_area').innerHTML = '';
+      // 画像送りのカウンター表示をクリア
+      this.modalDialog.querySelector('.image_counter').innerHTML = '';
       // 判定用に付与したクラス名を初期化
       this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
@@ -755,6 +781,7 @@ function createDialogImageElement(options) {
       </div>
       <div class="image_caption"></div>
       <div class="image_size"></div>
+      <div class="image_counter"></div>
     </div>
   `;
 

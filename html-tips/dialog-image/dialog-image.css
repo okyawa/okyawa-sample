@@ -161,6 +161,36 @@ html:has(dialog#dialog_image[open]) {
   margin-right: 5px;
 }
 
+/* 画像送りのカウンター */
+#dialog_image .image_counter {
+  display: none;
+}
+#dialog_image.image_group_enabled .image_counter {
+  min-width: 30px;
+  height: 30px;
+  padding: 5px;
+  display: grid;
+  place-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: content-box;
+  background-color: rgba(255, 255, 255, 0.75);
+  color: #888;
+  font-size: 0.63rem;
+  text-align: center;
+  letter-spacing: -.05em;
+}
+#dialog_image.image_group_enabled.controls_hidden .image_counter,
+#dialog_image.image_group_enabled.zoom .image_counter {
+  display: none;
+}
+#dialog_image .image_counter .slash {
+  margin-inline: 1px;
+  display: inline-block;
+}
+
+
 /* 右上の操作ボタン */
 #dialog_image .image_preview_wrapper {
   position: relative;
