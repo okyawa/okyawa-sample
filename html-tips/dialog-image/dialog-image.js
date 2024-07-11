@@ -190,7 +190,7 @@ class DialogImage {
    * 画像送りで画像とキャプションを切り替え
    * @param {string} url 画像ファイルのURL
    * @param {string} caption 画像のキャプション
-   * @returns {Promise<void>}
+   * @returns {Promise<{width: number, height: number}>}
    * @private
    */
   async changeImagePreview(url, caption) {
@@ -208,6 +208,11 @@ class DialogImage {
     await this.setupDialogZoomVisible(url, width, height);
     // グループ化しているときの前後の画像を先読み
     this.preloadPrevNextImages(url);
+
+    return {
+      width,
+      height,
+    }
   }
 
   /**
@@ -393,7 +398,10 @@ class DialogImage {
       this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
       return;
     }
-    await this.changeImagePreview(imageData.url, imageData.caption);
+    const { width, height } = await this.changeImagePreview(imageData.url, imageData.caption);
+
+    // 一旦、ズームボタンを非表示にする
+    this.modalDialog.classList.add(DIALOG_ZOOM_DISABLED_CLASS_NAME);
 
     // 画像送りできないボタンをdisabledにする
     this.managePrevNextButtonDisabled(imageData.url);
@@ -402,6 +410,12 @@ class DialogImage {
 
     // 画像送り完了
     this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
+
+    // dialog要素の開くアニメーションがすべて終了するまで待つ
+    await waitDialogAnimation(this.modalDialog);
+
+    // 表示する画像に拡大ボタンが必要かを判定
+    await this.setupDialogZoomVisible(imageData.url, width, height);
 
     // 左右の矢印キーで移動した場合、該当の画像ボタンをフォーカス
     if (this.modalDialog.dataset.direction === 'prev') {

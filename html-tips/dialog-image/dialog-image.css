@@ -221,6 +221,9 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image.image_group_enabled:not(.controls_hidden) .preview_controls.vertical_controls button {
   background-color: #f5f5f5;
 }
+#dialog_image.image_group_enabled:not(.controls_hidden).zoom .preview_controls.vertical_controls {
+  right: 8px;
+}
 
 /* ボタン系とキャプションと画像サイズを非表示 */
 #dialog_image.controls_hidden .preview_controls,
