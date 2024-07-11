@@ -377,6 +377,14 @@ class DialogImage {
 
     // 画像送り完了
     this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
+
+    // 左右の矢印キーで移動した場合、該当の画像ボタンをフォーカス
+    if (this.modalDialog.dataset.direction === 'prev') {
+      this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`)?.focus();
+    }
+    if (this.modalDialog.dataset.direction === 'next') {
+      this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`)?.focus();
+    }
   }
 
   /**
@@ -561,8 +569,9 @@ class DialogImage {
       }
       // キーボードイベントを削除
       this.removeKeyboardEvent();
-      // body要素のdata属性にdialog要素のIDを削除
+      // body要素に付与されたdata属性を削除
       delete document.body.dataset.dialogId;
+      delete this.modalDialog.dataset.direction
       // グループ化した画像の情報を初期化
       this.groupImages = [];
       // 表示テキストを全てクリア
@@ -671,21 +680,28 @@ function handleKeyboardEvent(event) {
     return;
   }
 
+  if (['ArrowLeft', 'ArrowRight'].includes(event.key) === false) {
+    return;
+  }
+
+  /** dialog要素 */
+  const dialogElem = document.querySelector(`#${dialogId}`);
+
   if (event.key === 'ArrowLeft') {
     // 右矢印きー: 前へ
-    const prevButtonElem = document.querySelector(`#${dialogId}`)
-      ?.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
+    const prevButtonElem = dialogElem?.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
     prevButtonElem?.dispatchEvent(new Event('click'));
-    prevButtonElem?.focus();
+    // 画像送り完了後にフォーカスを当てれるよう、判定用のdata属性をセット
+    dialogElem.dataset.direction = 'prev';
     return;
   }
 
   if (event.key === 'ArrowRight') {
     // 右矢印キー: 次へ
-    const nextButtonElem = document.querySelector(`#${dialogId}`)
-      ?.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
+    const nextButtonElem = dialogElem?.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
     nextButtonElem?.dispatchEvent(new Event('click'));
-    nextButtonElem?.focus();
+    // 画像送り完了後にフォーカスを当てれるよう、判定用のdata属性をセット
+    dialogElem.dataset.direction = 'next';
     return;
   }
 }
