@@ -73,6 +73,7 @@ class DialogImage {
       groupCaptionAttr: 'data-caption',
       groupCaptionWrapSelector: null,
       groupCaptionElemSelector: null,
+      groupControlVertical: true,
       prevButtonInnerHTML: '&lt;',
       prevButtonTitle: 'Previous',
       nextButtonTitle: 'Next',
@@ -750,7 +751,7 @@ function createDialogImageElement(options) {
   dialogElem.style.display = 'none';
   dialogElem.innerHTML = `
     <div class="image_preview_wrapper">
-      <div class="preview_controls">
+      <div class="preview_controls${options.groupControlVertical ? ' vertical_controls' : ''}">
         <button
           type="button"
           class="zoom_in_button"

@@ -28,6 +28,8 @@ export type DialogImageOptionType = {
   groupCaptionWrapSelector: string | null,
   /** グループ化した画像のキャプションを含む要素のセレクター */
   groupCaptionElemSelector: string | null,
+  /** グループ化したときに右上コントロールボタンを枠外で縦並びにするかどうか */
+  groupControlVertical: boolean,
 
   /** 画像の幅と高さを表示するかどうか */
   imageSizeVisible: boolean,
