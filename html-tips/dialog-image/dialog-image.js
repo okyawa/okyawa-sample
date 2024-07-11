@@ -181,7 +181,7 @@ class DialogImage {
     // キャプションの下部に画像の幅と高さを表示
     this.setupImageSizeView(width, height);
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(url, width, height);
+    await this.setupDialogZoomVisible(width, height);
     // グループ化しているときの前後の画像を先読み
     this.preloadPrevNextImages(url);
   }
@@ -205,7 +205,7 @@ class DialogImage {
     // キャプションの下部に画像の幅と高さを表示
     this.setupImageSizeView(width, height);
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(url, width, height);
+    await this.setupDialogZoomVisible(width, height);
     // グループ化しているときの前後の画像を先読み
     this.preloadPrevNextImages(url);
 
@@ -415,7 +415,7 @@ class DialogImage {
     await waitDialogAnimation(this.modalDialog);
 
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(imageData.url, width, height);
+    await this.setupDialogZoomVisible(width, height);
 
     // 左右の矢印キーで移動した場合、該当の画像ボタンをフォーカス
     if (this.modalDialog.dataset.direction === 'prev') {
@@ -540,12 +540,11 @@ class DialogImage {
 
   /**
    * 表示する画像に拡大ボタンが必要かを判定
-   * @param {string} url 画像ファイルのURL
    * @param {number} width 画像の幅
    * @param {number} height 画像の高さ
    * @private
    */
-  async setupDialogZoomVisible(url, width, height) {
+  async setupDialogZoomVisible(width, height) {
     const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight;
     if (zoomEnabled) {
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
