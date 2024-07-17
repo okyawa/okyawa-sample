@@ -1,0 +1,379 @@
+/**
+ * dialog要素を使った画像拡大用のCSS
+ */
+
+/* CSS変数定義 */
+#dialog_image {
+  --dialog-image-outer-size: 60px;
+  --dialog-image-height-caption: 29px;
+  --dialog-image-height-caption-image-size: 18px;
+  --dialog-image-height-image-size: 26px;
+  --dialog-image-next-prev-button-width: 30px;
+}
+
+/* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
+html:has(dialog#dialog_image[open]) {
+  /* overflow: hidden; */
+  scrollbar-gutter: stable;
+}
+
+/* 画像の枠 */
+#dialog_image .image_preview {
+  padding: 10px;
+  min-height: 240px;
+  min-width: 240px;
+  display: grid;
+  place-content: center;
+}
+/* コントロールボタンを表示しない場合、最小のサイズ指定を外す */
+#dialog_image.controls_hidden .image_preview {
+  min-width: auto;
+  min-height: 0;
+}
+
+/* 表示画像 */
+#dialog_image .image_preview img {
+  max-width: calc(100dvw - var(--dialog-image-outer-size));
+  max-height: calc(100dvh - var(--dialog-image-outer-size));
+  vertical-align: middle;
+}
+/* キャプションあり */
+#dialog_image.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-caption));
+}
+/* キャプションと画像サイズあり */
+#dialog_image.has_caption.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-caption-image-size) - var(--dialog-image-height-image-size));
+}
+/* 画像サイズあり*/
+#dialog_image.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-image-size));
+}
+/* 画像送りあり */
+#dialog_image.image_group_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
+  max-width: calc(100dvw - var(--dialog-image-outer-size) - (var(--dialog-image-next-prev-button-width) * 2));
+}
+
+/* キャプション */
+#dialog_image .image_caption {
+  position: relative;
+}
+#dialog_image .caption_text {
+  width: 100%;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+  box-sizing: border-box;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px #333;
+  text-align: center;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+/* キャプションあり */
+#dialog_image.has_caption .image_caption {
+  height: var(--dialog-image-height-caption);
+}
+/* キャプションと画像サイズあり */
+#dialog_image.has_caption.image_size_enabled .image_caption {
+  height: var(--dialog-image-height-caption-image-size);
+}
+#dialog_image.has_caption.image_size_enabled .caption_text {
+  padding-bottom: 0;
+}
+
+/* 画像の幅と高さのサイズ表示 */
+#dialog_image.image_size_enabled .image_size_text {
+  text-align: center;
+  font-size: 0.63rem;
+  color: #ccc;
+  text-shadow: 1px 1px 2px #333;
+}
+#dialog_image.image_size_enabled .image_size {
+  height: var(--dialog-image-height-image-size);
+}
+
+/* 拡大表示 */
+#dialog_image.zoom {
+  max-width: 100dvw;
+  max-height: 100dvh;
+}
+#dialog_image.zoom .image_preview {
+  padding: 0;
+  max-width: 100dvw;
+  max-height: 100dvh;
+  overflow: auto;
+}
+#dialog_image.zoom .image_preview img {
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+#dialog_image.zoom .image_caption {
+  display: none;
+}
+#dialog_image.zoom .image_size {
+  display: none;
+}
+
+/* グループ化で画像送りボタン表示 */
+#dialog_image.image_group_enabled .image_main_area {
+  display: flex;
+}
+#dialog_image .prev_button_area,
+#dialog_image .next_button_area {
+  display: none;
+}
+#dialog_image.image_group_enabled:not(.zoom) .prev_button_area,
+#dialog_image.image_group_enabled:not(.zoom) .next_button_area {
+  display: block;
+  align-self: center;
+}
+#dialog_image .prev_button,
+#dialog_image .next_button {
+  width: var(--dialog-image-next-prev-button-width);
+  height: 60px;
+  padding: 0;
+  background-color: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+}
+#dialog_image .prev_button:disabled,
+#dialog_image .next_button:disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+@media (any-hover: hover) {
+  #dialog_image .prev_button:hover,
+  #dialog_image .next_button:hover {
+    opacity: 0.8;
+  }
+}
+#dialog_image .prev_button {
+  margin-left: 5px;
+  margin-right: -5px;
+  left: 0;
+}
+#dialog_image .next_button {
+  margin-left: -5px;
+  margin-right: 5px;
+  right: 0;
+}
+
+/* 画像送りのカウンター */
+#dialog_image .image_counter {
+  display: none;
+}
+#dialog_image.image_group_enabled .image_counter {
+  min-width: 30px;
+  height: 30px;
+  padding: 5px;
+  display: grid;
+  place-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: content-box;
+  color: #ccc;
+  text-shadow: 1px 1px 2px #333;
+  font-size: 0.63rem;
+  text-align: center;
+  letter-spacing: -.05em;
+}
+#dialog_image.image_group_enabled.controls_hidden .image_counter,
+#dialog_image.image_group_enabled.zoom .image_counter {
+  display: none;
+}
+#dialog_image .image_counter .slash {
+  margin-inline: 1px;
+  display: inline-block;
+}
+
+
+/* 右上の操作ボタン */
+#dialog_image .image_preview_wrapper {
+  position: relative;
+}
+#dialog_image .preview_controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+}
+#dialog_image.zoom .preview_controls {
+  top: 0;
+  right: 0;
+}
+
+/* ボタン系とキャプションと画像サイズを非表示 */
+#dialog_image.controls_hidden .preview_controls,
+#dialog_image.controls_hidden .image_caption,
+#dialog_image.controls_hidden .image_size,
+#dialog_image.image_group_enabled.controls_hidden .prev_button_area,
+#dialog_image.image_group_enabled.controls_hidden .next_button_area {
+  display: none;
+}
+
+/* 拡大・縮小ボタン */
+#dialog_image .zoom_in_button,
+#dialog_image .zoom_out_button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background-color: #33333399;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  color: #ccc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+@media (any-hover: hover) {
+  #dialog_image .zoom_in_button:hover,
+  #dialog_image .zoom_out_button:hover {
+    opacity: 0.8;
+  }
+}
+#dialog_image.zoom .zoom_in_button {
+  display: none;
+}
+#dialog_image .zoom_out_button {
+  display: none;
+}
+#dialog_image.zoom .zoom_out_button {
+  display: block;
+}
+#dialog_image.zoom_disabled .zoom_in_button,
+#dialog_image.zoom_disabled .zoom_out_button {
+  display: none;
+}
+
+/* 閉じるボタン */
+#dialog_image .close_button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background-color: #33333399;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  background-image: none;
+  color: #ccc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+@media (any-hover: hover) {
+  #dialog_image .close_button:hover {
+    opacity: 0.8;
+  }
+}
+
+/* ダイアログ内のボタン全般 */
+#dialog_image button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 画像送り中 */
+#dialog_image.switching {
+  display: none;
+}
+
+/* dialog背景のぼかし */
+#dialog_image {
+  --dialog-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
+}
+#dialog_image {
+  box-shadow: var(--dialog-shadow);
+}
+dialog#dialog_image::backdrop {
+  backdrop-filter: blur(8px);
+  /* Safariでbackdrop-filterを使用するにはベンダープレフィックスの指定が必要 */
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* フェード・インのアニメーション*/
+  @keyframes dialogImageFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  /* ズーム・インのアニメーション */
+  @keyframes dialogImageZoomIn {
+    from {
+      transform: scale(0.6);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
+  dialog#dialog_image[open] {
+    /* @keyframesで作成したアニメーション名 */
+    animation-name: dialogImageFadeIn, dialogImageZoomIn;
+    /* アニメーションの進行状況 */
+    animation-fill-mode: forwards;
+    /* アニメーションの実行時間 */
+    animation-duration: 200ms;
+    /* アニメーションの進行状況 */
+    animation-timing-function: ease-out;
+  }
+  /* フェード・アウトのアニメーション */
+  @keyframes dialogImageFadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  /* ズーム・アウトのアニメーション */
+  @keyframes dialogImageZoomOut {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(0.6);
+    }
+  }
+  /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
+  #dialog_image {
+    animation-name: dialogImageFadeOut, dialogImageZoomOut;
+    animation-fill-mode: forwards;
+    animation-duration: 200ms;
+    animation-timing-function: ease-out;
+  }
+}
+#dialog_image {
+  width: 100dvw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  display: block;
+  position: fixed;
+  inset-inline: 0;
+  inset-block: 0;
+  border: none;
+  background-color: #000000aa;
+}
+#dialog_image .image_preview_wrapper {
+  height: 100%;
+  display: grid;
+  place-content: center;
+}

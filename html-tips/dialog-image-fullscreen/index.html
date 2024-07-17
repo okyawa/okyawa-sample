@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>dialog要素を使ったフルスクリーンの画像拡大Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <link rel="stylesheet" href="/html-tips/dialog-image-fullscreen/dialog-image-fullscreen.css?v=1" />
+  <script src="/html-tips/dialog-image-fullscreen/dialog-image-fullscreen.js?v=1"></script>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>dialog要素を使ったフルスクリーンの画像拡大Sample</h1>
+    </header>
+
+    <br />
+
+    <section id="sample01">
+      <details open>
+        <summary><h2>対象のリンク要素をクリックすると、画像拡大のダイアログを表示</h2></summary>
+
+        <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
+          <li>
+            <a href="/img/cocktails/w1440/strawberry_field.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1">
+              <img src="/img/cocktails/w640/strawberry_field.jpeg" width="160" height="160" alt="大きいサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/sol_cubano.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像2">
+              <img src="/img/cocktails/w640/sol_cubano.jpeg" width="160" height="160" alt="小さめのサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/port_splash.jpeg" class="popup_img" target="_blank">
+              <img src="/img/cocktails/w640/port_splash.jpeg" width="160" height="160" alt="キャプションなし画像" />
+            </a>
+          </li>
+        </ul>
+
+        <script>
+          window.addEventListener('DOMContentLoaded', () => {
+            (new DialogImage({
+              dialogId: 'dialog_image',
+              openLink: '#sample01 .popup_img',
+            })).init();
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <section id="sample02">
+      <details open>
+        <summary><h2>直接、dialogを開く処理を叩く</h2></summary>
+
+        <div style="display: flex; gap: 8px;">
+          <button
+            type="button"
+            class="dialog_open_button"
+            data-url="/img/cocktails/w1440/port_flip.jpeg"
+            data-caption="直接、dialogを開く処理を叩く処理を通りました 01"
+          >
+            Open Dialog Button 01
+          </button>
+          <button
+            type="button"
+            class="dialog_open_button"
+            data-url="/img/cocktails/w640/piti_81.jpeg"
+            data-caption="直接、dialogを開く処理を叩く処理を通りました 02"
+          >
+            Open Dialog Button 02
+          </button>
+        </div>
+
+        <script>
+          window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#sample02 .dialog_open_button').forEach((elem) => {
+              elem.addEventListener('click', (event) => {
+                const targetElem = event.currentTarget;
+                const param = {
+                  url: targetElem.dataset.url,
+                  caption: targetElem.dataset.caption,
+                };
+                (new DialogImage({
+                  dialogId: 'dialog_image',
+                })).open(param);
+              });
+            });
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <section id="sample03">
+      <details open>
+        <summary><h2>グループ化＆画像サイズ表記</h2></summary>
+
+        <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
+          <li>
+            <a href="/img/cocktails/w1440/marie_amour.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像1" data-dialog-group="sample03">
+              <img src="/img/cocktails/w640/marie_amour.jpeg" width="160" height="160" alt="大きいサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/irish_flag_shooter.jpeg" class="popup_img" target="_blank" data-caption="サンプル画像2" data-dialog-group="sample03">
+              <img src="/img/cocktails/w640/irish_flag_shooter.jpeg" width="160" height="160" alt="小さめのサンプル画像" />
+            </a>
+          </li>
+          <li>
+            <a href="/img/cocktails/w640/fantasia_01.jpeg" class="popup_img" target="_blank" data-dialog-group="sample03">
+              <img src="/img/cocktails/w640/fantasia_01.jpeg" width="160" height="160" alt="キャプションなし画像" />
+            </a>
+          </li>
+        </ul>
+
+        <script>
+
+          window.addEventListener('DOMContentLoaded', () => {
+            (new DialogImage({
+              dialogId: 'dialog_image',
+              openLink: '#sample03 .popup_img',
+              groupSelector: '[data-dialog-group="sample03"]',
+              groupUrlAttr: 'href',
+              groupCaptionAttr: 'data-caption',
+              imageSizeVisible: true,
+            })).init();
+          });
+
+        </script>
+
+      </details>
+
+  </div>
+</body>
+</html>
