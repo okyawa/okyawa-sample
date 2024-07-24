@@ -313,19 +313,10 @@ dialog#dialog_image::backdrop {
       opacity: 1;
     }
   }
-  /* ズーム・インのアニメーション */
-  @keyframes dialogImageZoomIn {
-    from {
-      transform: scale(0.6);
-    }
-    to {
-      transform: scale(1);
-    }
-  }
   /* open属性があるときに実行されるアニメーション (ダイアログを開くとき用) */
   dialog#dialog_image[open] {
     /* @keyframesで作成したアニメーション名 */
-    animation-name: dialogImageFadeIn, dialogImageZoomIn;
+    animation-name: dialogImageFadeIn;
     /* アニメーションの進行状況 */
     animation-fill-mode: forwards;
     /* アニメーションの実行時間 */
@@ -342,18 +333,9 @@ dialog#dialog_image::backdrop {
       opacity: 0;
     }
   }
-  /* ズーム・アウトのアニメーション */
-  @keyframes dialogImageZoomOut {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(0.6);
-    }
-  }
   /* open属性がないときに実行されるアニメーション (ダイアログを閉じるとき用) */
   #dialog_image {
-    animation-name: dialogImageFadeOut, dialogImageZoomOut;
+    animation-name: dialogImageFadeOut;
     animation-fill-mode: forwards;
     animation-duration: 200ms;
     animation-timing-function: ease-out;
