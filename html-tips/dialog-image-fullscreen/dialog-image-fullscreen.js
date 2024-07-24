@@ -113,7 +113,7 @@ class DialogImage {
    * @private
    */
   setupInitialEvent() {
-    // ダイアログの枠外をクリックした際にダイアログを閉じるイベントをセット
+    // ダイアログの枠外や黒塗りの部分をクリックした際にダイアログを閉じるイベントをセット
     this.setupDialogOuterClose();
     // ダイアログを閉じる際に実行するイベントを登録
     this.setupDialogClose();
@@ -573,11 +573,16 @@ class DialogImage {
   }
 
   /**
-   * ダイアログの枠外をクリックした際にダイアログを閉じるイベントをセット
+   * ダイアログの枠外や黒塗りの部分をクリックした際にダイアログを閉じるイベントをセット
    * @private
    */
   setupDialogOuterClose() {
     this.modalDialog.addEventListener('click', (event) => {
+      if (event.target === event.currentTarget) {
+        this.modalDialog.close();
+      }
+    });
+    this.modalDialog.querySelector('.image_preview_wrapper').addEventListener('click', (event) => {
       if (event.target === event.currentTarget) {
         this.modalDialog.close();
       }
