@@ -310,8 +310,11 @@ html:has(dialog#dialog_image[open]) {
 }
 
 /* 画像送り中 */
-#dialog_image.switching {
-  display: none;
+#dialog_image.switching .image_preview img {
+  opacity: 0;
+}
+#dialog_image .image_preview img {
+  transition: opacity 0.2s ease-in;
 }
 
 /* dialog背景のぼかし */
