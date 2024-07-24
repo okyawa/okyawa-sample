@@ -9,6 +9,8 @@
   --dialog-image-height-caption-image-size: 18px;
   --dialog-image-height-image-size: 26px;
   --dialog-image-next-prev-button-width: 30px;
+  --dialog-image-preview-control-height: 44px;
+  margin: 0;
 }
 
 /* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
@@ -18,6 +20,10 @@ html:has(dialog#dialog_image[open]) {
 }
 
 /* 画像の枠 */
+#dialog_image .image_main_area {
+  width: fit-content;
+  margin-inline: auto;
+}
 #dialog_image .image_preview {
   padding: 10px;
   min-height: 240px;
@@ -39,19 +45,24 @@ html:has(dialog#dialog_image[open]) {
 }
 /* キャプションあり */
 #dialog_image.has_caption:not(.zoom):not(.controls_hidden) .image_preview img {
-  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-caption));
+  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-caption) - var(--dialog-image-preview-control-height));
 }
 /* キャプションと画像サイズあり */
 #dialog_image.has_caption.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
-  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-caption-image-size) - var(--dialog-image-height-image-size));
+  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-caption-image-size) - var(--dialog-image-height-image-size) - var(--dialog-image-preview-control-height));
 }
 /* 画像サイズあり*/
 #dialog_image.image_size_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
-  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-image-size));
+  max-height: calc(100dvh - var(--dialog-image-outer-size) - var(--dialog-image-height-image-size) - var(--dialog-image-preview-control-height));
 }
 /* 画像送りあり */
 #dialog_image.image_group_enabled:not(.zoom):not(.controls_hidden) .image_preview img {
   max-width: calc(100dvw - var(--dialog-image-outer-size) - (var(--dialog-image-next-prev-button-width) * 2));
+}
+
+/* キャプションと画像サイズ表記を囲む枠 */
+#dialog_image .image_lower_text {
+  min-height: var(--dialog-image-preview-control-height);
 }
 
 /* キャプション */
@@ -109,6 +120,12 @@ html:has(dialog#dialog_image[open]) {
   max-height: none;
   cursor: zoom-out;
 }
+#dialog_image.zoom .preview_controls {
+  height: 0;
+}
+#dialog_image.zoom .image_lower_text {
+  min-height: 0;
+}
 #dialog_image.zoom .image_caption {
   display: none;
 }
@@ -126,16 +143,16 @@ html:has(dialog#dialog_image[open]) {
 }
 #dialog_image.image_group_enabled:not(.zoom) .prev_button_area,
 #dialog_image.image_group_enabled:not(.zoom) .next_button_area {
-  display: block;
-  align-self: center;
+  display: flex;
+  align-items: center;
 }
 #dialog_image .prev_button,
 #dialog_image .next_button {
   width: var(--dialog-image-next-prev-button-width);
   height: 60px;
   padding: 0;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: transparent;
+  color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -146,7 +163,7 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image .prev_button:disabled,
 #dialog_image .next_button:disabled {
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0;
 }
 @media (any-hover: hover) {
   #dialog_image .prev_button:hover,
@@ -194,20 +211,24 @@ html:has(dialog#dialog_image[open]) {
   display: inline-block;
 }
 
-
 /* 右上の操作ボタン */
 #dialog_image .image_preview_wrapper {
   position: relative;
 }
 #dialog_image .preview_controls {
+  width: 100dvw;
+  height: var(--dialog-image-preview-control-height);
+}
+#dialog_image .inner_preview_controls {
+  width: fit-content;
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0;
+  right: 0;
   padding: 8px;
   display: flex;
   gap: 8px;
 }
-#dialog_image.zoom .preview_controls {
+#dialog_image.zoom .inner_preview_controls {
   top: 0;
   right: 0;
 }
@@ -219,6 +240,9 @@ html:has(dialog#dialog_image[open]) {
 #dialog_image.image_group_enabled.controls_hidden .prev_button_area,
 #dialog_image.image_group_enabled.controls_hidden .next_button_area {
   display: none;
+}
+#dialog_image.controls_hidden .image_lower_text {
+  min-height: 0;
 }
 
 /* 拡大・縮小ボタン */

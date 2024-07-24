@@ -769,37 +769,41 @@ function createDialogImageElement(options) {
   dialogElem.innerHTML = `
     <div class="image_preview_wrapper">
       <div class="preview_controls">
-        <button
-          type="button"
-          class="zoom_in_button"
-          title="${htmlEscape(options.zoomInButtonTitle)}"
-        >
-          ${options.zoomInButtonInnerHTML}
-        </button>
-        <button
-          type="button"
-          class="zoom_out_button"
-          title="${htmlEscape(options.zoomOutButtonTitle)}"
-        >
-          ${options.zoomOutButtonInnerHTML}
-        </button>
-        <button
-          type="button"
-          class="close_button"
-          title="${htmlEscape(options.closeButtonTitle)}"
-          onclick="this.closest('dialog').close();"
-        >
-          ${options.closeButtonInnerHTML}
-        </button>
+        <div class="image_counter"></div>
+        <div class="inner_preview_controls">
+          <button
+            type="button"
+            class="zoom_in_button"
+            title="${htmlEscape(options.zoomInButtonTitle)}"
+          >
+            ${options.zoomInButtonInnerHTML}
+          </button>
+          <button
+            type="button"
+            class="zoom_out_button"
+            title="${htmlEscape(options.zoomOutButtonTitle)}"
+          >
+            ${options.zoomOutButtonInnerHTML}
+          </button>
+          <button
+            type="button"
+            class="close_button"
+            title="${htmlEscape(options.closeButtonTitle)}"
+            onclick="this.closest('dialog').close();"
+          >
+            ${options.closeButtonInnerHTML}
+          </button>
+        </div>
       </div>
       <div class="image_main_area">
         <div class="prev_button_area"></div>
         <div class="image_preview"></div>
         <div class="next_button_area"></div>
       </div>
-      <div class="image_caption"></div>
-      <div class="image_size"></div>
-      <div class="image_counter"></div>
+      <div class="image_lower_text">
+        <div class="image_caption"></div>
+        <div class="image_size"></div>
+      </div>
     </div>
   `;
 
