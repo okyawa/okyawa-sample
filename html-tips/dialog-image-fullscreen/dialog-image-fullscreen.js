@@ -218,6 +218,7 @@ class DialogImage {
    * グループ化しているときの前後の画像を先読み
    * @param {string} currentUrl 現在表示中の画像のURL
    * @returns
+   * @private
    */
   preloadPrevNextImages(currentUrl) {
     if (this.groupImages.length === 0) {
@@ -428,6 +429,7 @@ class DialogImage {
   /**
    * 画像送りできないボタンをdisabledにする
    * @param {string} currentUrl 現在表示中の画像のURL
+   * @private
    */
   managePrevNextButtonDisabled(currentUrl) {
     const prevImageData = this.readNextImageData('prev', currentUrl);
@@ -527,6 +529,7 @@ class DialogImage {
 
   /**
    * dialog要素を開く
+   * @private
    */
   showModal() {
     // dialog要素にデフォルトで付与していたdisplayのstyle指定を削除
