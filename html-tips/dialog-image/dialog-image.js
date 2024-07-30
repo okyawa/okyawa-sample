@@ -651,6 +651,34 @@ class DialogImage {
       this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
     });
   }
+
+  /**
+   * 画像を拡大表示した際に、中央を表示するようにスクロール
+   * @private
+   */
+    scrollToZoomCenter() {
+      /** overflow: auto; でスクロールする枠要素 */
+      const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
+      if (!imagePreviewElem) {
+        throw new Error('ERROR :: Not Found ".image_preview" element');
+      }
+      // 中央部分を拡大
+      const scrollWidth = imagePreviewElem.scrollWidth;
+      const scrollHeight = imagePreviewElem.scrollHeight;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      if (scrollWidth < windowWidth && scrollHeight < windowHeight) {
+        // スクロールが無しで、位置調整不要 (※この場合は拡大ボタンを表示しないが、念の為)
+        return;
+      }
+      // 画面幅と高さの中央にスクロール
+      if (scrollWidth > windowWidth) {
+        imagePreviewElem.scrollLeft = (scrollWidth - windowWidth) / 2;
+      }
+      if (scrollHeight > windowHeight) {
+        imagePreviewElem.scrollTop = (scrollHeight - windowHeight) / 2;
+      }
+    }
 }
 
 window.DialogImage = DialogImage;
