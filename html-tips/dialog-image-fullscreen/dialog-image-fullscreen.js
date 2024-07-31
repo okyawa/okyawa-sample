@@ -20,7 +20,7 @@ import { readImageSize, waitDialogAnimation } from './utility.js';
 /**
  * dialog要素を使った画像拡大
  */
-class DialogImage {
+export class DialogImage {
   /**
    * コンストラクタ
    * @param {DialogImageOptionType} config オプション指定

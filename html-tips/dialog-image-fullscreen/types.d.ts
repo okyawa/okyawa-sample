@@ -1,3 +1,5 @@
+import { DialogImage } from './index.js';
+
 /**
  * Windowオブジェクトの型を拡張
  */
