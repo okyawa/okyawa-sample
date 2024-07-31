@@ -1,6 +1,6 @@
 // @ts-check
 
-import {DialogImage} from './index.js';
+import { DialogImage } from './index.js';
 
 /**
  * Windowオブジェクトの型を拡張
@@ -16,48 +16,48 @@ declare global {
  */
 export type DialogImageOptionType = {
   /** 画像拡大表示に使うdialog要素のID値 */
-  dialogId: string,
+  dialogId: string;
   /** 開くリンクのセレクターか要素 */
-  openLink?: string | HTMLElement[],
+  openLink?: string | HTMLElement[];
 
   /* グループ化するセレクター */
-  groupSelector: string | null,
+  groupSelector: string | null;
   /** グループ化したセレクターから画像URLを取得する際の属性名 */
-  groupUrlAttr: string,
+  groupUrlAttr: string;
 
   /** 前へボタンのbutton要素内HTML */
-  prevButtonInnerHTML: string,
+  prevButtonInnerHTML: string;
   /** 前へボタンのbutton要素のtitle属性値 */
-  prevButtonTitle: string,
+  prevButtonTitle: string;
   /** 次へボタンのbutton要素内HTML */
-  nextButtonInnerHTML: string,
+  nextButtonInnerHTML: string;
   /** 次へボタンのbutton要素のtitle属性値 */
-  nextButtonTitle: string,
+  nextButtonTitle: string;
 
   // ※ "groupCaptionAttr" と "groupCaptionWrapSelector" と "groupCaptionElemSelector" は全てセットで指定
   /** グループ化したセレクターから画像キャプションを取得する際の属性名 */
-  groupCaptionAttr: string,
+  groupCaptionAttr: string;
   /** グループ化した画像のキャプションを含む要素を囲う要素のセレクター */
-  groupCaptionWrapSelector: string | null,
+  groupCaptionWrapSelector: string | null;
   /** グループ化した画像のキャプションを含む要素のセレクター */
-  groupCaptionElemSelector: string | null,
+  groupCaptionElemSelector: string | null;
 
   /** 画像の幅と高さを表示するかどうか */
-  imageSizeVisible: boolean,
+  imageSizeVisible: boolean;
 
   /** 拡大ボタンのbutton要素内HTML */
-  zoomInButtonInnerHTML: string,
+  zoomInButtonInnerHTML: string;
   /** 拡大ボタンのbutton要素のtitle属性値 */
-  zoomInButtonTitle: string,
+  zoomInButtonTitle: string;
   /** 縮小ボタンのbutton要素内HTML */
-  zoomOutButtonInnerHTML: string,
+  zoomOutButtonInnerHTML: string;
   /** 縮小ボタンのbutton要素のtitle属性値 */
-  zoomOutButtonTitle: string,
+  zoomOutButtonTitle: string;
 
   /** 閉じるボタンのbutton要素内HTML */
-  closeButtonInnerHTML: string,
+  closeButtonInnerHTML: string;
   /** 閉じるボタンのbutton要素のtitle属性値 */
-  closeButtonTitle: string,
+  closeButtonTitle: string;
 };
 
 /**
@@ -65,7 +65,7 @@ export type DialogImageOptionType = {
  */
 export type GroupImageType = {
   /** 画像のURL */
-  url: string,
+  url: string;
   /** 画像のキャプション */
-  caption: string,
+  caption: string;
 };

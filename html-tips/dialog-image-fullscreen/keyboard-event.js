@@ -1,6 +1,6 @@
 // @ts-check
 
-import {DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME} from './const.js';
+import { DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME } from './const.js';
 
 /**
  * キーボードイベントのイベントハンドラー

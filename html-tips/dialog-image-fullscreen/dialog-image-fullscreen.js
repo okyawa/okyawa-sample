@@ -11,10 +11,10 @@ import {
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
-import {createDialogImageElement, resetDialog} from './dom.js';
-import {handleKeyboardEvent} from './keyboard-event.js';
-import {setupImageSwipe} from './touch-event.js';
-import {readImageSize, waitDialogAnimation} from './utility.js';
+import { createDialogImageElement, resetDialog } from './dom.js';
+import { handleKeyboardEvent } from './keyboard-event.js';
+import { setupImageSwipe } from './touch-event.js';
+import { readImageSize, waitDialogAnimation } from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 /** @typedef { import('./types').GroupImageType } GroupImageType */
@@ -35,9 +35,7 @@ export class DialogImage {
     const modalDialog = document.querySelector(`#${this.options.dialogId}`);
     const existsDialog = modalDialog !== null && modalDialog instanceof HTMLDialogElement;
     /** @type {HTMLDialogElement} 画像拡大表示するdialog要素 */
-    this.modalDialog = existsDialog
-      ? modalDialog
-      : createDialogImageElement(this.options);
+    this.modalDialog = existsDialog ? modalDialog : createDialogImageElement(this.options);
 
     if (!existsDialog) {
       // 最初にdialog要素へセットするイベントを初期化
@@ -96,7 +94,7 @@ export class DialogImage {
    * 直接ダイアログを開く
    * @param {{url: string, caption?: string}} param0
    */
-  open({ url, caption = ''}) {
+  open({ url, caption = '' }) {
     // グループ化した画像の情報を初期化
     this.setupGroupImages(url);
     // 画像送りボタンの初期化
@@ -128,9 +126,10 @@ export class DialogImage {
     if (!this.options.openLink) {
       return;
     }
-    const openLinkElements = typeof this.options.openLink === 'string'
-      ? document.querySelectorAll(this.options.openLink)
-      : this.options.openLink;
+    const openLinkElements =
+      typeof this.options.openLink === 'string'
+        ? document.querySelectorAll(this.options.openLink)
+        : this.options.openLink;
     openLinkElements.forEach((linkElem) => {
       linkElem.addEventListener('click', (event) => {
         event.preventDefault();
@@ -233,11 +232,11 @@ export class DialogImage {
     const currentIndex = urlList.indexOf(currentUrl);
     if (this.groupImages[currentIndex - 1]) {
       // 前の画像をプリロード
-      (new Image()).src = this.groupImages[currentIndex - 1].url;
+      new Image().src = this.groupImages[currentIndex - 1].url;
     }
     if (this.groupImages[currentIndex + 1]) {
       // 次の画像をプリロード
-      (new Image()).src = this.groupImages[currentIndex + 1].url;
+      new Image().src = this.groupImages[currentIndex + 1].url;
     }
   }
 
@@ -267,9 +266,9 @@ export class DialogImage {
 
     // グループ化した画像のキャプションが別の要素で指定されている場合
     if (
-      this.options.groupCaptionAttr
-      && this.options.groupCaptionWrapSelector
-      && this.options.groupCaptionElemSelector
+      this.options.groupCaptionAttr &&
+      this.options.groupCaptionWrapSelector &&
+      this.options.groupCaptionElemSelector
     ) {
       this.groupImages = this.groupImages.map((item) => {
         const activeElem = document.querySelector(
@@ -323,7 +322,9 @@ export class DialogImage {
       return;
     }
     // カウンター表示に反映
-    counterElem.innerHTML = `<span className="counter_value">${currentIndex + 1}<span class="slash">/</span>${this.groupImages.length}</span>`;
+    counterElem.innerHTML = `<span class="counter_value">${
+      currentIndex + 1
+    }<span class="slash">/</span>${this.groupImages.length}</span>`;
   }
 
   /**
@@ -475,21 +476,23 @@ export class DialogImage {
     const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
 
     if (
-      (direction === 'prev' && this.groupImages[currentIndex - 1] === undefined)
-      || (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
+      (direction === 'prev' && this.groupImages[currentIndex - 1] === undefined) ||
+      (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
     ) {
       // 表示する画像なし
       return null;
     }
 
     // 次に表示する画像URL
-    const url = direction === 'prev'
-      ? this.groupImages[currentIndex - 1].url
-      : this.groupImages[currentIndex + 1].url;
+    const url =
+      direction === 'prev'
+        ? this.groupImages[currentIndex - 1].url
+        : this.groupImages[currentIndex + 1].url;
     // 次に表示するキャプション
-    const caption = direction === 'prev'
-      ? this.groupImages[currentIndex - 1].caption
-      : this.groupImages[currentIndex + 1].caption;
+    const caption =
+      direction === 'prev'
+        ? this.groupImages[currentIndex - 1].caption
+        : this.groupImages[currentIndex + 1].caption;
 
     return { url, caption };
   }
@@ -590,7 +593,8 @@ export class DialogImage {
    * @private
    */
   async setupDialogZoomVisible(width, height) {
-    const zoomEnabled = width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight;
+    const zoomEnabled =
+      width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight;
     if (zoomEnabled) {
       this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
     } else {

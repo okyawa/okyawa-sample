@@ -8,7 +8,7 @@ import {
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
-import {htmlEscape} from './utility.js';
+import { htmlEscape } from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 

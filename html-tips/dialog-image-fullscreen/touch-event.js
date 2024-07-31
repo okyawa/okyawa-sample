@@ -1,6 +1,10 @@
 // @ts-check
 
-import {DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME, DIALOG_ZOOM_CLASS_NAME} from './const.js';
+import {
+  DIALOG_NEXT_BUTTON_CLASS_NAME,
+  DIALOG_PREV_BUTTON_CLASS_NAME,
+  DIALOG_ZOOM_CLASS_NAME,
+} from './const.js';
 
 /**
  * メインで表示している画像のスワイプ操作を初期化
@@ -73,19 +77,19 @@ function setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwip
   let endY = 0;
 
   // 移動を開始した座標を取得
-  imgElem.addEventListener('touchstart', (e) =>  {
+  imgElem.addEventListener('touchstart', (e) => {
     startX = e.touches[0].pageX;
     startY = e.touches[0].pageY;
   });
 
   // 移動した座標を取得
-  imgElem.addEventListener('touchmove', (e) =>  {
+  imgElem.addEventListener('touchmove', (e) => {
     endX = e.changedTouches[0].pageX;
     endY = e.changedTouches[0].pageY;
   });
 
   // 移動距離から左右or上下の処理を実行
-  imgElem.addEventListener('touchend', (e) =>  {
+  imgElem.addEventListener('touchend', (e) => {
     endX = e.changedTouches[0].pageX;
     endY = e.changedTouches[0].pageY;
 

@@ -6,10 +6,7 @@
  * @returns {Promise<PromiseSettledResult<any>[]>}
  */
 export function waitDialogAnimation(dialog) {
-  return Promise.allSettled(
-    dialog.getAnimations()
-      .map((animation) => animation.finished),
-  );
+  return Promise.allSettled(dialog.getAnimations().map((animation) => animation.finished));
 }
 
 /**
