@@ -1,6 +1,8 @@
+// @ts-check
+
 /**
  * dialog要素のアニメーションがすべて終了するのを待つ関数
- * @type {HTMLDialogElement} dialog dialog要素
+ * @param {HTMLDialogElement} dialog dialog要素
  * @returns {Promise<PromiseSettledResult<any>[]>}
  */
 export function waitDialogAnimation(dialog) {

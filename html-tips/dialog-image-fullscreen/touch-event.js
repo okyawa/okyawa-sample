@@ -1,4 +1,6 @@
-import { DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME, DIALOG_ZOOM_CLASS_NAME } from './const.js';
+// @ts-check
+
+import {DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME, DIALOG_ZOOM_CLASS_NAME} from './const.js';
 
 /**
  * メインで表示している画像のスワイプ操作を初期化

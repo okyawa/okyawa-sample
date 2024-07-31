@@ -1,18 +1,18 @@
 import {
-  DIALOG_HAS_CAPTION_CLASS_NAME,
-  DIALOG_ZOOM_CLASS_NAME,
-  DIALOG_ZOOM_DISABLED_CLASS_NAME,
   DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
-  DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
   DIALOG_GROUP_IMAGES_ENABLED,
+  DIALOG_HAS_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
   DIALOG_NEXT_BUTTON_CLASS_NAME,
   DIALOG_PREV_BUTTON_CLASS_NAME,
   DIALOG_SWITCHING_CLASS_NAME,
+  DIALOG_ZOOM_CLASS_NAME,
+  DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
-import { createDialogImageElement } from './dom.js';
-import { handleKeyboardEvent } from './keyboard-event.js';
-import { setupImageSwipe } from './touch-event.js';
-import { readImageSize, waitDialogAnimation } from './utility.js';
+import {createDialogImageElement} from './dom.js';
+import {handleKeyboardEvent} from './keyboard-event.js';
+import {setupImageSwipe} from './touch-event.js';
+import {readImageSize, waitDialogAnimation} from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 /** @typedef { import('./types').GroupImageType } GroupImageType */
@@ -42,11 +42,11 @@ export class DialogImage {
       this.setupInitialEvent();
     }
 
+    /** @type {HTMLElement|null} 画像を囲む枠要素 */
     const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
     if (!imagePreviewElem) {
       throw new Error('ERROR :: Not Found ".image_preview" element');
     }
-    /** @type {HTMLElement} 画像を囲む枠要素 */
     this.imagePreviewElem = imagePreviewElem;
 
     /** @type {GroupImageType[]} グループ化した画像の情報 */
@@ -270,16 +270,22 @@ export class DialogImage {
         const activeElem = document.querySelector(
           `${this.options.groupSelector}[${this.options.groupUrlAttr}="${item.url}"]`,
         );
+        if (activeElem === null) {
+          throw new Error('ERROR :: Not Found Active Element');
+        }
         // グループ化した画像のキャプションが指定されている要素からキャプション情報を取り出す
+        /** @type {HTMLInputElement | null | undefined } */
         const captionElem = activeElem
-          .closest(this.options.groupCaptionWrapSelector)
-          ?.querySelector(this.options.groupCaptionElemSelector);
+          .closest(this.options.groupCaptionWrapSelector ?? '')
+          ?.querySelector(this.options.groupCaptionElemSelector ?? '');
         let caption = '';
         if (captionElem) {
           if (this.options.groupCaptionAttr === 'value') {
+            // input要素など
             caption = captionElem.value;
           } else {
-            caption = captionElem.getAttribute(this.options.groupCaptionAttr);
+            // リンクなど
+            caption = captionElem.getAttribute(this.options.groupCaptionAttr) ?? '';
           }
         }
         return {
@@ -324,6 +330,9 @@ export class DialogImage {
     // 画像送りボタンの枠要素
     const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
     const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
+    if (prevAreaElem === null || nextAreaElem === null) {
+      throw new Error('ERROR :: Not Found ".prev_button_area" or ".next_button_area" element');
+    }
 
     // 一旦中身をクリア
     prevAreaElem.innerHTML = '';
@@ -379,7 +388,7 @@ export class DialogImage {
   /**
    * 画像を送りを実行
    * @param {'prev' | 'next'} direction 画像を送る方向
-   * @returns {Promise<GroupImageType | null>}
+   * @returns {Promise<void>}
    * @private
    */
   async switchImage(direction) {

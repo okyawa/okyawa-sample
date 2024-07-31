@@ -1,4 +1,6 @@
-import { DialogImage } from './index.js';
+// @ts-check
+
+import {DialogImage} from './index.js';
 
 /**
  * Windowオブジェクトの型を拡張

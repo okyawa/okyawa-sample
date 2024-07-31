@@ -1,4 +1,6 @@
-import { DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME } from './const.js';
+// @ts-check
+
+import {DIALOG_NEXT_BUTTON_CLASS_NAME, DIALOG_PREV_BUTTON_CLASS_NAME} from './const.js';
 
 /**
  * キーボードイベントのイベントハンドラー
@@ -16,8 +18,11 @@ export function handleKeyboardEvent(event) {
     return;
   }
 
-  /** dialog要素 */
+  /** @type {HTMLDialogElement | null} dialog要素 */
   const dialogElem = document.querySelector(`#${dialogId}`);
+  if (dialogElem === null) {
+    throw new Error('Error: dialog element not found.');
+  }
 
   if (event.key === 'ArrowLeft') {
     // 右矢印きー: 前へ

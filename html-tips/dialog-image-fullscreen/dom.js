@@ -1,4 +1,6 @@
-import { htmlEscape } from './utility.js';
+// @ts-check
+
+import {htmlEscape} from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 
@@ -60,7 +62,11 @@ export function createDialogImageElement(options) {
   `;
 
   // 生成したdialog要素をbody要素の末尾に追加
-  document.querySelector('body').appendChild(dialogElem);
+  const bodyElem = document.querySelector('body');
+  if (bodyElem === null) {
+    throw new Error('Error: body element not found');
+  }
+  bodyElem.appendChild(dialogElem);
 
   return dialogElem;
 }

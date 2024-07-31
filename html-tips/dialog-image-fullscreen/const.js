@@ -1,3 +1,5 @@
+// @ts-check
+
 /** キャプションが含まれる場合にdialog要素へ付与されるクラス名 */
 export const DIALOG_HAS_CAPTION_CLASS_NAME = 'has_caption';
 /** 画像を拡大中の場合にdialog要素へ付与されるクラス名 */
