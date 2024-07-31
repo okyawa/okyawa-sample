@@ -107,33 +107,35 @@ export function resetDialog(dialogElem) {
  * @param {HTMLDialogElement} dialogElem dialog要素
  */
 function clearInnerHtml(dialogElem) {
-  // 表示テキストを全てクリア
+  // 表示テキスト
   const captionElem = dialogElem.querySelector('.image_caption');
   if (captionElem === null) {
     throw new Error('Error: image_caption element not found');
   }
-  captionElem.innerHTML = '';
   const imageSizeElem = dialogElem.querySelector('.image_size');
   if (imageSizeElem === null) {
     throw new Error('Error: image_size element not found');
   }
-  imageSizeElem.innerHTML = '';
-  // 画像送りボタンをクリア
+  // 画像送りボタン
   const prevButtonAreaElem = dialogElem.querySelector('.prev_button_area');
   if (prevButtonAreaElem === null) {
     throw new Error('Error: prev_button_area element not found');
   }
-  prevButtonAreaElem.innerHTML = '';
   const nextButtonAreaElem = dialogElem.querySelector('.next_button_area');
   if (nextButtonAreaElem === null) {
     throw new Error('Error: next_button_area element not found');
   }
-  nextButtonAreaElem.innerHTML = '';
-  // 画像送りのカウンター表示をクリア
+  // 画像送りのカウンター表示
   const counterElem = dialogElem.querySelector('.image_counter');
   if (counterElem === null) {
     throw new Error('Error: image_counter element not found');
   }
+
+  // 対象勝訴の中身をクリア
+  captionElem.innerHTML = '';
+  imageSizeElem.innerHTML = '';
+  prevButtonAreaElem.innerHTML = '';
+  nextButtonAreaElem.innerHTML = '';
   counterElem.innerHTML = '';
 }
 
