@@ -1,4 +1,13 @@
 /**
+ * Windowオブジェクトの型を拡張
+ */
+declare global {
+  interface Window {
+    DialogImage: typeof DialogImage;
+  }
+}
+
+/**
  * DialogImageのオプションの型
  */
 export type DialogImageOptionType = {
