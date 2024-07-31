@@ -11,10 +11,11 @@ import {
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
-import { createDialogImageElement, resetDialog } from './dom.js';
-import { handleKeyboardEvent } from './keyboard-event.js';
-import { setupImageSwipe } from './touch-event.js';
-import { readImageSize, waitDialogAnimation } from './utility.js';
+import {dialogImageOptionDefaults} from './defaults.js';
+import {createDialogImageElement, resetDialog} from './dom.js';
+import {handleKeyboardEvent} from './keyboard-event.js';
+import {setupImageSwipe} from './touch-event.js';
+import {readImageSize, waitDialogAnimation} from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 /** @typedef { import('./types').GroupImageType } GroupImageType */
@@ -29,7 +30,7 @@ export class DialogImage {
    */
   constructor(config) {
     /** @type {DialogImageOptionType} オプション */
-    this.options = { ...this.defaults, ...config };
+    this.options = { ...dialogImageOptionDefaults, ...config };
 
     // dialog要素
     const modalDialog = document.querySelector(`#${this.options.dialogId}`);
