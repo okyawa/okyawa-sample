@@ -164,6 +164,8 @@ class DialogImage {
   async openImagePreviewDialog(url, caption) {
     // 拡大画像をセット
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
+    // 画像のタッチイベントを初期化
+    this.setupImageTouchEvent();
     // キャプションのテキストを初期化
     this.setupCaptionView(caption);
     // 表示画像自体のクリックした際のイベントをセット
@@ -196,6 +198,8 @@ class DialogImage {
   async changeImagePreview(url, caption) {
     // 拡大画像をセット
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
+    // 画像のタッチイベントを初期化
+    this.setupImageTouchEvent();
     // キャプションのテキストを初期化
     this.setupCaptionView(caption);
     // 表示画像自体のクリックした際のイベントをセット
@@ -469,6 +473,19 @@ class DialogImage {
     return { url, caption };
   }
 
+  /**
+   * 画像のタッチイベントを初期化
+   * @private
+   */
+  setupImageTouchEvent() {
+    // メインで表示している画像の要素
+    const imgElem = this.imagePreviewElem.querySelector('img');
+    if (imgElem === null) {
+      throw new Error('ERROR :: Not Found "img" element in this.imagePreviewElem');
+    }
+    // メインで表示している画像のスワイプ操作を初期化
+    setupImageSwipe(imgElem, this.modalDialog);
+  }
 
   /**
    * キャプションのテキストを初期化
@@ -639,6 +656,7 @@ class DialogImage {
   setupZoomInButton() {
     this.modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', () => {
       this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
+      this.scrollToZoomCenter();
     });
   }
 
@@ -656,29 +674,29 @@ class DialogImage {
    * 画像を拡大表示した際に、中央を表示するようにスクロール
    * @private
    */
-    scrollToZoomCenter() {
-      /** overflow: auto; でスクロールする枠要素 */
-      const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
-      if (!imagePreviewElem) {
-        throw new Error('ERROR :: Not Found ".image_preview" element');
-      }
-      // 中央部分を拡大
-      const scrollWidth = imagePreviewElem.scrollWidth;
-      const scrollHeight = imagePreviewElem.scrollHeight;
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-      if (scrollWidth < windowWidth && scrollHeight < windowHeight) {
-        // スクロールが無しで、位置調整不要 (※この場合は拡大ボタンを表示しないが、念の為)
-        return;
-      }
-      // 画面幅と高さの中央にスクロール
-      if (scrollWidth > windowWidth) {
-        imagePreviewElem.scrollLeft = (scrollWidth - windowWidth) / 2;
-      }
-      if (scrollHeight > windowHeight) {
-        imagePreviewElem.scrollTop = (scrollHeight - windowHeight) / 2;
-      }
+  scrollToZoomCenter() {
+    /** overflow: auto; でスクロールする枠要素 */
+    const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
+    if (!imagePreviewElem) {
+      throw new Error('ERROR :: Not Found ".image_preview" element');
     }
+    // 中央部分を拡大
+    const scrollWidth = imagePreviewElem.scrollWidth;
+    const scrollHeight = imagePreviewElem.scrollHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    if (scrollWidth < windowWidth && scrollHeight < windowHeight) {
+      // スクロールが無しで、位置調整不要 (※この場合は拡大ボタンを表示しないが、念の為)
+      return;
+    }
+    // 画面幅と高さの中央にスクロール
+    if (scrollWidth > windowWidth) {
+      imagePreviewElem.scrollLeft = (scrollWidth - windowWidth) / 2;
+    }
+    if (scrollHeight > windowHeight) {
+      imagePreviewElem.scrollTop = (scrollHeight - windowHeight) / 2;
+    }
+  }
 }
 
 window.DialogImage = DialogImage;
@@ -775,9 +793,122 @@ function handleKeyboardEvent(event) {
 }
 
 /**
+ * メインで表示している画像のスワイプ操作を初期化
+ * @param {HTMLImageElement} imgElem メインのimg要素
+ * @param {HTMLDialogElement} dialogElem dialog要素
+ */
+function setupImageSwipe(imgElem, dialogElem) {
+  /**
+   * 左スワイプ時の処理
+   */
+  const handleSwipeLeft = () => {
+    if (dialogElem.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
+      // ズーム中はスワイプ動作を実行しない
+      return;
+    }
+    // 前へボタンをクリック
+    const prevButtonElem = dialogElem.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
+    prevButtonElem?.dispatchEvent(new Event('click'));
+  }
+
+  /**
+   * 右スワイプ時の処理
+   */
+  const handleSwipeRight = () => {
+    if (dialogElem.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
+      // ズーム中はスワイプ動作を実行しない
+      return;
+    }
+    // 次へボタンをクリック
+    const prevButtonElem = dialogElem.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
+    prevButtonElem?.dispatchEvent(new Event('click'));
+  }
+
+  /**
+   * 縦スワイプ時の処理
+   */
+  const handleSwipeVertical = () => {
+    if (dialogElem.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
+      // ズーム中はスワイプ動作を実行しない
+      return;
+    }
+    // ダイアログを閉じる
+    dialogElem.close();
+  }
+
+  // スワイプ操作をimg要素にセット
+  setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwipeVertical);
+}
+
+/**
+ * スワイプ操作の初期化
+ * @param {HTMLElement} imgElem img要素
+ * @param {function} handleSwipeLeft 左スワイプ時の処理
+ * @param {function} handleSwipeRight 右スワイプ時の処理
+ * @param {function} handleSwipeVertical 縦スワイプ時の処理
+ */
+function setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwipeVertical) {
+  if (window.ontouchend === undefined) {
+    // タッチイベントが使えない場合は不要な処理
+    return;
+  }
+
+  // タップ時の誤動作を防ぐためのスワイプ時の処理を実行しない最小距離
+  const minimumDistance = 30;
+  // スワイプ開始時の座標
+  let startX = 0;
+  let startY = 0;
+  // スワイプ終了時の座標
+  let endX = 0;
+  let endY = 0;
+
+  // 移動を開始した座標を取得
+  imgElem.addEventListener('touchstart', (e) =>  {
+    startX = e.touches[0].pageX
+    startY = e.touches[0].pageY
+  });
+
+  // 移動した座標を取得
+  imgElem.addEventListener('touchmove', (e) =>  {
+    endX = e.changedTouches[0].pageX
+    endY = e.changedTouches[0].pageY
+  });
+
+  // 移動距離から左右or上下の処理を実行
+  imgElem.addEventListener('touchend', (e) =>  {
+    endX = e.changedTouches[0].pageX
+    endY = e.changedTouches[0].pageY
+
+    // スワイプ終了時にx軸とy軸の移動量を取得
+    // 左スワイプに対応するためMath.abs()で+に変換
+    const distanceX = Math.abs(endX - startX)
+    const distanceY = Math.abs(endY - startY)
+
+    // 左右のスワイプ距離の方が上下より長い && 小さなスワイプは検知しないようにする
+    if (distanceX > distanceY && distanceX > minimumDistance) {
+      if (startX < endX) {
+        // 左スワイプ
+        handleSwipeLeft();
+      } else {
+        // 右スワイプ
+        handleSwipeRight();
+      }
+      return false;
+    }
+    
+    // 上下のスワイプ距離の方が左右より長い && 小さなスワイプは検知しないようにする
+    if (distanceX < distanceY && distanceY > minimumDistance) {
+      // 上下スワイプ
+      handleSwipeVertical();
+      return false;
+    }
+  });
+}
+
+/**
  * 画像拡大に使うdialog要素を生成
  * @param {DialogImageOptionType} options
- * @returns
+ * @returns {HTMLDialogElement}
  */
 function createDialogImageElement(options) {
   const modalDialog = document.querySelector(`#${options.dialogId}`);
