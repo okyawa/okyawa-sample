@@ -1,3 +1,5 @@
+// @ts-check
+
 import {
   DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
   DIALOG_GROUP_IMAGES_ENABLED,
@@ -9,7 +11,7 @@ import {
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
-import {createDialogImageElement} from './dom.js';
+import {createDialogImageElement, resetDialog} from './dom.js';
 import {handleKeyboardEvent} from './keyboard-event.js';
 import {setupImageSwipe} from './touch-event.js';
 import {readImageSize, waitDialogAnimation} from './utility.js';
@@ -135,7 +137,10 @@ export class DialogImage {
 
         // ダイアログで表示する画像のURLとキャプション
         const targetElem = event.currentTarget;
-        const url = targetElem.getAttribute('href');
+        if (targetElem === null || !(targetElem instanceof HTMLAnchorElement)) {
+          throw new Error('ERROR :: Not Found Target Anchor Element');
+        }
+        const url = targetElem.getAttribute('href') ?? '';
         const caption = targetElem.dataset.caption ?? '';
 
         // グループ化した画像の情報を初期化
@@ -210,7 +215,7 @@ export class DialogImage {
     return {
       width,
       height,
-    }
+    };
   }
 
   /**
@@ -427,10 +432,14 @@ export class DialogImage {
 
     // 左右の矢印キーで移動した場合、該当の画像ボタンをフォーカス
     if (this.modalDialog.dataset.direction === 'prev') {
-      this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`)?.focus();
+      /** @type {HTMLButtonElement | null} */
+      const prevButtonElem = this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
+      prevButtonElem?.focus();
     }
     if (this.modalDialog.dataset.direction === 'next') {
-      this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`)?.focus();
+      /** @type {HTMLButtonElement | null} */
+      const nextButtonElem = this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
+      nextButtonElem?.focus();
     }
   }
 
@@ -442,8 +451,15 @@ export class DialogImage {
   managePrevNextButtonDisabled(currentUrl) {
     const prevImageData = this.readNextImageData('prev', currentUrl);
     const nextImageData = this.readNextImageData('next', currentUrl);
-    this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`).disabled = prevImageData === null;
-    this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`).disabled = nextImageData === null;
+    /** @type {HTMLButtonElement | null} */
+    const prevButtonElem = this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
+    /** @type {HTMLButtonElement | null} */
+    const nextButtonElem = this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
+    if (prevButtonElem === null || nextButtonElem === null) {
+      throw new Error('ERROR :: Not Found Prev or Next Button Element');
+    }
+    prevButtonElem.disabled = prevImageData === null;
+    nextButtonElem.disabled = nextImageData === null;
   }
 
   /**
@@ -499,6 +515,9 @@ export class DialogImage {
    */
   setupCaptionView(caption) {
     const captionElem = this.modalDialog.querySelector('.image_caption');
+    if (captionElem === null) {
+      throw new Error('ERROR :: Not Found ".image_caption" element');
+    }
     if (caption) {
       const divElem = document.createElement('div');
       divElem.classList.add('caption_text');
@@ -522,6 +541,9 @@ export class DialogImage {
       return;
     }
     const imageSizeElem = this.modalDialog.querySelector('.image_size');
+    if (imageSizeElem === null) {
+      throw new Error('ERROR :: Not Found ".image_size" element');
+    }
 
     const divElem = document.createElement('div');
     divElem.classList.add('image_size_text');
@@ -606,7 +628,11 @@ export class DialogImage {
         this.modalDialog.close();
       }
     });
-    this.modalDialog.querySelector('.image_preview_wrapper').addEventListener('click', (event) => {
+    const imagePreviewWrapperElem = this.modalDialog.querySelector('.image_preview_wrapper');
+    if (imagePreviewWrapperElem === null) {
+      throw new Error('ERROR :: Not Found ".image_preview_wrapper" element');
+    }
+    imagePreviewWrapperElem.addEventListener('click', (event) => {
       if (event.target === event.currentTarget) {
         this.modalDialog.close();
       }
@@ -626,37 +652,12 @@ export class DialogImage {
       }
       // dialog要素の閉じるアニメーションがすべて終了するまで待つ
       await waitDialogAnimation(dialog);
-      // dialog要素のstyle指定で非表示にする
-      dialog.style.display = 'none';
-      // image_preview内の画像を削除
-      const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
-      if (imagePreviewElem) {
-        imagePreviewElem.innerHTML = '';
-      }
       // キーボードイベントを削除
       this.removeKeyboardEvent();
-      // body要素に付与されたdata属性を削除
-      delete document.body.dataset.dialogId;
-      delete this.modalDialog.dataset.direction
       // グループ化した画像の情報を初期化
       this.groupImages = [];
-      // 表示テキストを全てクリア
-      this.modalDialog.querySelector('.image_caption').innerHTML = '';
-      this.modalDialog.querySelector('.image_size').innerHTML = '';
-      // 画像送りボタンをクリア
-      this.modalDialog.querySelector('.prev_button_area').innerHTML = '';
-      this.modalDialog.querySelector('.next_button_area').innerHTML = '';
-      // 画像送りのカウンター表示をクリア
-      this.modalDialog.querySelector('.image_counter').innerHTML = '';
-      // 判定用に付与したクラス名を初期化
-      this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
-      this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
-      this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
-      this.modalDialog.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
-      this.modalDialog.classList.remove(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
-      this.modalDialog.classList.remove(DIALOG_GROUP_IMAGES_ENABLED);
-      // 背景スクロールを防ぐために追加したスタイルを削除
-      document.documentElement.style.overflow = '';
+      // dialog要素の状態をリセット
+      resetDialog(dialog);
     });
   }
 

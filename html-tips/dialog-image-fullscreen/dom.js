@@ -1,5 +1,13 @@
 // @ts-check
 
+import {
+  DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
+  DIALOG_GROUP_IMAGES_ENABLED,
+  DIALOG_HAS_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
+  DIALOG_ZOOM_CLASS_NAME,
+  DIALOG_ZOOM_DISABLED_CLASS_NAME,
+} from './const.js';
 import {htmlEscape} from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
@@ -69,4 +77,76 @@ export function createDialogImageElement(options) {
   bodyElem.appendChild(dialogElem);
 
   return dialogElem;
+}
+
+/**
+ * dialog要素の状態をリセット
+ * @param {HTMLDialogElement} dialogElem dialog要素
+ */
+export function resetDialog(dialogElem) {
+  // dialog要素のstyle指定で非表示にする
+  dialogElem.style.display = 'none';
+  // image_preview内の画像を削除
+  const imagePreviewElem = dialogElem.querySelector('.image_preview');
+  if (imagePreviewElem) {
+    imagePreviewElem.innerHTML = '';
+  }
+  // body要素に付与されたdata属性を削除
+  delete document.body.dataset.dialogId;
+  delete dialogElem.dataset.direction;
+  // dialogをリセットする際に各DOM要素の中身を空っぽに戻す
+  clearInnerHtml(dialogElem);
+  // 判定用に付与したクラス名を初期化
+  resetDialogClassName(dialogElem);
+  // 背景スクロールを防ぐために追加したスタイルを削除
+  document.documentElement.style.overflow = '';
+}
+
+/**
+ * dialogをリセットする際に各DOM要素の中身を空っぽに戻す
+ * @param {HTMLDialogElement} dialogElem dialog要素
+ */
+function clearInnerHtml(dialogElem) {
+  // 表示テキストを全てクリア
+  const captionElem = dialogElem.querySelector('.image_caption');
+  if (captionElem === null) {
+    throw new Error('Error: image_caption element not found');
+  }
+  captionElem.innerHTML = '';
+  const imageSizeElem = dialogElem.querySelector('.image_size');
+  if (imageSizeElem === null) {
+    throw new Error('Error: image_size element not found');
+  }
+  imageSizeElem.innerHTML = '';
+  // 画像送りボタンをクリア
+  const prevButtonAreaElem = dialogElem.querySelector('.prev_button_area');
+  if (prevButtonAreaElem === null) {
+    throw new Error('Error: prev_button_area element not found');
+  }
+  prevButtonAreaElem.innerHTML = '';
+  const nextButtonAreaElem = dialogElem.querySelector('.next_button_area');
+  if (nextButtonAreaElem === null) {
+    throw new Error('Error: next_button_area element not found');
+  }
+  nextButtonAreaElem.innerHTML = '';
+  // 画像送りのカウンター表示をクリア
+  const counterElem = dialogElem.querySelector('.image_counter');
+  if (counterElem === null) {
+    throw new Error('Error: image_counter element not found');
+  }
+  counterElem.innerHTML = '';
+}
+
+/**
+ * dialog要素のクラス名指定を初期状態に戻す
+ * @param {HTMLDialogElement} dialogElem dialog要素
+ */
+function resetDialogClassName(dialogElem) {
+  // 判定用に付与したクラス名を初期化
+  dialogElem.classList.remove(DIALOG_ZOOM_CLASS_NAME);
+  dialogElem.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
+  dialogElem.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
+  dialogElem.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
+  dialogElem.classList.remove(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
+  dialogElem.classList.remove(DIALOG_GROUP_IMAGES_ENABLED);
 }
