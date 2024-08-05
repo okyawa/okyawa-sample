@@ -13,12 +13,6 @@
   margin: 0;
 }
 
-/* dialogを開いた際にWindowsのブラウザで常にスクロールバー分の幅が確保されるようにする */
-html:has(dialog#dialog_image[open]) {
-  /* overflow: hidden; */
-  scrollbar-gutter: stable;
-}
-
 /* 画像の枠 */
 #dialog_image .image_main_area {
   width: fit-content;
@@ -117,6 +111,7 @@ html:has(dialog#dialog_image[open]) {
   max-width: 100dvw;
   max-height: 100dvh;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 #dialog_image.zoom .image_preview img {
   max-width: none;

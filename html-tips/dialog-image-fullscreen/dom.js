@@ -98,8 +98,6 @@ export function resetDialog(dialogElem) {
   clearInnerHtml(dialogElem);
   // 判定用に付与したクラス名を初期化
   resetDialogClassName(dialogElem);
-  // 背景スクロールを防ぐために追加したスタイルを削除
-  document.documentElement.style.overflow = '';
 }
 
 /**

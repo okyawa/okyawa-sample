@@ -11,11 +11,11 @@ import {
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
-import {dialogImageOptionDefaults} from './defaults.js';
-import {createDialogImageElement, resetDialog} from './dom.js';
-import {handleKeyboardEvent} from './keyboard-event.js';
-import {setupImageSwipe} from './touch-event.js';
-import {readImageSize, waitDialogAnimation} from './utility.js';
+import { dialogImageOptionDefaults } from './defaults.js';
+import { createDialogImageElement, resetDialog } from './dom.js';
+import { handleKeyboardEvent } from './keyboard-event.js';
+import { setupImageSwipe } from './touch-event.js';
+import { readImageSize, waitDialogAnimation } from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
 /** @typedef { import('./types').GroupImageType } GroupImageType */
@@ -655,6 +655,8 @@ export class DialogImage {
         // dialog要素ではない場合は中断
         return;
       }
+      // 背景スクロールを防ぐために追加したスタイルを削除
+      document.documentElement.style.overflow = '';
       // dialog要素の閉じるアニメーションがすべて終了するまで待つ
       await waitDialogAnimation(dialog);
       // キーボードイベントを削除

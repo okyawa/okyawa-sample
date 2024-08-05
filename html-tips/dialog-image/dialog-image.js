@@ -613,6 +613,8 @@ class DialogImage {
         // dialog要素ではない場合は中断
         return;
       }
+      // 背景スクロールを防ぐために追加したスタイルを削除
+      document.documentElement.style.overflow = '';
       // dialog要素の閉じるアニメーションがすべて終了するまで待つ
       await waitDialogAnimation(dialog);
       // dialog要素のstyle指定で非表示にする
@@ -644,8 +646,6 @@ class DialogImage {
       this.modalDialog.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
       this.modalDialog.classList.remove(DIALOG_GROUP_IMAGES_ENABLED);
-      // 背景スクロールを防ぐために追加したスタイルを削除
-      document.documentElement.style.overflow = '';
     });
   }
 
