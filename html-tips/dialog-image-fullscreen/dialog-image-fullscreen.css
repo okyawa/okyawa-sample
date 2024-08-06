@@ -10,7 +10,6 @@
   --dialog-image-height-image-size: 26px;
   --dialog-image-next-prev-button-width: 30px;
   --dialog-image-preview-control-height: 44px;
-  margin: 0;
 }
 
 /* 画像の枠 */
@@ -112,6 +111,7 @@
   max-height: 100dvh;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 #dialog_image.zoom .image_preview img {
   max-width: none;
@@ -373,6 +373,7 @@ dialog#dialog_image::backdrop {
   height: 100dvh;
   max-width: none;
   max-height: none;
+  margin: 0;
   padding: 0;
   display: block;
   position: fixed;
@@ -385,4 +386,8 @@ dialog#dialog_image::backdrop {
   height: 100%;
   display: grid;
   place-content: center;
+}
+/* 背面のスクロールを抑制 */
+body:has(dialog#dialog_image[open]) {
+  overflow: hidden;
 }
