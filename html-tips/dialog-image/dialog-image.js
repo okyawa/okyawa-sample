@@ -870,6 +870,7 @@ function setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwip
 
   // 移動した座標を取得
   imgElem.addEventListener('touchmove', (e) =>  {
+    e.preventDefault();
     endX = e.changedTouches[0].pageX
     endY = e.changedTouches[0].pageY
   });
