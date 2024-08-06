@@ -15,7 +15,7 @@ import {
 import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
 import { handleKeyboardEvent } from './keyboard-event.js';
-import { setupImageSwipe } from './touch-event.js';
+import { setupDialogTouchMove, setupImageSwipe } from './touch-event.js';
 import { readImageSize, waitDialogAnimation } from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
@@ -89,6 +89,8 @@ export class DialogImage {
     this.setupZoomInButton();
     // 縮小ボタンのイベント登録
     this.setupZoomOutButton();
+    // dialog要素に対するtouchmoveイベントの初期化 (※iPhoneでの背面スクロール防止策)
+    setupDialogTouchMove(this.modalDialog);
   }
 
   /**

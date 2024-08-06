@@ -119,3 +119,15 @@ function setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwip
     }
   });
 }
+
+/**
+ * dialog要素に対するtouchmoveイベントの初期化
+ *
+ * ※iPhone Safariでアドレスバーが表示されていない場合、この指定が内と背面スクロールが動いてしまうため
+ * @param {HTMLDialogElement} dialogElem dialog要素
+ */
+export function setupDialogTouchMove(dialogElem) {
+  dialogElem.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+  });
+}
