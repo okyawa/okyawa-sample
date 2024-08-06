@@ -4,9 +4,17 @@ import {
   DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
   DIALOG_GROUP_IMAGES_ENABLED,
   DIALOG_HAS_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_COUNTER_CLASS_NAME,
+  DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME,
+  DIALOG_IMAGE_SIZE_CLASS_NAME,
   DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
+  DIALOG_NEXT_BUTTON_AREA_CLASS_NAME,
+  DIALOG_PREV_BUTTON_AREA_CLASS_NAME,
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
+  DIALOG_ZOOM_IN_BUTTON_CLASS_NAME,
+  DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME,
 } from './const.js';
 import { htmlEscape } from './utility.js';
 
@@ -29,20 +37,20 @@ export function createDialogImageElement(options) {
   dialogElem.id = options.dialogId;
   dialogElem.style.display = 'none';
   dialogElem.innerHTML = `
-    <div class="image_preview_wrapper">
+    <div class="${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}">
       <div class="preview_controls">
-        <div class="image_counter"></div>
+        <div class="${DIALOG_IMAGE_COUNTER_CLASS_NAME}"></div>
         <div class="inner_preview_controls">
           <button
             type="button"
-            class="zoom_in_button"
+            class="${DIALOG_ZOOM_IN_BUTTON_CLASS_NAME}"
             title="${htmlEscape(options.zoomInButtonTitle)}"
           >
             ${options.zoomInButtonInnerHTML}
           </button>
           <button
             type="button"
-            class="zoom_out_button"
+            class="${DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME}"
             title="${htmlEscape(options.zoomOutButtonTitle)}"
           >
             ${options.zoomOutButtonInnerHTML}
@@ -58,13 +66,13 @@ export function createDialogImageElement(options) {
         </div>
       </div>
       <div class="image_main_area">
-        <div class="prev_button_area"></div>
+        <div class="${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}"></div>
         <div class="image_preview"></div>
-        <div class="next_button_area"></div>
+        <div class="${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}"></div>
       </div>
       <div class="image_lower_text">
-        <div class="image_caption"></div>
-        <div class="image_size"></div>
+        <div class="${DIALOG_IMAGE_CAPTION_CLASS_NAME}"></div>
+        <div class="${DIALOG_IMAGE_SIZE_CLASS_NAME}"></div>
       </div>
     </div>
   `;
@@ -106,27 +114,27 @@ export function resetDialog(dialogElem) {
  */
 function clearInnerHtml(dialogElem) {
   // 表示テキスト
-  const captionElem = dialogElem.querySelector('.image_caption');
+  const captionElem = dialogElem.querySelector(`.${DIALOG_IMAGE_CAPTION_CLASS_NAME}`);
   if (captionElem === null) {
-    throw new Error('Error: image_caption element not found');
+    throw new Error(`Error: .${DIALOG_IMAGE_CAPTION_CLASS_NAME} element not found`);
   }
-  const imageSizeElem = dialogElem.querySelector('.image_size');
+  const imageSizeElem = dialogElem.querySelector(`.${DIALOG_IMAGE_SIZE_CLASS_NAME}`);
   if (imageSizeElem === null) {
-    throw new Error('Error: image_size element not found');
+    throw new Error(`Error: .${DIALOG_IMAGE_SIZE_CLASS_NAME} element not found`);
   }
   // 画像送りボタン
-  const prevButtonAreaElem = dialogElem.querySelector('.prev_button_area');
+  const prevButtonAreaElem = dialogElem.querySelector(`.${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}`);
   if (prevButtonAreaElem === null) {
-    throw new Error('Error: prev_button_area element not found');
+    throw new Error(`Error: .${DIALOG_PREV_BUTTON_AREA_CLASS_NAME} element not found`);
   }
-  const nextButtonAreaElem = dialogElem.querySelector('.next_button_area');
+  const nextButtonAreaElem = dialogElem.querySelector(`.${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}`);
   if (nextButtonAreaElem === null) {
-    throw new Error('Error: next_button_area element not found');
+    throw new Error(`Error: .${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME} element not found`);
   }
   // 画像送りのカウンター表示
-  const counterElem = dialogElem.querySelector('.image_counter');
+  const counterElem = dialogElem.querySelector(`.${DIALOG_IMAGE_COUNTER_CLASS_NAME}`);
   if (counterElem === null) {
-    throw new Error('Error: image_counter element not found');
+    throw new Error(`Error: .${DIALOG_IMAGE_COUNTER_CLASS_NAME} element not found`);
   }
 
   // 対象勝訴の中身をクリア

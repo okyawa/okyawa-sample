@@ -4,13 +4,22 @@ import {
   DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
   DIALOG_GROUP_IMAGES_ENABLED,
   DIALOG_HAS_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_COUNTER_CLASS_NAME,
+  DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME,
+  DIALOG_IMAGE_SIZE_CLASS_NAME,
   DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
+  DIALOG_IMAGE_SIZE_TEXT_CLASS_NAME,
   DIALOG_LOADING_CLASS_NAME,
+  DIALOG_NEXT_BUTTON_AREA_CLASS_NAME,
   DIALOG_NEXT_BUTTON_CLASS_NAME,
+  DIALOG_PREV_BUTTON_AREA_CLASS_NAME,
   DIALOG_PREV_BUTTON_CLASS_NAME,
   DIALOG_SWITCHING_CLASS_NAME,
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
+  DIALOG_ZOOM_IN_BUTTON_CLASS_NAME,
+  DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME,
 } from './const.js';
 import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
@@ -295,7 +304,7 @@ export class DialogImage {
    * @private
    */
   setupImageCounterView(currentUrl) {
-    const counterElem = this.modalDialog.querySelector('.image_counter');
+    const counterElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_COUNTER_CLASS_NAME}`);
     if (counterElem === null) {
       return;
     }
@@ -317,10 +326,10 @@ export class DialogImage {
    */
   setupNextPrevButton(url) {
     // 画像送りボタンの枠要素
-    const prevAreaElem = this.modalDialog.querySelector('.prev_button_area');
-    const nextAreaElem = this.modalDialog.querySelector('.next_button_area');
+    const prevAreaElem = this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}`);
+    const nextAreaElem = this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}`);
     if (prevAreaElem === null || nextAreaElem === null) {
-      throw new Error('ERROR :: Not Found ".prev_button_area" or ".next_button_area" element');
+      throw new Error(`ERROR :: Not Found ".${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}" or ".${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}" element`);
     }
 
     // 一旦中身をクリア
@@ -500,9 +509,9 @@ export class DialogImage {
    * @private
    */
   setupCaptionView(caption) {
-    const captionElem = this.modalDialog.querySelector('.image_caption');
+    const captionElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_CAPTION_CLASS_NAME}`);
     if (captionElem === null) {
-      throw new Error('ERROR :: Not Found ".image_caption" element');
+      throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_CAPTION_CLASS_NAME}}" element`);
     }
     if (caption) {
       const divElem = document.createElement('div');
@@ -526,13 +535,13 @@ export class DialogImage {
     if (this.options.imageSizeVisible !== true) {
       return;
     }
-    const imageSizeElem = this.modalDialog.querySelector('.image_size');
+    const imageSizeElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_SIZE_CLASS_NAME}`);
     if (imageSizeElem === null) {
-      throw new Error('ERROR :: Not Found ".image_size" element');
+      throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_SIZE_CLASS_NAME}" element`);
     }
 
     const divElem = document.createElement('div');
-    divElem.classList.add('image_size_text');
+    divElem.classList.add(DIALOG_IMAGE_SIZE_TEXT_CLASS_NAME);
     divElem.textContent = `(${width}x${height})`;
 
     imageSizeElem.innerHTML = divElem.outerHTML;
@@ -615,9 +624,9 @@ export class DialogImage {
         this.modalDialog.close();
       }
     });
-    const imagePreviewWrapperElem = this.modalDialog.querySelector('.image_preview_wrapper');
+    const imagePreviewWrapperElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}`);
     if (imagePreviewWrapperElem === null) {
-      throw new Error('ERROR :: Not Found ".image_preview_wrapper" element');
+      throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}" element`);
     }
     imagePreviewWrapperElem.addEventListener('click', (event) => {
       if (event.target === event.currentTarget) {
@@ -655,7 +664,7 @@ export class DialogImage {
    * @private
    */
   setupZoomInButton() {
-    this.modalDialog.querySelector('.zoom_in_button')?.addEventListener('click', () => {
+    this.modalDialog.querySelector(`.${DIALOG_ZOOM_IN_BUTTON_CLASS_NAME}`)?.addEventListener('click', () => {
       this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
       this.scrollToZoomCenter();
     });
@@ -666,7 +675,7 @@ export class DialogImage {
    * @private
    */
   setupZoomOutButton() {
-    this.modalDialog.querySelector('.zoom_out_button')?.addEventListener('click', () => {
+    this.modalDialog.querySelector(`.${DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME}`)?.addEventListener('click', () => {
       this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
     });
   }
