@@ -19,8 +19,8 @@
 }
 #dialog_image .image_preview {
   padding: 10px;
-  min-height: 240px;
-  min-width: 240px;
+  min-height: 60px;
+  min-width: 60px;
   display: grid;
   place-content: center;
 }
@@ -59,6 +59,23 @@
 /* キャプションと画像サイズ表記を囲む枠 */
 #dialog_image .image_lower_text {
   min-height: var(--dialog-image-preview-control-height);
+}
+
+/* キャプションと画像サイズの位置 */
+#dialog_image.has_caption .image_caption,
+#dialog_image.image_size_enabled .image_size {
+  position: absolute;
+  width: 100%;
+  left: 0;
+}
+#dialog_image.has_caption .image_caption {
+  bottom: 8px;
+}
+#dialog_image.has_caption.image_size_enabled .image_caption {
+  bottom: var(--dialog-image-height-image-size);
+}
+#dialog_image.image_size_enabled .image_size {
+  bottom: 0;
 }
 
 /* キャプション */
