@@ -125,6 +125,8 @@ class DialogImage {
     this.setupZoomInButton();
     // 縮小ボタンのイベント登録
     this.setupZoomOutButton();
+    // dialog要素に対するtouchmoveイベントの初期化 (※iPhoneでの背面スクロール防止策)
+    this.setupDialogTouchMove();
   }
 
   /**
@@ -707,6 +709,17 @@ class DialogImage {
     if (scrollHeight > windowHeight) {
       imagePreviewElem.scrollTop = (scrollHeight - windowHeight) / 2;
     }
+  }
+
+/**
+ * dialog要素に対するtouchmoveイベントの初期化
+ *
+ * ※iPhone Safariでアドレスバーが表示されていない場合、この指定が内と背面スクロールが動いてしまうため
+ */
+  setupDialogTouchMove() {
+    this.modalDialog.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    });
   }
 }
 
