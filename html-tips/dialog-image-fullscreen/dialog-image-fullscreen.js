@@ -329,7 +329,9 @@ export class DialogImage {
     const prevAreaElem = this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}`);
     const nextAreaElem = this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}`);
     if (prevAreaElem === null || nextAreaElem === null) {
-      throw new Error(`ERROR :: Not Found ".${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}" or ".${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}" element`);
+      throw new Error(
+        `ERROR :: Not Found ".${DIALOG_PREV_BUTTON_AREA_CLASS_NAME}" or ".${DIALOG_NEXT_BUTTON_AREA_CLASS_NAME}" element`,
+      );
     }
 
     // 一旦中身をクリア
@@ -624,7 +626,9 @@ export class DialogImage {
         this.modalDialog.close();
       }
     });
-    const imagePreviewWrapperElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}`);
+    const imagePreviewWrapperElem = this.modalDialog.querySelector(
+      `.${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}`,
+    );
     if (imagePreviewWrapperElem === null) {
       throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}" element`);
     }
@@ -664,10 +668,12 @@ export class DialogImage {
    * @private
    */
   setupZoomInButton() {
-    this.modalDialog.querySelector(`.${DIALOG_ZOOM_IN_BUTTON_CLASS_NAME}`)?.addEventListener('click', () => {
-      this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
-      this.scrollToZoomCenter();
-    });
+    this.modalDialog
+      .querySelector(`.${DIALOG_ZOOM_IN_BUTTON_CLASS_NAME}`)
+      ?.addEventListener('click', () => {
+        this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
+        this.scrollToZoomCenter();
+      });
   }
 
   /**
@@ -675,9 +681,11 @@ export class DialogImage {
    * @private
    */
   setupZoomOutButton() {
-    this.modalDialog.querySelector(`.${DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME}`)?.addEventListener('click', () => {
-      this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
-    });
+    this.modalDialog
+      .querySelector(`.${DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME}`)
+      ?.addEventListener('click', () => {
+        this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
+      });
   }
 
   /**
