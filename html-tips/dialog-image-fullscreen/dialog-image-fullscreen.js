@@ -5,6 +5,7 @@ import {
   DIALOG_GROUP_IMAGES_ENABLED,
   DIALOG_HAS_CAPTION_CLASS_NAME,
   DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
+  DIALOG_LOADING_CLASS_NAME,
   DIALOG_NEXT_BUTTON_CLASS_NAME,
   DIALOG_PREV_BUTTON_CLASS_NAME,
   DIALOG_SWITCHING_CLASS_NAME,
@@ -52,35 +53,6 @@ export class DialogImage {
 
     /** @type {GroupImageType[]} グループ化した画像の情報 */
     this.groupImages = [];
-  }
-
-  /**
-   * オプションの初期値
-   * @type {DialogImageOptionType}
-   * @private
-   */
-  get defaults() {
-    /** @type {DialogImageOptionType} */
-    return {
-      dialogId: 'dialog_image',
-      openLink: '.popup_img',
-      groupSelector: null,
-      groupUrlAttr: 'href',
-      groupCaptionAttr: 'data-caption',
-      groupCaptionWrapSelector: null,
-      groupCaptionElemSelector: null,
-      prevButtonInnerHTML: '&lt;',
-      prevButtonTitle: 'Previous',
-      nextButtonTitle: 'Next',
-      nextButtonInnerHTML: '&gt;',
-      imageSizeVisible: false,
-      zoomInButtonInnerHTML: '🔍',
-      zoomInButtonTitle: 'Zoom in',
-      zoomOutButtonInnerHTML: '🔎',
-      zoomOutButtonTitle: 'Zoom out',
-      closeButtonInnerHTML: 'x',
-      closeButtonTitle: 'Close',
-    };
   }
 
   /**
@@ -161,6 +133,8 @@ export class DialogImage {
    * @private
    */
   async openImagePreviewDialog(url, caption) {
+    // ローディング表示を付与
+    this.modalDialog.classList.add(DIALOG_LOADING_CLASS_NAME);
     // 拡大画像をセット
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
     // 画像のタッチイベントを初期化
@@ -179,6 +153,12 @@ export class DialogImage {
     this.showModal();
     // 表示する画像の幅と高さを取得
     const { width, height } = await readImageSize(url);
+    if (this.options.debug === 'loading') {
+      // ローディング表示のデバッグモード
+      return;
+    }
+    // ローディング表示を外す
+    this.modalDialog.classList.remove(DIALOG_LOADING_CLASS_NAME);
     // キャプションの下部に画像の幅と高さを表示
     this.setupImageSizeView(width, height);
     // 表示する画像に拡大ボタンが必要かを判定

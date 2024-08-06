@@ -18,3 +18,5 @@ export const DIALOG_NEXT_BUTTON_CLASS_NAME = 'next_button';
 export const DIALOG_PREV_BUTTON_CLASS_NAME = 'prev_button';
 /** 画像送り中にdialog要素へ付与されるクラス名 */
 export const DIALOG_SWITCHING_CLASS_NAME = 'switching';
+/** ローディング中にdialog要素へ付与されるクラス名 */
+export const DIALOG_LOADING_CLASS_NAME = 'loading';

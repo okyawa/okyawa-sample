@@ -25,4 +25,5 @@ export const dialogImageOptionDefaults = {
   zoomOutButtonTitle: 'Zoom out',
   closeButtonInnerHTML: 'x',
   closeButtonTitle: 'Close',
+  debug: null,
 };

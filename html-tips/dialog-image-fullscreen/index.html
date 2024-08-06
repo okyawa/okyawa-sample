@@ -158,6 +158,34 @@
         </script>
 
       </details>
+    </section> 
+
+    <br />
+
+    <section id="sample04">
+      <details open>
+        <summary><h2>dialogのローディング表示</h2></summary>
+
+        <ul style="padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px;">
+          <li>
+            <a href="/img/cocktails/w1440/strawberry_field.jpeg" class="popup_img" target="_blank" data-caption="ローディング表示のデバッグ">
+              <img src="/img/cocktails/w640/strawberry_field.jpeg" width="160" height="160" alt="ローディング表示のデバッグ" />
+            </a>
+          </li>
+        </ul>
+
+        <script>
+          window.addEventListener('DOMContentLoaded', () => {
+            (new DialogImage({
+              dialogId: 'dialog_image',
+              openLink: '#sample04 .popup_img',
+              debug: 'loading',
+            })).init();
+          });
+        </script>
+
+      </details>
+    </section>
 
   </div>
 </body>

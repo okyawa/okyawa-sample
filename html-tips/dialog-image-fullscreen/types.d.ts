@@ -58,6 +58,9 @@ export type DialogImageOptionType = {
   closeButtonInnerHTML: string;
   /** 閉じるボタンのbutton要素のtitle属性値 */
   closeButtonTitle: string;
+
+  /* デバッグ用 ("loading" でローディング表示の確認) */
+  debug: 'loading' | null;
 };
 
 /**
