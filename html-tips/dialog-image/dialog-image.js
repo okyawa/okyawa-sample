@@ -21,6 +21,8 @@ const DIALOG_NEXT_BUTTON_CLASS_NAME = 'next_button';
 const DIALOG_PREV_BUTTON_CLASS_NAME = 'prev_button';
 /** 画像送り中にdialog要素へ付与されるクラス名 */
 const DIALOG_SWITCHING_CLASS_NAME = 'switching';
+/** ローディング中にdialog要素へ付与されるクラス名 */
+const DIALOG_LOADING_CLASS_NAME = 'loading';
 
 /**
  * dialog要素を使った画像拡大
@@ -85,6 +87,7 @@ class DialogImage {
       zoomOutButtonTitle: 'Zoom out',
       closeButtonInnerHTML: 'x',
       closeButtonTitle: 'Close',
+      debug: null,
     };
   }
 
@@ -162,6 +165,8 @@ class DialogImage {
    * @private
    */
   async openImagePreviewDialog(url, caption) {
+    // ローディング表示を付与
+    this.modalDialog.classList.add(DIALOG_LOADING_CLASS_NAME);
     // 拡大画像をセット
     this.imagePreviewElem.innerHTML = `<img src="${url}" alt="" />`;
     // 画像のタッチイベントを初期化
@@ -180,6 +185,12 @@ class DialogImage {
     this.showModal();
     // 表示する画像の幅と高さを取得
     const { width, height } = await readImageSize(url);
+    if (this.options.debug === 'loading') {
+      // ローディング表示のデバッグモード
+      return;
+    }
+    // ローディング表示を外す
+    this.modalDialog.classList.remove(DIALOG_LOADING_CLASS_NAME);
     // キャプションの下部に画像の幅と高さを表示
     this.setupImageSizeView(width, height);
     // 表示する画像に拡大ボタンが必要かを判定
