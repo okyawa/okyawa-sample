@@ -29,6 +29,8 @@ export const DIALOG_SWITCHING_CLASS_NAME = 'switching';
 
 /** dialog内の枠要素のクラス名 */
 export const DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME = 'image_preview_wrapper';
+/** 上部コントロール部分を囲う枠要素 */
+export const DIALOG_PREVIEW_CONTROLS_CLASS_NAME = 'preview_controls';
 /** 画像送りのカウンター表示要素のクラス名 */
 export const DIALOG_IMAGE_COUNTER_CLASS_NAME = 'image_counter';
 /** 画像拡大ボタンのクラス名 */
@@ -43,6 +45,8 @@ export const DIALOG_NEXT_BUTTON_AREA_CLASS_NAME = 'next_button_area';
 export const DIALOG_NEXT_BUTTON_CLASS_NAME = 'next_button';
 /** 次へボタン要素のクラス名 */
 export const DIALOG_PREV_BUTTON_CLASS_NAME = 'prev_button';
+/** 下部テキスト表示エリアの枠要素のクラス名 */
+export const DIALOG_IMAGE_LOWER_TEXT_CLASS_NAME = 'image_lower_text';
 /** キャプション枠のクラス名 */
 export const DIALOG_IMAGE_CAPTION_CLASS_NAME = 'image_caption';
 /** 画像サイズ表記枠のクラス名 */

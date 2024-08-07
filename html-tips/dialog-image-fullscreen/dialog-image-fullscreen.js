@@ -20,7 +20,12 @@ import {
 } from './const.js';
 import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
-import { setupDialogOuterClose, setupZoomInButton, setupZoomOutButton } from './initial-click-event.js';
+import {
+  setupDialogOuterClose,
+  setupOuterClickClose,
+  setupZoomInButton,
+  setupZoomOutButton,
+} from './initial-click-event.js';
 import { handleKeyboardEvent } from './keyboard-event.js';
 import { setupDialogTouchMove, setupImageSwipe } from './touch-event.js';
 import { readImageSize, waitDialogAnimation } from './utility.js';
@@ -513,16 +518,30 @@ export class DialogImage {
     if (captionElem === null) {
       throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_CAPTION_CLASS_NAME}}" element`);
     }
-    if (caption) {
-      const divElem = document.createElement('div');
-      divElem.classList.add('caption_text');
-      divElem.textContent = caption;
-      captionElem.innerHTML = divElem.outerHTML;
-      this.modalDialog.classList.add(DIALOG_HAS_CAPTION_CLASS_NAME);
-    } else {
+
+    if (!caption) {
+      // キャプション指定なし
       captionElem.innerHTML = '';
       this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
+      return;
     }
+
+    // キャプション指定あり
+    // ※生成するHTML構成↓
+    // <div class="caption_text"><span class="inner_caption_text">キャプション</span></div>
+    const divElem = document.createElement('div');
+    divElem.classList.add('caption_text');
+    const spanElem = document.createElement('span');
+    spanElem.classList.add('inner_caption_text');
+    // エスケープするために、textContentを使用
+    spanElem.textContent = caption;
+    divElem.append(spanElem);
+    // キャプションのテキスト外をクリックした際は、ダイアログを閉じるイベントをセット
+    setupOuterClickClose(divElem, this.modalDialog);
+    // 生成したものを枠要素へセット
+    captionElem.innerHTML = '';
+    captionElem.append(divElem);
+    this.modalDialog.classList.add(DIALOG_HAS_CAPTION_CLASS_NAME);
   }
 
   /**

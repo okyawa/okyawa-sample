@@ -84,15 +84,21 @@
 }
 #dialog_image .caption_text {
   width: 100%;
-  padding: 10px;
+  padding-block: 10px;
   position: absolute;
   bottom: 0;
   box-sizing: border-box;
   color: #ffffff;
   text-shadow: 1px 1px 2px #333;
-  text-align: center;
   font-size: 0.76rem;
   line-height: 1.4;
+}
+#dialog_image .inner_caption_text {
+  padding-inline: 56px;
+  inline-size: fit-content;
+  margin-inline: auto;
+  display: block;
+  box-sizing: content-box;
 }
 /* キャプションあり */
 #dialog_image.has_caption .image_caption {
@@ -108,7 +114,9 @@
 
 /* 画像の幅と高さのサイズ表示 */
 #dialog_image.image_size_enabled .image_size_text {
-  text-align: center;
+  inline-size: fit-content;
+  margin-inline: auto;
+  padding-inline: 56px;
   font-size: 0.63rem;
   color: #ccc;
   text-shadow: 1px 1px 2px #333;

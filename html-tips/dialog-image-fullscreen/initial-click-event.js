@@ -1,29 +1,45 @@
 // @ts-check
 
 import {
+  DIALOG_IMAGE_CAPTION_CLASS_NAME,
+  DIALOG_IMAGE_LOWER_TEXT_CLASS_NAME,
   DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME,
+  DIALOG_IMAGE_SIZE_CLASS_NAME,
+  DIALOG_PREVIEW_CONTROLS_CLASS_NAME,
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_IN_BUTTON_CLASS_NAME,
   DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME,
 } from './const.js';
 
 /**
- * ダイアログの枠外や黒塗りの部分をクリックした際にダイアログを閉じるイベントをセット
+ * ダイアログの枠外や黒塗りの部分をクリックした際に、ダイアログを閉じるイベントをセット
  * @param {HTMLDialogElement} dialogElem dialog要素
  */
 export function setupDialogOuterClose(dialogElem) {
-  dialogElem.addEventListener('click', (event) => {
-    if (event.target === event.currentTarget) {
-      dialogElem.close();
-    }
-  });
-  const imagePreviewWrapperElem = dialogElem.querySelector(
+  // dialog要素自身
+  setupOuterClickClose(dialogElem, dialogElem);
+
+  // ダイアログ要素内で黒塗りになっている部分
+  const selectors = [
     `.${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}`,
-  );
-  if (imagePreviewWrapperElem === null) {
-    throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}" element`);
-  }
-  imagePreviewWrapperElem.addEventListener('click', (event) => {
+    `.${DIALOG_PREVIEW_CONTROLS_CLASS_NAME}`,
+    `.${DIALOG_IMAGE_LOWER_TEXT_CLASS_NAME}`,
+    `.${DIALOG_IMAGE_CAPTION_CLASS_NAME}`,
+    `.${DIALOG_IMAGE_SIZE_CLASS_NAME}`,
+  ];
+  const targetElemList = dialogElem.querySelectorAll(selectors.join(', '));
+  targetElemList.forEach((targetElem) => {
+    setupOuterClickClose(targetElem, dialogElem);
+  });
+}
+/**
+ * 対象要素に枠外クリックで閉じるイベントをセット
+ * @param {Element} targetElem clickイベントを付与する要素
+ * @param {HTMLDialogElement} dialogElem dialog要素
+ */
+
+export function setupOuterClickClose(targetElem, dialogElem) {
+  targetElem.addEventListener('click', (event) => {
     if (event.target === event.currentTarget) {
       dialogElem.close();
     }
