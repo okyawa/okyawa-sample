@@ -6,7 +6,6 @@ import {
   DIALOG_HAS_CAPTION_CLASS_NAME,
   DIALOG_IMAGE_CAPTION_CLASS_NAME,
   DIALOG_IMAGE_COUNTER_CLASS_NAME,
-  DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME,
   DIALOG_IMAGE_SIZE_CLASS_NAME,
   DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
   DIALOG_IMAGE_SIZE_TEXT_CLASS_NAME,
@@ -18,11 +17,10 @@ import {
   DIALOG_SWITCHING_CLASS_NAME,
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
-  DIALOG_ZOOM_IN_BUTTON_CLASS_NAME,
-  DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME,
 } from './const.js';
 import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
+import { setupDialogOuterClose, setupZoomInButton, setupZoomOutButton } from './initial-click-event.js';
 import { handleKeyboardEvent } from './keyboard-event.js';
 import { setupDialogTouchMove, setupImageSwipe } from './touch-event.js';
 import { readImageSize, waitDialogAnimation } from './utility.js';
@@ -91,13 +89,13 @@ export class DialogImage {
    */
   setupInitialEvent() {
     // ダイアログの枠外や黒塗りの部分をクリックした際にダイアログを閉じるイベントをセット
-    this.setupDialogOuterClose();
+    setupDialogOuterClose(this.modalDialog);
     // ダイアログを閉じる際に実行するイベントを登録
     this.setupDialogClose();
     // 拡大ボタンのイベント登録
-    this.setupZoomInButton();
+    setupZoomInButton(this.modalDialog);
     // 縮小ボタンのイベント登録
-    this.setupZoomOutButton();
+    setupZoomOutButton(this.modalDialog);
     // dialog要素に対するtouchmoveイベントの初期化 (※iPhoneでの背面スクロール防止策)
     setupDialogTouchMove(this.modalDialog);
   }
@@ -617,29 +615,6 @@ export class DialogImage {
   }
 
   /**
-   * ダイアログの枠外や黒塗りの部分をクリックした際にダイアログを閉じるイベントをセット
-   * @private
-   */
-  setupDialogOuterClose() {
-    this.modalDialog.addEventListener('click', (event) => {
-      if (event.target === event.currentTarget) {
-        this.modalDialog.close();
-      }
-    });
-    const imagePreviewWrapperElem = this.modalDialog.querySelector(
-      `.${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}`,
-    );
-    if (imagePreviewWrapperElem === null) {
-      throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_PREVIEW_WRAPPER_CLASS_NAME}" element`);
-    }
-    imagePreviewWrapperElem.addEventListener('click', (event) => {
-      if (event.target === event.currentTarget) {
-        this.modalDialog.close();
-      }
-    });
-  }
-
-  /**
    * ダイアログを閉じる際に実行するイベントを登録
    * @private
    */
@@ -661,59 +636,6 @@ export class DialogImage {
       // dialog要素の状態をリセット
       resetDialog(dialog);
     });
-  }
-
-  /**
-   * 拡大ボタンのイベント登録
-   * @private
-   */
-  setupZoomInButton() {
-    this.modalDialog
-      .querySelector(`.${DIALOG_ZOOM_IN_BUTTON_CLASS_NAME}`)
-      ?.addEventListener('click', () => {
-        this.modalDialog.classList.add(DIALOG_ZOOM_CLASS_NAME);
-        this.scrollToZoomCenter();
-      });
-  }
-
-  /**
-   * 縮小ボタンのイベント登録
-   * @private
-   */
-  setupZoomOutButton() {
-    this.modalDialog
-      .querySelector(`.${DIALOG_ZOOM_OUT_BUTTON_CLASS_NAME}`)
-      ?.addEventListener('click', () => {
-        this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
-      });
-  }
-
-  /**
-   * 画像を拡大表示した際に、中央を表示するようにスクロール
-   * @private
-   */
-  scrollToZoomCenter() {
-    /** overflow: auto; でスクロールする枠要素 */
-    const imagePreviewElem = this.modalDialog.querySelector('.image_preview');
-    if (!imagePreviewElem) {
-      throw new Error('ERROR :: Not Found ".image_preview" element');
-    }
-    // 中央部分を拡大
-    const scrollWidth = imagePreviewElem.scrollWidth;
-    const scrollHeight = imagePreviewElem.scrollHeight;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    if (scrollWidth < windowWidth && scrollHeight < windowHeight) {
-      // スクロールが無しで、位置調整不要 (※この場合は拡大ボタンを表示しないが、念の為)
-      return;
-    }
-    // 画面幅と高さの中央にスクロール
-    if (scrollWidth > windowWidth) {
-      imagePreviewElem.scrollLeft = (scrollWidth - windowWidth) / 2;
-    }
-    if (scrollHeight > windowHeight) {
-      imagePreviewElem.scrollTop = (scrollHeight - windowHeight) / 2;
-    }
   }
 }
 
