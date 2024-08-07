@@ -3,12 +3,6 @@
 import {
   DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
   DIALOG_GROUP_IMAGES_ENABLED,
-  DIALOG_HAS_CAPTION_CLASS_NAME,
-  DIALOG_IMAGE_CAPTION_CLASS_NAME,
-  DIALOG_IMAGE_COUNTER_CLASS_NAME,
-  DIALOG_IMAGE_SIZE_CLASS_NAME,
-  DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
-  DIALOG_IMAGE_SIZE_TEXT_CLASS_NAME,
   DIALOG_LOADING_CLASS_NAME,
   DIALOG_NEXT_BUTTON_AREA_CLASS_NAME,
   DIALOG_NEXT_BUTTON_CLASS_NAME,
@@ -22,11 +16,11 @@ import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
 import {
   setupDialogOuterClose,
-  setupOuterClickClose,
   setupZoomInButton,
   setupZoomOutButton,
 } from './initial-click-event.js';
 import { handleKeyboardEvent } from './keyboard-event.js';
+import { setupCaptionView, setupImageCounterView, setupImageSizeView } from './text-view.js';
 import { setupDialogTouchMove, setupImageSwipe } from './touch-event.js';
 import { readImageSize, waitDialogAnimation } from './utility.js';
 
@@ -154,7 +148,7 @@ export class DialogImage {
     // 画像のタッチイベントを初期化
     this.setupImageTouchEvent();
     // キャプションのテキストを初期化
-    this.setupCaptionView(caption);
+    setupCaptionView(caption, this.modalDialog);
     // 表示画像自体のクリックした際のイベントをセット
     this.setupImageClick();
     // キーボードイベントを追加
@@ -174,7 +168,9 @@ export class DialogImage {
     // ローディング表示を外す
     this.modalDialog.classList.remove(DIALOG_LOADING_CLASS_NAME);
     // キャプションの下部に画像の幅と高さを表示
-    this.setupImageSizeView(width, height);
+    if (this.options.imageSizeVisible === true) {
+      setupImageSizeView(width, height, this.modalDialog);
+    }
     // 表示する画像に拡大ボタンが必要かを判定
     await this.setupDialogZoomVisible(width, height);
     // グループ化しているときの前後の画像を先読み
@@ -194,13 +190,15 @@ export class DialogImage {
     // 画像のタッチイベントを初期化
     this.setupImageTouchEvent();
     // キャプションのテキストを初期化
-    this.setupCaptionView(caption);
+    setupCaptionView(caption, this.modalDialog);
     // 表示画像自体のクリックした際のイベントをセット
     this.setupImageClick();
     // 表示する画像の幅と高さを取得
     const { width, height } = await readImageSize(url);
     // キャプションの下部に画像の幅と高さを表示
-    this.setupImageSizeView(width, height);
+    if (this.options.imageSizeVisible === true) {
+      setupImageSizeView(width, height, this.modalDialog);
+    }
     // 表示する画像に拡大ボタンが必要かを判定
     await this.setupDialogZoomVisible(width, height);
     // グループ化しているときの前後の画像を先読み
@@ -295,31 +293,10 @@ export class DialogImage {
     }
 
     // カウンター表示を初期化
-    this.setupImageCounterView(url);
+    setupImageCounterView(url, this.modalDialog, this.groupImages);
 
     // 枠にグループ化が使われていることを示すクラス名を付与
     this.modalDialog.classList.add(DIALOG_GROUP_IMAGES_ENABLED);
-  }
-
-  /**
-   * 画像送りのカウンター表示を初期化
-   * @param {string} currentUrl 現在表示中のURL
-   * @private
-   */
-  setupImageCounterView(currentUrl) {
-    const counterElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_COUNTER_CLASS_NAME}`);
-    if (counterElem === null) {
-      return;
-    }
-    // 現在表示中の画像の並び順
-    const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
-    if (currentIndex === -1) {
-      return;
-    }
-    // カウンター表示に反映
-    counterElem.innerHTML = `<span class="counter_value">${
-      currentIndex + 1
-    }<span class="slash">/</span>${this.groupImages.length}</span>`;
   }
 
   /**
@@ -417,7 +394,7 @@ export class DialogImage {
     // 画像送りできないボタンをdisabledにする
     this.managePrevNextButtonDisabled(imageData.url);
     // 画像送りのカウンター表示を更新
-    this.setupImageCounterView(imageData.url);
+    setupImageCounterView(imageData.url, this.modalDialog, this.groupImages);
 
     // 画像送り完了
     this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
@@ -506,65 +483,6 @@ export class DialogImage {
     }
     // メインで表示している画像のスワイプ操作を初期化
     setupImageSwipe(imgElem, this.modalDialog);
-  }
-
-  /**
-   * キャプションのテキストを初期化
-   * @param {string} caption キャプションのテキスト
-   * @private
-   */
-  setupCaptionView(caption) {
-    const captionElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_CAPTION_CLASS_NAME}`);
-    if (captionElem === null) {
-      throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_CAPTION_CLASS_NAME}}" element`);
-    }
-
-    if (!caption) {
-      // キャプション指定なし
-      captionElem.innerHTML = '';
-      this.modalDialog.classList.remove(DIALOG_HAS_CAPTION_CLASS_NAME);
-      return;
-    }
-
-    // キャプション指定あり
-    // ※生成するHTML構成↓
-    // <div class="caption_text"><span class="inner_caption_text">キャプション</span></div>
-    const divElem = document.createElement('div');
-    divElem.classList.add('caption_text');
-    const spanElem = document.createElement('span');
-    spanElem.classList.add('inner_caption_text');
-    // エスケープするために、textContentを使用
-    spanElem.textContent = caption;
-    divElem.append(spanElem);
-    // キャプションのテキスト外をクリックした際は、ダイアログを閉じるイベントをセット
-    setupOuterClickClose(divElem, this.modalDialog);
-    // 生成したものを枠要素へセット
-    captionElem.innerHTML = '';
-    captionElem.append(divElem);
-    this.modalDialog.classList.add(DIALOG_HAS_CAPTION_CLASS_NAME);
-  }
-
-  /**
-   * 画像の幅と高さの表示を初期化
-   * @param {number} width 画像の幅
-   * @param {number} height 画像の高さ
-   * @private
-   */
-  setupImageSizeView(width, height) {
-    if (this.options.imageSizeVisible !== true) {
-      return;
-    }
-    const imageSizeElem = this.modalDialog.querySelector(`.${DIALOG_IMAGE_SIZE_CLASS_NAME}`);
-    if (imageSizeElem === null) {
-      throw new Error(`ERROR :: Not Found ".${DIALOG_IMAGE_SIZE_CLASS_NAME}" element`);
-    }
-
-    const divElem = document.createElement('div');
-    divElem.classList.add(DIALOG_IMAGE_SIZE_TEXT_CLASS_NAME);
-    divElem.textContent = `(${width}x${height})`;
-
-    imageSizeElem.innerHTML = divElem.outerHTML;
-    this.modalDialog.classList.add(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
   }
 
   /**
