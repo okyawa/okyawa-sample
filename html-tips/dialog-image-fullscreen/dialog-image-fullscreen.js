@@ -14,6 +14,7 @@ import {
 } from './const.js';
 import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
+import { managePrevNextButtonDisabled, readNextImageData } from './grouping.js';
 import {
   setupDialogOuterClose,
   setupZoomInButton,
@@ -328,7 +329,7 @@ export class DialogImage {
     nextAreaElem.appendChild(nextButtonElem);
 
     // 画像送りできないボタンをdisabledにする
-    this.managePrevNextButtonDisabled(url);
+    managePrevNextButtonDisabled(url, this.modalDialog, this.groupImages);
   }
 
   /**
@@ -381,7 +382,7 @@ export class DialogImage {
 
     // 現在表示中の画像URL
     const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
-    const imageData = this.readNextImageData(direction, currentUrl);
+    const imageData = readNextImageData(direction, currentUrl, this.groupImages);
     if (imageData === null) {
       this.modalDialog.classList.remove(DIALOG_SWITCHING_CLASS_NAME);
       return;
@@ -392,7 +393,7 @@ export class DialogImage {
     this.modalDialog.classList.add(DIALOG_ZOOM_DISABLED_CLASS_NAME);
 
     // 画像送りできないボタンをdisabledにする
-    this.managePrevNextButtonDisabled(imageData.url);
+    managePrevNextButtonDisabled(imageData.url, this.modalDialog, this.groupImages);
     // 画像送りのカウンター表示を更新
     setupImageCounterView(imageData.url, this.modalDialog, this.groupImages);
 
@@ -416,59 +417,6 @@ export class DialogImage {
       const nextButtonElem = this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
       nextButtonElem?.focus();
     }
-  }
-
-  /**
-   * 画像送りできないボタンをdisabledにする
-   * @param {string} currentUrl 現在表示中の画像のURL
-   * @private
-   */
-  managePrevNextButtonDisabled(currentUrl) {
-    const prevImageData = this.readNextImageData('prev', currentUrl);
-    const nextImageData = this.readNextImageData('next', currentUrl);
-    /** @type {HTMLButtonElement | null} */
-    const prevButtonElem = this.modalDialog.querySelector(`.${DIALOG_PREV_BUTTON_CLASS_NAME}`);
-    /** @type {HTMLButtonElement | null} */
-    const nextButtonElem = this.modalDialog.querySelector(`.${DIALOG_NEXT_BUTTON_CLASS_NAME}`);
-    if (prevButtonElem === null || nextButtonElem === null) {
-      throw new Error('ERROR :: Not Found Prev or Next Button Element');
-    }
-    prevButtonElem.disabled = prevImageData === null;
-    nextButtonElem.disabled = nextImageData === null;
-  }
-
-  /**
-   * 画像送りで画像とキャプションを切り替え
-   * @param {'prev' | 'next'} direction 画像を送る方向
-   * @param {string} currentUrl 現在表示中の画像のURL
-   * @returns {GroupImageType | null}
-   * @private
-   */
-  readNextImageData(direction, currentUrl) {
-    // 現在表示中の画像URL
-    // const currentUrl = this.imagePreviewElem.querySelector('img')?.getAttribute('src') ?? '';
-    const currentIndex = this.groupImages.findIndex((image) => image.url === currentUrl);
-
-    if (
-      (direction === 'prev' && this.groupImages[currentIndex - 1] === undefined) ||
-      (direction === 'next' && this.groupImages[currentIndex + 1] === undefined)
-    ) {
-      // 表示する画像なし
-      return null;
-    }
-
-    // 次に表示する画像URL
-    const url =
-      direction === 'prev'
-        ? this.groupImages[currentIndex - 1].url
-        : this.groupImages[currentIndex + 1].url;
-    // 次に表示するキャプション
-    const caption =
-      direction === 'prev'
-        ? this.groupImages[currentIndex - 1].caption
-        : this.groupImages[currentIndex + 1].caption;
-
-    return { url, caption };
   }
 
   /**
