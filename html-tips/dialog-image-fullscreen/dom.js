@@ -10,7 +10,9 @@ import {
   DIALOG_IMAGE_SIZE_CLASS_NAME,
   DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
   DIALOG_NEXT_BUTTON_AREA_CLASS_NAME,
+  DIALOG_NEXT_BUTTON_CLASS_NAME,
   DIALOG_PREV_BUTTON_AREA_CLASS_NAME,
+  DIALOG_PREV_BUTTON_CLASS_NAME,
   DIALOG_ZOOM_CLASS_NAME,
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
   DIALOG_ZOOM_IN_BUTTON_CLASS_NAME,
@@ -157,4 +159,34 @@ function resetDialogClassName(dialogElem) {
   dialogElem.classList.remove(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
   dialogElem.classList.remove(DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME);
   dialogElem.classList.remove(DIALOG_GROUP_IMAGES_ENABLED);
+}
+
+/**
+ * 前へボタンの要素を生成
+ * @param {DialogImageOptionType} options オプション値
+ * @returns {HTMLButtonElement}
+ * @private
+ */
+export function createPrevButton(options) {
+  const prevButtonElem = document.createElement('button');
+  prevButtonElem.type = 'button';
+  prevButtonElem.classList.add(DIALOG_PREV_BUTTON_CLASS_NAME);
+  prevButtonElem.title = options.prevButtonTitle;
+  prevButtonElem.innerHTML = options.prevButtonInnerHTML;
+  return prevButtonElem;
+}
+
+/**
+ * 前へボタンの要素を生成
+ * @param {DialogImageOptionType} options オプション値
+ * @returns {HTMLButtonElement}
+ * @private
+ */
+export function createNextButton(options) {
+  const nextButtonElem = document.createElement('button');
+  nextButtonElem.type = 'button';
+  nextButtonElem.classList.add(DIALOG_NEXT_BUTTON_CLASS_NAME);
+  nextButtonElem.title = options.nextButtonTitle;
+  nextButtonElem.innerHTML = options.nextButtonInnerHTML;
+  return nextButtonElem;
 }

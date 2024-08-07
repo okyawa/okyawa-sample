@@ -13,8 +13,18 @@ import {
   DIALOG_ZOOM_DISABLED_CLASS_NAME,
 } from './const.js';
 import { dialogImageOptionDefaults } from './defaults.js';
-import { createDialogImageElement, resetDialog } from './dom.js';
-import { managePrevNextButtonDisabled, preloadPrevNextImages, readGroupingData, readNextImageData } from './grouping.js';
+import {
+  createDialogImageElement,
+  createNextButton,
+  createPrevButton,
+  resetDialog,
+} from './dom.js';
+import {
+  managePrevNextButtonDisabled,
+  preloadPrevNextImages,
+  readGroupingData,
+  readNextImageData,
+} from './grouping.js';
 import {
   setupDialogOuterClose,
   setupZoomInButton,
@@ -289,11 +299,7 @@ export class DialogImage {
    * @private
    */
   createPrevButtonElement() {
-    const prevButtonElem = document.createElement('button');
-    prevButtonElem.type = 'button';
-    prevButtonElem.classList.add(DIALOG_PREV_BUTTON_CLASS_NAME);
-    prevButtonElem.title = this.options.prevButtonTitle;
-    prevButtonElem.innerHTML = this.options.prevButtonInnerHTML;
+    const prevButtonElem = createPrevButton(this.options);
     prevButtonElem.addEventListener('click', async () => {
       await this.switchImage('prev');
     });
@@ -306,11 +312,7 @@ export class DialogImage {
    * @private
    */
   createNextButtonElement() {
-    const nextButtonElem = document.createElement('button');
-    nextButtonElem.type = 'button';
-    nextButtonElem.classList.add(DIALOG_NEXT_BUTTON_CLASS_NAME);
-    nextButtonElem.title = this.options.nextButtonTitle;
-    nextButtonElem.innerHTML = this.options.nextButtonInnerHTML;
+    const nextButtonElem = createNextButton(this.options);
     nextButtonElem.addEventListener('click', async () => {
       await this.switchImage('next');
     });
