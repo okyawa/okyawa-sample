@@ -8,7 +8,7 @@ import {
   DIALOG_IMAGE_SIZE_ENABLED_CLASS_NAME,
   DIALOG_IMAGE_SIZE_TEXT_CLASS_NAME,
 } from './const.js';
-import { setupOuterClickClose } from './eventl-click.js';
+import { setupOuterClickClose } from './event-click.js';
 
 /** @typedef { import('./types').GroupImageType } GroupImageType */
 

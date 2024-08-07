@@ -1,7 +1,6 @@
 // @ts-check
 
 import {
-  DIALOG_CONTROLS_HIDDEN_CLASS_NAME,
   DIALOG_GROUP_IMAGES_ENABLED,
   DIALOG_LOADING_CLASS_NAME,
   DIALOG_NEXT_BUTTON_AREA_CLASS_NAME,
@@ -18,21 +17,23 @@ import {
   createNextButton,
   createPrevButton,
   resetDialog,
+  setupDialogZoomVisible,
 } from './dom.js';
+import {
+  setupDialogOuterClose,
+  setupImageClick,
+  setupZoomInButton,
+  setupZoomOutButton,
+} from './event-click.js';
+import { handleKeyboardEvent } from './event-keyboard.js';
+import { setupDialogTouchMove, setupImageSwipe } from './event-touch.js';
 import {
   managePrevNextButtonDisabled,
   preloadPrevNextImages,
   readGroupingData,
   readNextImageData,
 } from './grouping.js';
-import {
-  setupDialogOuterClose,
-  setupZoomInButton,
-  setupZoomOutButton,
-} from './eventl-click.js';
-import { handleKeyboardEvent } from './event-keyboard.js';
 import { setupCaptionView, setupImageCounterView, setupImageSizeView } from './text-view.js';
-import { setupDialogTouchMove, setupImageSwipe } from './event-touch.js';
 import { readImageSize, waitDialogAnimation } from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
@@ -161,7 +162,7 @@ export class DialogImage {
     // キャプションのテキストを初期化
     setupCaptionView(caption, this.modalDialog);
     // 表示画像自体のクリックした際のイベントをセット
-    this.setupImageClick();
+    setupImageClick(this.modalDialog);
     // キーボードイベントを追加
     this.addKeyboardEvent();
     // body要素のdata属性にdialog要素のIDをセット (※キーボードイベント用)
@@ -183,7 +184,7 @@ export class DialogImage {
       setupImageSizeView(width, height, this.modalDialog);
     }
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(width, height);
+    await setupDialogZoomVisible(width, height, this.modalDialog, this.imagePreviewElem);
     // グループ化しているときの前後の画像を先読み
     preloadPrevNextImages(url, this.groupImages);
   }
@@ -203,7 +204,7 @@ export class DialogImage {
     // キャプションのテキストを初期化
     setupCaptionView(caption, this.modalDialog);
     // 表示画像自体のクリックした際のイベントをセット
-    this.setupImageClick();
+    setupImageClick(this.modalDialog);
     // 表示する画像の幅と高さを取得
     const { width, height } = await readImageSize(url);
     // キャプションの下部に画像の幅と高さを表示
@@ -211,7 +212,7 @@ export class DialogImage {
       setupImageSizeView(width, height, this.modalDialog);
     }
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(width, height);
+    await setupDialogZoomVisible(width, height, this.modalDialog, this.imagePreviewElem);
     // グループ化しているときの前後の画像を先読み
     preloadPrevNextImages(url, this.groupImages);
 
@@ -357,7 +358,7 @@ export class DialogImage {
     await waitDialogAnimation(this.modalDialog);
 
     // 表示する画像に拡大ボタンが必要かを判定
-    await this.setupDialogZoomVisible(width, height);
+    await setupDialogZoomVisible(width, height, this.modalDialog, this.imagePreviewElem);
 
     // 左右の矢印キーで移動した場合、該当の画像ボタンをフォーカス
     if (this.modalDialog.dataset.direction === 'prev') {
@@ -387,23 +388,6 @@ export class DialogImage {
   }
 
   /**
-   * 表示画像自体のクリックした際のイベントをセット
-   * @private
-   */
-  setupImageClick() {
-    const imgElem = this.modalDialog.querySelector('.image_preview img');
-    imgElem?.addEventListener('click', () => {
-      if (this.modalDialog.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
-        // ズーム中の場合は縮小表示に戻す
-        this.modalDialog.classList.remove(DIALOG_ZOOM_CLASS_NAME);
-        return;
-      }
-      // コントロール表示を切り替え
-      this.modalDialog.classList.toggle(DIALOG_CONTROLS_HIDDEN_CLASS_NAME);
-    });
-  }
-
-  /**
    * dialog要素を開く
    * @private
    */
@@ -414,22 +398,6 @@ export class DialogImage {
     this.modalDialog.showModal();
     // モーダルダイアログを表示する際に、HTML要素(背景部分)がスクロールしないようにする
     document.documentElement.style.overflow = 'hidden';
-  }
-
-  /**
-   * 表示する画像に拡大ボタンが必要かを判定
-   * @param {number} width 画像の幅
-   * @param {number} height 画像の高さ
-   * @private
-   */
-  async setupDialogZoomVisible(width, height) {
-    const zoomEnabled =
-      width > this.imagePreviewElem.clientWidth || height > this.imagePreviewElem.clientHeight;
-    if (zoomEnabled) {
-      this.modalDialog.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
-    } else {
-      this.modalDialog.classList.add(DIALOG_ZOOM_DISABLED_CLASS_NAME);
-    }
   }
 
   /**

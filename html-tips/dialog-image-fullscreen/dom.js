@@ -190,3 +190,21 @@ export function createNextButton(options) {
   nextButtonElem.innerHTML = options.nextButtonInnerHTML;
   return nextButtonElem;
 }
+
+/**
+ * 表示する画像に拡大ボタンが必要かを判定
+ * @param {number} width 画像の幅
+ * @param {number} height 画像の高さ
+ * @param {HTMLDialogElement} dialogElem ダイアログ要素
+ * @param {HTMLElement} imagePreviewElem 画像表示エリアの要素
+ * @private
+ */
+export async function setupDialogZoomVisible(width, height, dialogElem, imagePreviewElem) {
+  const zoomEnabled =
+    width > imagePreviewElem.clientWidth || height > imagePreviewElem.clientHeight;
+  if (zoomEnabled) {
+    dialogElem.classList.remove(DIALOG_ZOOM_DISABLED_CLASS_NAME);
+  } else {
+    dialogElem.classList.add(DIALOG_ZOOM_DISABLED_CLASS_NAME);
+  }
+}
