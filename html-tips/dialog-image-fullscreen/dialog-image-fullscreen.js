@@ -29,10 +29,10 @@ import {
   setupDialogOuterClose,
   setupZoomInButton,
   setupZoomOutButton,
-} from './initial-click-event.js';
-import { handleKeyboardEvent } from './keyboard-event.js';
+} from './eventl-click.js';
+import { handleKeyboardEvent } from './event-keyboard.js';
 import { setupCaptionView, setupImageCounterView, setupImageSizeView } from './text-view.js';
-import { setupDialogTouchMove, setupImageSwipe } from './touch-event.js';
+import { setupDialogTouchMove, setupImageSwipe } from './event-touch.js';
 import { readImageSize, waitDialogAnimation } from './utility.js';
 
 /** @typedef { import('./types').DialogImageOptionType } DialogImageOptionType */
