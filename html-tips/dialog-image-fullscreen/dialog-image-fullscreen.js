@@ -14,7 +14,7 @@ import {
 } from './const.js';
 import { dialogImageOptionDefaults } from './defaults.js';
 import { createDialogImageElement, resetDialog } from './dom.js';
-import { managePrevNextButtonDisabled, readNextImageData } from './grouping.js';
+import { managePrevNextButtonDisabled, preloadPrevNextImages, readGroupingData, readNextImageData } from './grouping.js';
 import {
   setupDialogOuterClose,
   setupZoomInButton,
@@ -175,7 +175,7 @@ export class DialogImage {
     // 表示する画像に拡大ボタンが必要かを判定
     await this.setupDialogZoomVisible(width, height);
     // グループ化しているときの前後の画像を先読み
-    this.preloadPrevNextImages(url);
+    preloadPrevNextImages(url, this.groupImages);
   }
 
   /**
@@ -203,35 +203,12 @@ export class DialogImage {
     // 表示する画像に拡大ボタンが必要かを判定
     await this.setupDialogZoomVisible(width, height);
     // グループ化しているときの前後の画像を先読み
-    this.preloadPrevNextImages(url);
+    preloadPrevNextImages(url, this.groupImages);
 
     return {
       width,
       height,
     };
-  }
-
-  /**
-   * グループ化しているときの前後の画像を先読み
-   * @param {string} currentUrl 現在表示中の画像のURL
-   * @returns
-   * @private
-   */
-  preloadPrevNextImages(currentUrl) {
-    if (this.groupImages.length === 0) {
-      // プリロードする画像なし
-      return;
-    }
-    const urlList = this.groupImages.map((image) => image.url);
-    const currentIndex = urlList.indexOf(currentUrl);
-    if (this.groupImages[currentIndex - 1]) {
-      // 前の画像をプリロード
-      new Image().src = this.groupImages[currentIndex - 1].url;
-    }
-    if (this.groupImages[currentIndex + 1]) {
-      // 次の画像をプリロード
-      new Image().src = this.groupImages[currentIndex + 1].url;
-    }
   }
 
   /**
@@ -264,33 +241,7 @@ export class DialogImage {
       this.options.groupCaptionWrapSelector &&
       this.options.groupCaptionElemSelector
     ) {
-      this.groupImages = this.groupImages.map((item) => {
-        const activeElem = document.querySelector(
-          `${this.options.groupSelector}[${this.options.groupUrlAttr}="${item.url}"]`,
-        );
-        if (activeElem === null) {
-          throw new Error('ERROR :: Not Found Active Element');
-        }
-        // グループ化した画像のキャプションが指定されている要素からキャプション情報を取り出す
-        /** @type {HTMLInputElement | null | undefined } */
-        const captionElem = activeElem
-          .closest(this.options.groupCaptionWrapSelector ?? '')
-          ?.querySelector(this.options.groupCaptionElemSelector ?? '');
-        let caption = '';
-        if (captionElem) {
-          if (this.options.groupCaptionAttr === 'value') {
-            // input要素など
-            caption = captionElem.value;
-          } else {
-            // リンクなど
-            caption = captionElem.getAttribute(this.options.groupCaptionAttr) ?? '';
-          }
-        }
-        return {
-          url: item.url,
-          caption: caption ?? '',
-        };
-      });
+      this.groupImages = this.groupImages.map((item) => readGroupingData(item, this.options));
     }
 
     // カウンター表示を初期化
