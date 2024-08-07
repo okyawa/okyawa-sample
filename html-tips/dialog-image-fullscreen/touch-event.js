@@ -84,7 +84,11 @@ function setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwip
 
   // 移動した座標を取得
   imgElem.addEventListener('touchmove', (e) => {
-    e.preventDefault();
+    const dialogElem = imgElem.closest('dialog');
+    if (dialogElem !== null && !dialogElem.classList.contains(DIALOG_ZOOM_CLASS_NAME)) {
+      // ズーム中以外は、ブラウザ側にtouchmoveのイベントを走らせない
+      e.preventDefault();
+    }
     endX = e.changedTouches[0].pageX;
     endY = e.changedTouches[0].pageY;
   });
@@ -128,6 +132,13 @@ function setupHandleSwipe(imgElem, handleSwipeLeft, handleSwipeRight, handleSwip
  */
 export function setupDialogTouchMove(dialogElem) {
   dialogElem.addEventListener('touchmove', (e) => {
-    e.preventDefault();
+    const targetElem = e.currentTarget;
+    if (
+      targetElem instanceof HTMLDialogElement &&
+      !targetElem.classList.contains(DIALOG_ZOOM_CLASS_NAME)
+    ) {
+      // ズーム中以外は、ブラウザ側にtouchmoveのイベントを走らせない
+      e.preventDefault();
+    }
   });
 }
