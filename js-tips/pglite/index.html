@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>PGliteを使ってブラウザ上でPostgreSQLを使うSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    // hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>PGlite: PostgreSQLのWebAssemblyビルド</h1>
+      <h2>ブラウザ上でPostgreSQLを使うSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>PGliteとは</h2></summary>
+
+        <div class="markdown_content">
+- `PGlite` は、 `PostgreSQL` のソースコードを `WebAssembly` バイナリとしてビルドしたもの
+- Node.jsなどのJavaScriptランタイムやWebブラウザ上で、ほぼフル機能のPostgreSQLを実行可能
+- Webブラウザでは、 `IndexedDB` を利用して永続的なデータベースを作成できる
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <fieldset>
+          <button type="button" id="reset_button">データベースを初期状態に戻す</button>
+          <button type="button" id="fetch_all_button">保存データを全件取得</button>
+          <button type="button" id="update_button">id=5のデータを完了済みに更新</button>
+        </fieldset>
+
+        <pre id="result"><code class="language-json"></code></pre>
+
+<script type="module">
+import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js'
+
+const resultElement = document.getElementById('result');
+
+const db = new PGlite('idb://my-pgdata')
+
+/**
+ * データベースを作成し、初期データを挿入
+ */
+async function createDB() {
+  await db.exec(`
+  CREATE TABLE IF NOT EXISTS pglite_todo (
+    id SERIAL PRIMARY KEY,
+    task TEXT,
+    done BOOLEAN DEFAULT false
+  );
+  INSERT INTO pglite_todo (task, done) VALUES ('Install PGlite from NPM', true);
+  INSERT INTO pglite_todo (task, done) VALUES ('Load PGlite', true);
+  INSERT INTO pglite_todo (task, done) VALUES ('Create a table', true);
+  INSERT INTO pglite_todo (task, done) VALUES ('Insert some data', true);
+  INSERT INTO pglite_todo (task) VALUES ('Update a task');
+`);
+}
+
+/**
+ * データベースを削除
+ */
+async function deleteDB() {
+  await db.exec(`
+    DROP TABLE IF EXISTS pglite_todo;
+  `);
+}
+
+/**
+ * データベースのレコードを全件取得
+ * @returns {array}
+ */
+async function selectAll() {
+  return await db.query(`
+    SELECT * from pglite_todo;
+  `);
+}
+
+/**
+ * データベースのレコードを更新
+ * @param {number} id
+ * @param {string} task
+ * @param {boolean} done
+ * @returns {array}
+ */
+async function update(id, task, done) {
+  await db.query(
+    'UPDATE pglite_todo SET task = $2, done = $3 WHERE id = $1',
+    [id, 'Update a task using parametrised queries', true],
+  )
+  return await db.query(`SELECT * from pglite_todo where id = $1;`, [id])
+}
+
+/**
+ * 画面に表示する結果をハイライト表示
+ * @param {any} value
+ */
+function highlightResult(value) {
+  const resultElement = document.getElementById('result');
+  resultElement.innerHTML = '';
+  const codeElement = document.createElement('code');
+  codeElement.textContent = JSON.stringify(value, null, 2);
+  resultElement.append(codeElement);
+  hljs.highlightElement(codeElement);
+}
+
+// 画面読み込み時の初期化処理
+await deleteDB();
+await createDB();
+
+// 初期化ボタン
+document.getElementById('reset_button')?.addEventListener('click', async () => {
+  await deleteDB();
+  await createDB();
+  const resultElement = document.getElementById('result');
+  resultElement.textContent = 'データベースを初期状態に戻しました。';
+});
+// 全件取得ボタン
+document.getElementById('fetch_all_button')?.addEventListener('click', async () => {
+  const result = await selectAll();
+  highlightResult(result.rows);
+});
+// 更新ボタン
+document.getElementById('update_button')?.addEventListener('click', async () => {
+  const result = await update(5, 'Update a task using parametrised queries', true);
+  highlightResult(result.rows);
+});
+</script>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://pglite.dev/docs/" ref="nofollow noreferrer noopener" target="_blank">
+              Getting started with PGlite | PGlite
+            </a>
+          </li>
+          <li>
+            <a href="https://www.publickey1.jp/blog/24/webassembypostgresqlpglitenodejspostgresqldb.html" ref="nofollow noreferrer noopener" target="_blank">
+              WebAssemblyとしてPostgreSQLをビルドした「PGlite」公開。Node.jsやブラウザ上でPostgreSQLを実行、DBの永続化も可能 | Publickey
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
