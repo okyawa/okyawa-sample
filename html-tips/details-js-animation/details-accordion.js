@@ -1,7 +1,7 @@
 // @ts-check
 
 /** アニメーションの時間とイージング */
-const animTiming = {
+const DEFAULT_ANIMATION_TIMING = {
   duration: 300,
   easing: 'ease-in-out',
 };
@@ -59,16 +59,25 @@ function handleClickSummary(event) {
   // summary要素click時のデフォルトの挙動を無効化
   event.preventDefault();
 
+  // アニメーションのオプション指定
+  const animationTiming = {
+    duration: detailsElement.dataset.duration
+      ? Number(detailsElement.dataset.duration)
+      : DEFAULT_ANIMATION_TIMING.duration,
+    easing: detailsElement.dataset.easing || DEFAULT_ANIMATION_TIMING.easing,
+  };
+
+
   if (detailsElement.getAttribute('open') === null) {
     // 閉じている場合で、open属性を付与して「開く」
     // open属性を付与
     detailsElement.setAttribute('open', 'true');
     // アコーディオンを開くときの処理
-    contentElement.animate(openingAnimation(contentElement), animTiming);
+    contentElement.animate(openingAnimation(contentElement), animationTiming);
     return;
   }
   // 開いている場合、open属性を取り除いて「閉じる」
-  const closingAnim = contentElement.animate(closingAnimation(contentElement), animTiming);
+  const closingAnim = contentElement.animate(closingAnimation(contentElement), animationTiming);
   // アニメーション完了後の処理
   closingAnim.onfinish = () => {
     // アニメーションの完了後にopen属性を取り除く
