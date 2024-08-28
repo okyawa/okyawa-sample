@@ -68,10 +68,15 @@
     <br />
 
     <section>
-      <details>
+      <details open>
         <summary><h2>概要</h2></summary>
         
         <div class="markdown_content">
+- JavaScript `details` 要素を使ったアコーディオンの開閉動作にアニメーションを付与する形式
+- `Web Animation API` を使用してJSから `height` `opacity` を操作して、アニメーションを実装
+- `summary` 要素のデフォルトのクリック動作を無効化
+  - `summary` クリック時の挙動は `display: none;` のような挙動に近く、 `transition` などでアニメーションを設定しても、即開閉となってしまう
+  - `open` 属性の着脱は、JavaScriptで制御
         </div>
       </details>
     </section>
@@ -90,10 +95,11 @@
               </div>
             </div>
           </details>
-          <details class="accordion">
+          <details class="accordion" data-duration="100" data-easing="linear">
             <summary>メニュー2</summary>
             <div class="accordion_content">
               <div class="inner_accordion_content">
+                <code>data-duration="100" data-easing="linear"</code> の指定で、アニメーションのオプション指定あり<br />
                 内容2<br />内容2<br />内容2<br />内容2<br />内容2
               </div>
             </div>
