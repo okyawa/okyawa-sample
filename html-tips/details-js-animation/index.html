@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>detailsを使ったアコーディオンにJSでアニメーションアニメーションを付与するサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <script type="module" src="./details-accordion.js?v=1"></script>
+  <!--
+  <style>
+    /* summary左端のdefaultの三角形を削除する指定 */
+    .accordion > summary {
+      display: block; /* デフォルトの三角形を削除 */
+      cursor: pointer;
+      padding: 20px;
+    }
+    .accordion > .summary::-webkit-details-marker {
+      /* Safariでデフォルトの三角形を削除 */
+      display: none;
+    }
+  </style>
+  -->
+  <style>
+    .accordion_content {
+      overflow: hidden;
+      /* padding・marginはここでは設定しない */	
+    }
+    .inner_accordion_content {
+      padding: 0 20px 20px;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>detailsを使ったアコーディオン</h1>
+      <h2>JSでアニメーションアニメーションを付与</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details>
+        <summary><h2>概要</h2></summary>
+        
+        <div class="markdown_content">
+        </div>
+      </details>
+    </section>
+
+    <section id="sample_01">
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <fieldset>
+
+          <details class="accordion">
+            <summary>メニュー1</summary>
+            <div class="accordion_content">
+              <div class="inner_accordion_content">
+                内容1<br />内容1<br />内容1<br />内容1<br />内容1
+              </div>
+            </div>
+          </details>
+          <details class="accordion">
+            <summary>メニュー2</summary>
+            <div class="accordion_content">
+              <div class="inner_accordion_content">
+                内容2<br />内容2<br />内容2<br />内容2<br />内容2
+              </div>
+            </div>
+          </details>
+
+        </fieldset>
+
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
