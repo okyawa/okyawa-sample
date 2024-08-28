@@ -29,7 +29,7 @@
   <script src="/res/js/presentation/presentation.js"></script>
 
   <!-- ↓このHTML専用の指定 -->
-  <script type="module" src="./details-accordion.js?v=1"></script>
+  <script type="module" src="/html-tips/details-js-animation/details-accordion.js?v=1"></script>
   <!--
   <style>
     /* summary左端のdefaultの三角形を削除する指定 */
@@ -125,10 +125,11 @@
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/details&gt;
-&lt;details class="accordion"&gt;
+&lt;details class="accordion" data-duration="100" data-easing="linear"&gt;
   &lt;summary&gt;メニュー2&lt;/summary&gt;
   &lt;div class="accordion_content"&gt;
     &lt;div class="inner_accordion_content"&gt;
+      data-duration="100" data-easing="linear" の指定で、アニメーションのオプション指定あり&lt;br /&gt;
       内容2&lt;br /&gt;内容2&lt;br /&gt;内容2&lt;br /&gt;内容2&lt;br /&gt;内容2
     &lt;/div&gt;
   &lt;/div&gt;
