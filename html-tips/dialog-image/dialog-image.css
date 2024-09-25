@@ -412,6 +412,7 @@ dialog#dialog_image::backdrop {
   inset-inline: 0;
   inset-block: 0;
   border: none;
+  overscroll-behavior: contain;
 }
 /* 背面のスクロールを抑制 */
 body:has(dialog#dialog_image[open]) {

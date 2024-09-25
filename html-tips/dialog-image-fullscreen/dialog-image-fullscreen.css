@@ -450,6 +450,7 @@ dialog#dialog_image::backdrop {
   inset-block: 0;
   border: none;
   background-color: #000000cc;
+  overscroll-behavior: contain;
 }
 #dialog_image .image_preview_wrapper {
   height: 100%;
