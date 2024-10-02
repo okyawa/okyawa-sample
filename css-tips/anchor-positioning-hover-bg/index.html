@@ -1,0 +1,259 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Anchor Positioningでカードの背景をホバーで追従させるSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    .card-wrapper {
+      --_column-min-size: calc(320 * 1rem / 16);
+      --_background: #f5f5f5;
+      --_duration: 0.3s;
+
+      position: relative;
+      display: block grid;
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(var(--_column-min-size), 100%), 1fr)
+      );
+      max-width: 1024px;
+      margin-inline: auto;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: anchor(--card start);
+        z-index: -1;
+        width: anchor-size(--card inline);
+        height: anchor-size(--card block);
+        border-radius: 4px;
+        background-color: var(--_background);
+        transition-duration: var(--_duration);
+        transition-property: inset, width, height;
+      }
+    }
+
+    .card {
+      padding: 32px 16px;
+      display: block grid;
+      grid-template-rows: subgrid;
+      grid-row: span 4;
+
+      @supports not (anchor-name: --a) {
+        transition: background-color var(--_duration);
+
+        &:has(:any-link:hover) {
+          @media (any-hover: hover) {
+            background-color: var(--_background);
+          }
+        }
+      }
+
+      &:where(:hover, :has(:focus-visible)) {
+        anchor-name: --card;
+      }
+    }
+
+    .title {
+      font-size: 1em;
+
+      & :any-link {
+        color: #666;
+        text-decoration: none;
+      }
+    }
+
+    .publish {
+      margin: 0;
+    }
+
+    .thumbnail {
+      contain: strict;
+      order: -1;
+      aspect-ratio: 16 / 9;
+
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background-color: #ccc;
+      }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Anchor Positioning</h1>
+      <h2>カードの背景をホバーで追従させるSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- Chromeで導入された `Anchor Positioning` を使用すればCSSのみで背景をホバーで追従させることが可能
+- `Anchor Positioning` の指定が非対応の環境で悪さをすることはないため、プログレッシブ・エンハンスメントの一環で導入しても差し支えない
+- `@supports` 機能クエリを使用して、 `Anchor Positioning` 非対応のブラウザでは背景色を表示させるフォールバック指定を追加
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div class="card-wrapper">
+          <article class="card" aria-labelledby="article1">
+            <h2 id="article1" class="title">
+              <a class="article-link" href="#" target="_blank" rel="external">
+                border-imageを使った背景画像上のオーバーレイのサンプル
+              </a>
+            </h2>
+            <p class="publish">
+              <span class="visually-hidden">投稿日：</span>
+              <time datetime="2024-04-30">2024.04.30</time>
+            </p>
+            <div class="thumbnail">
+              <img src="https://picsum.photos/800/450?random=1" width="800" height="450" decoding="async" fetchpriority="high" alt="" />
+            </div>
+          </article>
+          <article class="card" aria-labelledby="article2">
+            <h2 id="article2" class="title">
+              <a class="article-link" href="#" target="_blank" rel="external">
+                ::file-selector-button を使ったファイル選択ボタンのサンプル
+              </a>
+            </h2>
+            <p class="publish">
+              <span class="visually-hidden">投稿日：</span>
+              <time datetime="2024-04-23">2024.04.23</time>
+            </p>
+            <div class="thumbnail">
+              <img src="https://picsum.photos/800/450?random=2" width="800" height="450" decoding="async" fetchpriority="high" alt="" />
+            </div>
+          </article>
+          <article class="card" aria-labelledby="article3">
+            <h2 id="article3" class="title">
+              <a class="article-link" href="#" target="_blank" rel="external">
+                ファイル選択ボタンのCSSカスタマイズ
+              </a>
+            </h2>
+            <p class="publish">
+              <span class="visually-hidden">投稿日：</span>
+              <time datetime="2024-04-12">2024.04.12</time>
+            </p>
+            <div class="thumbnail">
+              <img src="https://picsum.photos/800/450?random=3" width="800" height="450" decoding="async" fetchpriority="high" alt="" />
+            </div>
+          </article>
+          <article class="card" aria-labelledby="article4">
+            <h2 id="article4" class="title">
+              <a class="article-link" href="#" target="_blank" rel="external">
+                SVGで円形のプログレスバー (アニメーションあり)
+              </a>
+            </h2>
+            <p class="publish">
+              <span class="visually-hidden">投稿日：</span>
+              <time datetime="2024-04-30">2024.04.30</time>
+            </p>
+            <div class="thumbnail">
+              <img src="https://picsum.photos/800/450?random=4" width="800" height="450" decoding="async" fetchpriority="high" alt="" />
+            </div>
+          </article>
+          <article class="card" aria-labelledby="article5">
+            <h2 id="article5" class="title">
+              <a class="article-link" href="#" target="_blank" rel="external">
+                CSSでフォームの入力時にフロートする入力欄ラベルのサンプル
+              </a>
+            </h2>
+            <p class="publish">
+              <span class="visually-hidden">投稿日：</span>
+              <time datetime="2024-04-23">2024.04.23</time>
+            </p>
+            <div class="thumbnail">
+              <img src="https://picsum.photos/800/450?random=5" width="800" height="450" decoding="async" fetchpriority="high" alt="" />
+            </div>
+          </article>
+          <article class="card" aria-labelledby="article6">
+            <h2 id="article6" class="title">
+              <a class="article-link" href="#" target="_blank" rel="external">
+                :autofill 擬似クラスを使ったサンプル
+              </a>
+            </h2>
+            <p class="publish">
+              <span class="visually-hidden">投稿日：</span>
+              <time datetime="2024-04-12">2024.04.12</time>
+            </p>
+            <div class="thumbnail">
+              <img src="https://picsum.photos/800/450?random=6" width="800" height="450" decoding="async" fetchpriority="high" alt="" />
+            </div>
+          </article>
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://www.tak-dcxi.com/article/summary-of-css-techniques-posted-on-x-in-june-2024/#anchor-positioning%E3%81%A7%E3%82%AB%E3%83%BC%E3%83%89%E3%81%AE%E8%83%8C%E6%99%AF%E3%82%92%E3%83%9B%E3%83%90%E3%83%BC%E3%81%A7%E8%BF%BD%E5%BE%93%E3%81%95%E3%81%9B%E3%82%8B" ref="nofollow noreferrer noopener" target="_blank">
+              Anchor Positioningでカードの背景をホバーで追従させる - 2024年6月にXに投稿したCSSテクニックのまとめ | TAKLOG
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
