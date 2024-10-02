@@ -64,6 +64,7 @@
       grid-template-rows: subgrid;
       grid-row: span 4;
 
+      /* Anchor Positioningに対応していないブラウザ用 */
       @supports not (anchor-name: --a) {
         transition: background-color var(--_duration);
 
@@ -74,6 +75,7 @@
         }
       }
 
+      /* anchor-nameを指定 */
       &:where(:hover, :has(:focus-visible)) {
         anchor-name: --card;
       }
@@ -233,6 +235,51 @@
           <summary><h3>CSS</h3></summary>
 
 <pre><code class="language-css">
+.card-wrapper {
+  --_column-min-size: calc(320 * 1rem / 16);
+  --_background: #f5f5f5;
+  --_duration: 0.3s;
+
+  position: relative;
+  display: block grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(var(--_column-min-size), 100%), 1fr)
+  );
+  max-width: 1024px;
+  margin-inline: auto;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: anchor(--card start);
+    z-index: -1;
+    width: anchor-size(--card inline);
+    height: anchor-size(--card block);
+    border-radius: 4px;
+    background-color: var(--_background);
+    transition-duration: var(--_duration);
+    transition-property: inset, width, height;
+  }
+}
+
+.card {
+  /* Anchor Positioningに対応していないブラウザ用 */
+  @supports not (anchor-name: --a) {
+    transition: background-color var(--_duration);
+
+    &:has(:any-link:hover) {
+      @media (any-hover: hover) {
+        background-color: var(--_background);
+      }
+    }
+  }
+
+  /* anchor-nameを指定 */
+  &:where(:hover, :has(:focus-visible)) {
+    anchor-name: --card;
+  }
+}
 </code></pre>
 
         </details>
