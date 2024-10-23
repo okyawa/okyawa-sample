@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Web Speech APIの音声読み上げと音声認識のSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Web Speech API</h1>
+      <h2>ブラウザ上で音声読み上げと音声認識</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>Web Speech APIとは</h2></summary>
+
+        <div class="markdown_content">
+- 音声データをWebアプリに組み入れることができる
+- `SpeechSynthesis` (音声合成、`Text-to-Speech`) と `SpeechRecognition` (非同期音声認識、`Asynchronous Speech Recognition`) の2つから成り立つ
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>音声読み上げ</h2></summary>
+
+        <div class="markdown_content">
+- 音声合成は、 `SpeechSynthesis` インターフェイス経由でアクセスされ、テキストコンテンツを読み上げる機能を提供
+- 音声の種類は `SpeechSynthesisVoice` オブジェクトで、ブラウザに内蔵されているものから指定可能
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>音声認識</h2></summary>
+
+        <div class="markdown_content">
+- 音声は、 `SpeechSynthesisVoice` インターフェイス経由でアクセスされ、音声認識を行う機能を提供
+- このオブジェクトは、端末のマイクを通して入力された音声を検知
+- `SpeechGrammar` インターフェイスで、認識サービスに認識させたい単語のセットまたは単語パターンを指定できる
+- Chromeなど一部のブラウザーでは、Webページ上で音声認識を使用すると、サーバーベースの認識エンジンが使用される
+  - 音声を認識処理するためにWebサービスへ送信するため、オフラインでは動作しない
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <form>
+          <fieldset>
+            <legend>音声読み上げ</legend>
+            <label for="speech_text">読み上げるテキスト</label>
+            <input type="text" id="speech_text" name="speech_text" value="こんにちは" />
+            <button type="button" id="speech_button">読み上げ</button>
+          </fieldset>
+        </form>
+
+        <br />
+
+        <form>
+          <fieldset>
+            <legend>音声認識</legend>
+            <button type="button" id="recognition_button">音声認識開始</button>
+            <span id="listening"></span>
+            <div id="recognized_text" style="margin-top: 8px;"></div>
+          </fieldset>
+        </form>
+
+        <script>
+          /**
+           * Web Speech APIのSpeechSynthesisを使った音声読み上げの初期化
+           * 
+           * @param {HTMLButtonElement} buttonElement 読み上げを開始するボタン要素
+           * @param {HTMLInputElement} inputElement 読み上げるテキストを入力する要素
+           */
+          function setupSpeechSynthesis(buttonElement, inputElement) {
+            buttonElement.addEventListener('click', () => {
+              // 読み上げるテキスト
+              const speechText = inputElement.value;
+              // SpeechSynthesisUtteranceオブジェクトのインスタンスを作成
+              const speech = new SpeechSynthesisUtterance(speechText);
+              // 読み上げ言語 (既定値: HTMLのlang属性、なければUserAgentの言語)
+              speech.lang = 'ja-JP';
+              // 読み上げ速度 (0.1〜10.0, 既定値: 1.0)
+              speech.rate = 1.0;
+              // 読み上げ音量 (0.0〜1.0, 既定値: 1.0)
+              speech.volume = 1.0;
+              // 読み上げ音程 (0.1〜2.0, 既定値: 1.0)
+              speech.pitch = 1.0;
+              // 読み上げ音声 (SpeechSynthesisVoiceオブジェクト)
+              speech.voice = speechSynthesis.getVoices().filter(voice => voice.lang === 'ja-JP')[0];
+              // 読み上げの開始
+              speechSynthesis.speak(speech);
+            });
+          }
+
+          const speechButtonElem = document.getElementById('speech_button');
+          const speechTextElem = document.getElementById('speech_text');
+          setupSpeechSynthesis(speechButtonElem, speechTextElem);
+        </script>
+
+        <script>
+          /**
+           * Web Speech APIのSpeechRecognitionを使った音声認識の初期化
+           * 
+           * @param {HTMLButtonElement} startButtonElem 音声認識を開始するボタン要素
+           * @param {HTMLDivElement} recognizedTextElem 認識されたテキストを表示する要素
+           * @param {HTMLSpanElement} listeningElem 音声認識中を表示する要素
+           */
+          function setupSpeechRecognition(startButtonElem, recognizedTextElem, listeningElem) {
+            // SpeechRecognitionが使えるかどうかの判定
+            if (window.SpeechRecognition === undefined && window.webkitSpeechRecognition === undefined) {
+              // SpeechRecognitionに対応していないブラウザ
+              recognizedTextElem.textContent = 'このブラウザは音声認識に対応していません。';
+              return;
+            }
+
+            // SpeechRecognitionオブジェクトのインスタンスを作成
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            // 認識言語 (既定値: HTMLのlang属性、なければUserAgentの言語)
+            recognition.lang = 'ja-JP';
+            // 暫定的な結果を返すかどうか (true: 途中経過を返す, false: 最終結果のみを返す)
+            recognition.interimResults = false;
+            // 最大の認識候補数 (既定値: 1)
+            recognition.maxAlternatives = 1;
+
+            // 音声認識の開始
+            startButtonElem.addEventListener('click', () => {
+              recognizedTextElem.textContent = ``;
+              listeningElem.textContent = `👂️`;
+              recognition.start();
+            });
+
+            // 音声認識の結果
+            recognition.addEventListener('result', (event) => {
+              const transcript = event.results[0][0].transcript;
+              recognizedTextElem.textContent = `認識されたテキスト: ${transcript}`;
+            });
+
+            // 音声認識の終了
+            recognition.addEventListener('speechend', () => {
+              listeningElem.textContent = ``;
+              recognition.stop();
+            });
+
+            // 音声認識のエラー
+            recognition.addEventListener('error', (event) => {
+              recognizedTextElem.textContent = `エラー: ${event.error}`;
+            });
+          }
+
+          const recognitionButtonElem = document.getElementById('recognition_button');
+          const recognizedTextElem = document.getElementById('recognized_text');
+          const listeningElem = document.getElementById('listening');
+          setupSpeechRecognition(recognitionButtonElem, recognizedTextElem, listeningElem);
+        </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">
+
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>JavaScript</h3></summary>
+
+<pre><code class="language-js">
+
+</code></pre>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.mozilla.org/ja/docs/Web/API/Web_Speech_API" ref="nofollow noreferrer noopener" target="_blank">
+              Web Speech API - Web API | MDN
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.mozilla.org/ja/docs/Web/API/SpeechSynthesis" ref="nofollow noreferrer noopener" target="_blank">
+              SpeechSynthesis - Web API | MDN
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.mozilla.org/ja/docs/Web/API/SpeechRecognition" ref="nofollow noreferrer noopener" target="_blank">
+              SpeechRecognition - Web API | MDN
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=SpeechSynthesis" ref="nofollow noreferrer noopener" target="_blank">
+              SpeechSynthesis | Can I use...
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=SpeechSynthesisVoice" ref="nofollow noreferrer noopener" target="_blank">
+              SpeechSynthesisVoice | Can I use...
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=SpeechRecognition" ref="nofollow noreferrer noopener" target="_blank">
+              SpeechRecognition | Can I use...
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=SpeechGrammar" ref="nofollow noreferrer noopener" target="_blank">
+              SpeechGrammar | Can I use...
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
