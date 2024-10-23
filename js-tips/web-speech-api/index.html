@@ -88,6 +88,10 @@
         <form>
           <fieldset>
             <legend>音声読み上げ</legend>
+            <div style="margin-bottom: 8px;">
+              <label for="voice_select">声の種類</label>
+              <select id="voice_select"></select>
+            </div>
             <label for="speech_text">読み上げるテキスト</label>
             <input type="text" id="speech_text" name="speech_text" value="こんにちは" />
             <button type="button" id="speech_button">読み上げ</button>
@@ -111,8 +115,27 @@
            * 
            * @param {HTMLButtonElement} buttonElement 読み上げを開始するボタン要素
            * @param {HTMLInputElement} inputElement 読み上げるテキストを入力する要素
+           * @param {HTMLSelectElement} voiceSelectElement 音声リストを表示するセレクトボックス要素
            */
-          function setupSpeechSynthesis(buttonElement, inputElement) {
+          function setupSpeechSynthesis(buttonElement, inputElement, voiceSelectElement) {
+            /**
+             * 音声合成の音声リストを取得してセレクトボックスにセット
+             */
+            const populateVoiceList = () => {
+              const voices = window.speechSynthesis.getVoices();
+              voiceSelectElement.innerHTML = '';
+              voices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = index;
+                console.log(voiceSelectElement)
+                voiceSelectElement.appendChild(option);
+              });
+            }
+            populateVoiceList();
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+
+            // ボタンに音声読み上げの開始のクリックイベントをセット
             buttonElement.addEventListener('click', () => {
               // 読み上げるテキスト
               const speechText = inputElement.value;
@@ -127,7 +150,9 @@
               // 読み上げ音程 (0.1〜2.0, 既定値: 1.0)
               speech.pitch = 1.0;
               // 読み上げ音声 (SpeechSynthesisVoiceオブジェクト)
-              speech.voice = speechSynthesis.getVoices().filter(voice => voice.lang === 'ja-JP')[0];
+              const selectedVoiceIndex = voiceSelectElement.value;
+              const voices = speechSynthesis.getVoices();
+              speech.voice = voices[selectedVoiceIndex];
               // 読み上げの開始
               speechSynthesis.speak(speech);
             });
@@ -135,7 +160,8 @@
 
           const speechButtonElem = document.getElementById('speech_button');
           const speechTextElem = document.getElementById('speech_text');
-          setupSpeechSynthesis(speechButtonElem, speechTextElem);
+          const voiceSelectElem = document.getElementById('voice_select');
+          setupSpeechSynthesis(speechButtonElem, speechTextElem, voiceSelectElem);
         </script>
 
         <script>
