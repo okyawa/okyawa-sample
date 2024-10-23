@@ -83,7 +83,7 @@
 
     <section>
       <details open>
-        <summary><h2>デモ</h2></summary>
+        <summary><h2>音声読み上げのデモ</h2></summary>
 
         <form>
           <fieldset>
@@ -95,17 +95,6 @@
             <label for="speech_text">読み上げるテキスト: </label>
             <input type="text" id="speech_text" name="speech_text" value="こんにちは" />
             <button type="button" id="speech_button">読み上げ</button>
-          </fieldset>
-        </form>
-
-        <br />
-
-        <form>
-          <fieldset>
-            <legend>音声認識</legend>
-            <button type="button" id="recognition_button">音声認識開始</button>
-            <span id="listening"></span>
-            <div id="recognized_text" style="margin-top: 8px;"></div>
           </fieldset>
         </form>
 
@@ -126,13 +115,14 @@
              */
             const populateVoiceList = () => {
               voiceSelectElement.innerHTML = '';
+              // ブラウザで利用可能な音声リストを取得し、使用する言語にフィルタリング
               window.speechSynthesis.getVoices()
                 .filter((voice) => voice.lang === LANG)
                 .forEach((voice, index) => {
+                  // 取得した音声リストをセレクトボックスの選択肢に追加
                   const option = document.createElement('option');
                   option.textContent = `${voice.name} (${voice.lang})`;
                   option.value = index;
-                  console.log(voiceSelectElement)
                   voiceSelectElement.appendChild(option);
                 });
             }
@@ -168,6 +158,108 @@
           const voiceSelectElem = document.getElementById('voice_select');
           setupSpeechSynthesis(speechButtonElem, speechTextElem, voiceSelectElem);
         </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>音声読み上げのコード</h2></summary>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div&gt;
+  &lt;label for=&quot;voice_select&quot;&gt;声の種類: &lt;/label&gt;
+  &lt;select id=&quot;voice_select&quot;&gt;&lt;/select&gt;
+&lt;/div&gt;
+&lt;label for=&quot;speech_text&quot;&gt;読み上げるテキスト: &lt;/label&gt;
+&lt;input type=&quot;text&quot; id=&quot;speech_text&quot; name=&quot;speech_text&quot; value=&quot;こんにちは&quot; /&gt;
+&lt;button type=&quot;button&quot; id=&quot;speech_button&quot;&gt;読み上げ&lt;/button&gt;
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>JavaScript</h3></summary>
+
+<pre><code class="language-js">/**
+ * Web Speech APIのSpeechSynthesisを使った音声読み上げの初期化
+ * 
+ * @param {HTMLButtonElement} buttonElement 読み上げを開始するボタン要素
+ * @param {HTMLInputElement} inputElement 読み上げるテキストを入力する要素
+ * @param {HTMLSelectElement} voiceSelectElement 音声リストを表示するセレクトボックス要素
+ */
+function setupSpeechSynthesis(buttonElement, inputElement, voiceSelectElement) {
+  /** 読み上げ言語 */
+  const LANG = 'ja-JP';
+
+  /**
+    * 音声合成の音声リストを取得してセレクトボックスにセット
+    */
+  const populateVoiceList = () => {
+    voiceSelectElement.innerHTML = '';
+    // ブラウザで利用可能な音声リストを取得し、使用する言語にフィルタリング
+    window.speechSynthesis.getVoices()
+      .filter((voice) => voice.lang === LANG)
+      .forEach((voice, index) => {
+        // 取得した音声リストをセレクトボックスの選択肢に追加
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.value = index;
+        voiceSelectElement.appendChild(option);
+      });
+  }
+  populateVoiceList();
+  speechSynthesis.onvoiceschanged = populateVoiceList;
+
+  // ボタンに音声読み上げの開始のクリックイベントをセット
+  buttonElement.addEventListener('click', () => {
+    // 読み上げるテキスト
+    const speechText = inputElement.value;
+    // SpeechSynthesisUtteranceオブジェクトのインスタンスを作成
+    const speech = new SpeechSynthesisUtterance(speechText);
+    // 読み上げ言語 (既定値: HTMLのlang属性、なければUserAgentの言語)
+    speech.lang = LANG;
+    // 読み上げ速度 (0.1〜10.0, 既定値: 1.0)
+    speech.rate = 1.0;
+    // 読み上げ音量 (0.0〜1.0, 既定値: 1.0)
+    speech.volume = 1.0;
+    // 読み上げ音程 (0.1〜2.0, 既定値: 1.0)
+    speech.pitch = 1.0;
+    // 読み上げ音声 (SpeechSynthesisVoiceオブジェクト)
+    const selectedVoiceIndex = voiceSelectElement.value;
+    const voices = speechSynthesis.getVoices()
+      .filter((voice) => voice.lang === LANG);
+    speech.voice = voices[selectedVoiceIndex];
+    // 読み上げの開始
+    speechSynthesis.speak(speech);
+  });
+}
+
+const speechButtonElem = document.getElementById('speech_button');
+const speechTextElem = document.getElementById('speech_text');
+const voiceSelectElem = document.getElementById('voice_select');
+setupSpeechSynthesis(speechButtonElem, speechTextElem, voiceSelectElem);
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>音声認識のデモ</h2></summary>
+
+        <form>
+          <fieldset>
+            <legend>音声認識</legend>
+            <button type="button" id="recognition_button">音声認識開始</button>
+            <span id="listening"></span>
+            <div id="recognized_text" style="margin-top: 8px;"></div>
+          </fieldset>
+        </form>
 
         <script>
           /**
@@ -246,13 +338,14 @@
 
     <section>
       <details>
-        <summary><h2>コード</h2></summary>
+        <summary><h2>音声認識のコード</h2></summary>
 
         <details open>
           <summary><h3>HTML</h3></summary>
 
-<pre><code class="language-html">
-
+<pre><code class="language-html">&lt;button type=&quot;button&quot; id=&quot;recognition_button&quot;&gt;音声認識開始&lt;/button&gt;
+&lt;span id=&quot;listening&quot;&gt;&lt;/span&gt;
+&lt;div id=&quot;recognized_text&quot;&gt;&lt;/div&gt;
 </code></pre>
 
         </details>
@@ -260,9 +353,77 @@
         <details open>
           <summary><h3>JavaScript</h3></summary>
 
-<pre><code class="language-js">
+<pre><code class="language-js">/**
+ * Web Speech APIのSpeechRecognitionを使った音声認識の初期化
+ * 
+ * @param {HTMLButtonElement} startButtonElem 音声認識を開始するボタン要素
+ * @param {HTMLDivElement} recognizedTextElem 認識されたテキストを表示する要素
+ * @param {HTMLSpanElement} listeningElem 音声認識中を表示する要素
+ */
+function setupSpeechRecognition(startButtonElem, recognizedTextElem, listeningElem) {
+  // SpeechRecognitionが使えるかどうかの判定
+  if (window.SpeechRecognition === undefined && window.webkitSpeechRecognition === undefined) {
+    // SpeechRecognitionに対応していないブラウザ
+    recognizedTextElem.textContent = 'このブラウザは音声認識に対応していません。';
+    return;
+  }
 
+  // SpeechRecognitionオブジェクトのインスタンスを作成
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  // 認識言語 (既定値: HTMLのlang属性、なければUserAgentの言語)
+  recognition.lang = 'ja-JP';
+  // 暫定的な結果を返すかどうか (true: 途中経過を返す, false: 最終結果のみを返す)
+  recognition.interimResults = false;
+  // 最大の認識候補数 (既定値: 1)
+  recognition.maxAlternatives = 1;
+
+  // 音声認識中かどうか
+  let loading = false;
+
+  // 音声認識の開始
+  startButtonElem.addEventListener('click', () => {
+    if (loading) {
+      // 開始中の場合は停止
+      startButtonElem.textContent = `音声認識開始`;
+      listeningElem.textContent = ``;
+      recognition.stop();
+      loading = false;
+      return;
+    }
+    // 開始
+    startButtonElem.textContent = `音声認識終了`;
+    recognizedTextElem.textContent = ``;
+    listeningElem.textContent = `👂️`;
+    loading = true;
+    recognition.start();
+  });
+
+  // 音声認識の結果
+  recognition.addEventListener('result', (event) => {
+    const transcript = event.results[0][0].transcript;
+    recognizedTextElem.textContent = `認識されたテキスト: ${transcript}`;
+  });
+
+  // 音声認識の終了
+  recognition.addEventListener('speechend', () => {
+    startButtonElem.textContent = `音声認識開始`;
+    listeningElem.textContent = ``;
+    recognition.stop();
+    loading = false;
+  });
+
+  // 音声認識のエラー
+  recognition.addEventListener('error', (event) => {
+    recognizedTextElem.textContent = `エラー: ${event.error}`;
+  });
+}
+
+const recognitionButtonElem = document.getElementById('recognition_button');
+const recognizedTextElem = document.getElementById('recognized_text');
+const listeningElem = document.getElementById('listening');
+setupSpeechRecognition(recognitionButtonElem, recognizedTextElem, listeningElem);
 </code></pre>
+
         </details>
 
       </details>
