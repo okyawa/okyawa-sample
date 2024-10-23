@@ -189,10 +189,24 @@
             // 最大の認識候補数 (既定値: 1)
             recognition.maxAlternatives = 1;
 
+            // 音声認識中かどうか
+            let loading = false;
+
             // 音声認識の開始
             startButtonElem.addEventListener('click', () => {
+              if (loading) {
+                // 開始中の場合は停止
+                startButtonElem.textContent = `音声認識開始`;
+                listeningElem.textContent = ``;
+                recognition.stop();
+                loading = false;
+                return;
+              }
+              // 開始
+              startButtonElem.textContent = `音声認識終了`;
               recognizedTextElem.textContent = ``;
               listeningElem.textContent = `👂️`;
+              loading = true;
               recognition.start();
             });
 
@@ -204,8 +218,10 @@
 
             // 音声認識の終了
             recognition.addEventListener('speechend', () => {
+              startButtonElem.textContent = `音声認識開始`;
               listeningElem.textContent = ``;
               recognition.stop();
+              loading = false;
             });
 
             // 音声認識のエラー
