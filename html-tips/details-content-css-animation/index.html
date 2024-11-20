@@ -45,10 +45,11 @@
     <section>
       <details open>
         <summary><h2>概要</h2></summary>
-        
+
         <div class="markdown_content">
-- Chrome `131` より、遂に `details` 要素がCSSのみでアニメーション可能になった
-  - `131` よりサポートされる `::details-content` 疑似要素をアニメーションさせることで、ようやくCSSだけでアニメーション可能になる
+- Chrome `131` から、 `details` 要素がCSSのみでアニメーション可能になった
+  - `131` からサポートされる `::details-content` 疑似要素をアニメーションさせることで、ようやくCSSだけでアニメーション可能になる
+  - 2024/11/20 現在、 `::details-content` 疑似要素に対応してるのは、まだChromeのみ
 - `interpolate-size` は内在サイズ ( `auto` や `max-content` など) のアニメーションを許可するプロパティ
   - `:root` に指定しておけば `calc-size()` を使わずとも内在サイズのアニメーションが可能になる
   - 非サポートの環境で悪さするわけでもないので、リセットするCSSに標準搭載しても問題なさそう
