@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>::details-content 疑似要素を使ってdetails要素をCSSアニメーションさせるサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=3" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>::details-content 疑似要素</h1>
+      <h2>details要素をCSSアニメーションさせるサンプル</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+        
+        <div class="markdown_content">
+- Chrome `131` より、遂に `details` 要素がCSSのみでアニメーション可能になった
+  - `131` よりサポートされる `::details-content` 疑似要素をアニメーションさせることで、ようやくCSSだけでアニメーション可能になる
+- `interpolate-size` は内在サイズ ( `auto` や `max-content` など) のアニメーションを許可するプロパティ
+  - `:root` に指定しておけば `calc-size()` を使わずとも内在サイズのアニメーションが可能になる
+  - 非サポートの環境で悪さするわけでもないので、リセットするCSSに標準搭載しても問題なさそう
+        </div>
+      </details>
+    </section>
+
+    <section id="sample_01">
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+<style>
+:where(:root) {
+  /* 内在サイズ ( `auto` や `max-content` など) のアニメーションを許可するプロパティ */
+  /* interpolate-size: allow-keywords; */
+}
+
+details {
+  &::details-content {
+    interpolate-size: allow-keywords;
+    overflow: clip;
+    block-size: 0;
+    transition-duration: 0.3s;
+    transition-property: content-visibility, block-size;
+    transition-behavior: allow-discrete;
+  }
+
+  &[open]::details-content {
+    block-size: unset;
+  }
+}
+</style>
+
+        <fieldset>
+
+          <details class="accordion">
+            <summary>メニュー1</summary>
+            <div class="accordion_content">
+              内容1<br />内容1<br />内容1<br />内容1<br />内容1
+            </div>
+          </details>
+          <details class="accordion">
+            <summary>メニュー2</summary>
+            <div class="accordion_content">
+              内容2<br />内容2<br />内容2<br />内容2<br />内容2
+            </div>
+          </details>
+
+        </fieldset>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">details {
+  &::details-content {
+    interpolate-size: allow-keywords;
+    overflow: clip;
+    block-size: 0;
+    transition-duration: 0.3s;
+    transition-property: content-visibility, block-size;
+    transition-behavior: allow-discrete;
+  }
+
+  &[open]::details-content {
+    block-size: unset;
+  }
+}
+</code></pre>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://x.com/tak_dcxi/status/1844209478805414123" ref="nofollow noreferrer noopener" target="_blank">
+              Chrome 131よりついにdetails要素がCSSのみでアニメーション可能に | TAK | X
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=%3A%3Adetails-content" ref="nofollow noreferrer noopener" target="_blank">
+              Can I use... | ::details-content
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
