@@ -48,6 +48,21 @@ details section {
   margin: 0 1rem;
 }
 
+details {
+  &::details-content {
+    interpolate-size: allow-keywords;
+    overflow: clip;
+    block-size: 0;
+    transition-duration: 0.3s;
+    transition-property: content-visibility, block-size;
+    transition-behavior: allow-discrete;
+  }
+
+  &[open]::details-content {
+    block-size: unset;
+  }
+}
+
 fieldset {
   padding: 1rem;
   border: solid 1px #ccc;
