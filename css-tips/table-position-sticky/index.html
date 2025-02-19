@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>table "position: sticky;" Sample</title>
+  <title>table "position: sticky;" "container-type: scroll-state" Sample</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
 
@@ -79,13 +79,46 @@
     }
   </style>
 
+  <style>
+    /* scroll-stateのscrollableを使ったscroll hint表示 */
+    .table_wrapper {
+      position: relative;
+      container-type: scroll-state;
+      overflow: auto;
+      overscroll-behavior-inline: contain;
+
+      &::after {
+        content: "＞";
+        padding: 2px 4px;
+        position: absolute; 
+        top: 50%;
+        right: 16px;
+        color: #999;
+        font-weight: bold;
+        background-color: #eeeeeecc;
+        border-radius: 8px;
+        transition-duration: 0.3s;
+        transition-property: opacity, visibility;
+        @container scroll-state((scrollable: inline-start) or (not (scrollable: inline-end))) {
+          visibility: hidden;
+          opacity: 0;
+        }
+      }
+      
+      & :where(table) {
+        width: 100%;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="container">
 
     <h1>table "position: sticky;" Sample</h1>
+    <h2>"container-type: scroll-state" Scroll Hint</h2>
 
-    <div role="region" aria-labelledby="caption" tabindex="0">
+    <div role="region" aria-labelledby="caption" tabindex="0" class="table_wrapper">
       <table>
         <caption id="caption">Baseball numbers.</caption>
         <thead>
