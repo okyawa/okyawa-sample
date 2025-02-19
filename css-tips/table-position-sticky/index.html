@@ -81,32 +81,34 @@
 
   <style>
     /* scroll-stateのscrollableを使ったscroll hint表示 */
-    .table_wrapper {
-      position: relative;
-      container-type: scroll-state;
-      overflow: auto;
-      overscroll-behavior-inline: contain;
+    @supports (container-type: scroll-state) {
+      .table_wrapper {
+        position: relative;
+        container-type: scroll-state;
+        overflow: auto;
+        overscroll-behavior-inline: contain;
 
-      &::after {
-        content: "＞";
-        padding: 2px 4px;
-        position: absolute; 
-        top: 50%;
-        right: 16px;
-        color: #999;
-        font-weight: bold;
-        background-color: #eeeeeecc;
-        border-radius: 8px;
-        transition-duration: 0.3s;
-        transition-property: opacity, visibility;
-        @container scroll-state((scrollable: inline-start) or (not (scrollable: inline-end))) {
-          visibility: hidden;
-          opacity: 0;
+        &::after {
+          content: "＞";
+          padding: 2px 4px;
+          position: absolute; 
+          top: 50%;
+          right: 16px;
+          color: #999;
+          font-weight: bold;
+          background-color: #eeeeeecc;
+          border-radius: 8px;
+          transition-duration: 0.3s;
+          transition-property: opacity, visibility;
+          @container scroll-state((scrollable: inline-start) or (not (scrollable: inline-end))) {
+            visibility: hidden;
+            opacity: 0;
+          }
         }
-      }
-      
-      & :where(table) {
-        width: 100%;
+        
+        & :where(table) {
+          width: 100%;
+        }
       }
     }
   </style>
