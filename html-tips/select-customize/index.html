@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>select要素とoption要素のカスタマイズ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>select要素とoption要素のカスタマイズ</h1>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- ChromeとEdgeは134から対応
+        </div>
+      </details>
+    </section>
+
+    <section id="sample_01">
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+<style>
+/* select要素とoption要素のカスタマイズ ==================================== */
+
+/* ☆ select要素のカスタマイズ必須のCSS指定 ☆ */
+select,
+::picker(select) {
+  appearance: base-select;
+}
+
+/* ポップアップするピッカー */
+::picker(select) {
+  margin-block: 4px;
+  padding: 2px;
+  border: #ccc solid 1px;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), /* ぼかし部分の影 */
+    0 1px 3px rgba(0, 0, 0, 0.08); /* 縁の影 */
+  /* アニメーションも設定できる */
+  transition: scale 0.2s;
+}
+::picker(select):hover {
+  scale: 1.05;
+}
+
+/* セレクト要素の矢印アイコン */
+select::picker-icon {
+  content: "▽";
+}
+
+/* optionのチェックマーク */
+option::checkmark {
+  content: "✔";
+}
+
+/* ボタン選択内は、説明欄を非表示にして、画像サイズを小さくする */
+selectedcontent .desc {
+  display: none;
+}
+selectedcontent img {
+  width: 40px;
+  height: 40px;
+}
+selectedcontent .inner_option {
+  gap: 6px;
+}
+
+/* select要素とoption要素をhoverしたときの背景色指定 */
+select:hover,
+option:enabled:hover {
+  background-color: palegoldenrod;
+}
+
+/* セレクトボックス右端矢印を上下中央揃えにする */
+select {
+  display: inline-flex;
+  align-items: center;
+}
+
+
+/* その他、デザイン調整 ==================================== */
+.inner_option {
+  padding-block: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inner_option img {
+  border-radius: 8px;
+}
+.desc {
+  color: #999;
+  line-height: 1;
+  font-size: 0.72rem;
+}
+</style>
+
+        <fieldset>
+
+          <select>
+            <button>
+              <selectedcontent></selectedcontent>
+            </button>
+
+            <optgroup label="ロングカクテル">
+              <option value="1">
+                <div class="inner_option">
+                  <img src="/img/cocktails/w640/absinthe_cola.jpeg" width="60" height="60" alt="" />
+                  <div>
+                    <div>アブサン・コーラ</div>
+                    <div class="desc">ベース: アブサン</div>
+                  </div>
+                </div>
+              </option>
+            </optgroup>
+            <optgroup label="ショートカクテル">
+              <option value="2">
+                <div class="inner_option">
+                  <img src="/img/cocktails/w640/port_flip.jpeg" width="60" height="60" alt="" />
+                  <div>
+                    <div>ポート・フィリップ</div>
+                    <div class="desc">ベース: ポートワイン</div>
+                  </div>
+                </div>
+              </option>
+              <option value="3">
+                <div class="inner_option">
+                  <img src="/img/cocktails/w640/strawberry_field.jpeg" width="60" height="60" alt="" />
+                  <div>
+                    <div>ストロベリー・フィールド</div>
+                    <div class="desc">ベース: ストロベリーリキュール</div>
+                  </div>
+                </div>
+              </option>
+            </optgroup>
+          </select>
+
+        </fieldset>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">
+
+</code></pre>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://ics.media/entry/250307/" ref="nofollow noreferrer noopener" target="_blank">
+              HTML/CSSで装飾可能に！select・optionタグの新しいカスタマイズ方法 | ICS MEDIA
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/blog/rfc-customizable-select?hl=ja" ref="nofollow noreferrer noopener" target="_blank">
+              デベロッパー フィードバックのリクエスト: カスタマイズ可能な選択 | chrome for developers
+            </a>
+          </li>
+          <li>
+            <a href="https://zenn.dev/h_yokoyama/articles/html-select-style" ref="nofollow noreferrer noopener" target="_blank">
+              HTMLのselect要素がCSSでカスタマイズ可能になる | Zenn
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
