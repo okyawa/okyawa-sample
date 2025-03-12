@@ -46,7 +46,18 @@
         <summary><h2>概要</h2></summary>
 
         <div class="markdown_content">
-- ChromeとEdgeは134から対応
+- `select` 要素と `option` 要素がカスタマイズできるようになった
+- ChromeとEdgeは `134` から対応
+  - 2025年3月12日現在、SafariとFirefoxは未対応
+- カスタマイズに必須のCSSは、 `select` と `::picker(select)` に `appearance: base-select;` の指定
+  - この指定を入れることで、CSS自由にカスタマイズできようになり、 `option` 要素内にある程度のHTML要素を追加することも可能
+    - 厳密には成約があるものの、 実際に使いそうなパターンでは、`option` 要素内のHTMLとCSSでカスタマイズがほぼ自由にできそうな感じ
+- ポップアップする選択欄は、 `::picker(select)` のセレクタでCSS指定が可能
+  - `::picker(select)` のポップアップは、 `Popover` と `Anchor Positioning` の2つの基盤技術で構築されている
+- 選択したものは、 `select` 要素内に設置した `selectedcontent` 要素に入る
+  - `option` 内に指定したものが、そのまま入る感じ
+  - CSSで `selectedcontent` 内のセレクタ指定を加えることで、 `button` 内の選択済み表示にだけCSS指定を適用可能
+
         </div>
       </details>
     </section>
@@ -87,6 +98,7 @@ select::picker-icon {
 /* optionのチェックマーク */
 option::checkmark {
   content: "✔";
+  color: green;
 }
 
 /* ボタン選択内は、説明欄を非表示にして、画像サイズを小さくする */
@@ -181,10 +193,125 @@ select {
         <summary><h2>コード</h2></summary>
 
         <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;select&gt;
+  &lt;button&gt;
+    &lt;selectedcontent&gt;&lt;/selectedcontent&gt;
+  &lt;/button&gt;
+
+  &lt;optgroup label="ロングカクテル"&gt;
+    &lt;option value="1"&gt;
+      &lt;div class="inner_option"&gt;
+        &lt;img src="/img/cocktails/w640/absinthe_cola.jpeg" width="60" height="60" alt="" /&gt;
+        &lt;div&gt;
+          &lt;div&gt;アブサン・コーラ&lt;/div&gt;
+          &lt;div class="desc"&gt;ベース: アブサン&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/option&gt;
+  &lt;/optgroup&gt;
+  &lt;optgroup label="ショートカクテル"&gt;
+    &lt;option value="2"&gt;
+      &lt;div class="inner_option"&gt;
+        &lt;img src="/img/cocktails/w640/port_flip.jpeg" width="60" height="60" alt="" /&gt;
+        &lt;div&gt;
+          &lt;div&gt;ポート・フィリップ&lt;/div&gt;
+          &lt;div class="desc"&gt;ベース: ポートワイン&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/option&gt;
+    &lt;option value="3"&gt;
+      &lt;div class="inner_option"&gt;
+        &lt;img src="/img/cocktails/w640/strawberry_field.jpeg" width="60" height="60" alt="" /&gt;
+        &lt;div&gt;
+          &lt;div&gt;ストロベリー・フィールド&lt;/div&gt;
+          &lt;div class="desc"&gt;ベース: ストロベリーリキュール&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/option&gt;
+  &lt;/optgroup&gt;
+&lt;/select&gt;
+</code></pre>
+        </details>
+
+        <details open>
           <summary><h3>CSS</h3></summary>
 
-<pre><code class="language-css">
+<pre><code class="language-css">/* select要素とoption要素のカスタマイズ ==================================== */
 
+/* ☆ select要素のカスタマイズ必須のCSS指定 ☆ */
+select,
+::picker(select) {
+  appearance: base-select;
+}
+
+/* ポップアップするピッカー */
+::picker(select) {
+  margin-block: 4px;
+  padding: 2px;
+  border: #ccc solid 1px;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), /* ぼかし部分の影 */
+    0 1px 3px rgba(0, 0, 0, 0.08); /* 縁の影 */
+  /* アニメーションも設定できる */
+  transition: scale 0.2s;
+}
+::picker(select):hover {
+  scale: 1.05;
+}
+
+/* セレクト要素の矢印アイコン */
+select::picker-icon {
+  content: "▽";
+}
+
+/* optionのチェックマーク */
+option::checkmark {
+  content: "✔";
+  color: green;
+}
+
+/* ボタン選択内は、説明欄を非表示にして、画像サイズを小さくする */
+selectedcontent .desc {
+  display: none;
+}
+selectedcontent img {
+  width: 40px;
+  height: 40px;
+}
+selectedcontent .inner_option {
+  gap: 6px;
+}
+
+/* select要素とoption要素をhoverしたときの背景色指定 */
+select:hover,
+option:enabled:hover {
+  background-color: palegoldenrod;
+}
+
+/* セレクトボックス右端矢印を上下中央揃えにする */
+select {
+  display: inline-flex;
+  align-items: center;
+}
+
+
+/* その他、デザイン調整 ==================================== */
+.inner_option {
+  padding-block: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inner_option img {
+  border-radius: 8px;
+}
+.desc {
+  color: #999;
+  line-height: 1;
+  font-size: 0.72rem;
+}
 </code></pre>
         </details>
 
