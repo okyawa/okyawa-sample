@@ -30,10 +30,7 @@
 
   <!-- ↓このHTML専用の指定 -->
   <style>
-    .content-section {
-      min-height: 100vh;
-    }
-
+    /* スクロールすることでフェード・インさせる要素 */
     .fade-in-element {
       font-size: 1.5rem;
       padding: 2rem;
@@ -113,29 +110,27 @@
       <details open>
         <summary><h2>デモ</h2></summary>
 
-        <div class="container">
-          <div class="content-section">
-            <div class="fade-in-element">
-              この要素は、スクロールして画面に表示されると、フェードインしながら現れます。
-            </div>
-            
-            <div class="fade-in-element">
-              Scroll-driven Animationを使うと、JavaScript不要で実装できます。
-            </div>
-            
-            <div class="fade-in-element">
-              animation-timelineとanimation-rangeプロパティを使って、
-              スクロール位置に基づいたアニメーションが可能です。
-            </div>
-            
-            <div class="fade-in-element">
-              このデモでは、要素が視界に25%入ったときにアニメーションが開始され、
-              70%表示されたときに完了します。
-            </div>
-            
-            <div class="fade-in-element">
-              モダンブラウザでサポートされている新しい機能です。
-            </div>
+        <div>
+          <div class="fade-in-element">
+            この要素は、スクロールして画面に表示されると、フェードインしながら現れます。
+          </div>
+          
+          <div class="fade-in-element">
+            Scroll-driven Animationを使うと、JavaScript不要で実装できます。
+          </div>
+          
+          <div class="fade-in-element">
+            animation-timelineとanimation-rangeプロパティを使って、
+            スクロール位置に基づいたアニメーションが可能です。
+          </div>
+          
+          <div class="fade-in-element">
+            このデモでは、要素が視界に25%入ったときにアニメーションが開始され、
+            70%表示されたときに完了します。
+          </div>
+          
+          <div class="fade-in-element">
+            モダンブラウザでサポートされている新しい機能です。
           </div>
         </div>
 
@@ -149,7 +144,80 @@
         <details open>
           <summary><h3>CSS</h3></summary>
 
-<pre><code class="language-css">
+<pre><code class="language-css">/* スクロールすることでフェード・インさせる要素 */
+.fade-in-element {
+  font-size: 1.5rem;
+  padding: 2rem;
+  margin: 2rem 0;
+  background-color: #e9f7fe;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  /* 初期状態は透明 */
+  opacity: 0;
+  
+  /* アニメーションの設定 */
+  animation-timeline: view();
+  animation-name: fade-in;
+  
+  /* 要素が25%表示されたらアニメーション開始 */
+  animation-range: entry 25% cover 70%;
+  
+  /* アニメーションの他のプロパティ */
+  animation-fill-mode: both;
+  animation-duration: 1s;
+}
+
+/* フェードインアニメーションの定義 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* スクロールを促すスタイル */
+.scroll-down {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div class="fade-in-element"&gt;
+  この要素は、スクロールして画面に表示されると、フェードインしながら現れます。
+&lt;/div&gt;
+
+&lt;div class="fade-in-element"&gt;
+  Scroll-driven Animationを使うと、JavaScript不要で実装できます。
+&lt;/div&gt;
+
+&lt;div class="fade-in-element"&gt;
+  animation-timelineとanimation-rangeプロパティを使って、
+  スクロール位置に基づいたアニメーションが可能です。
+&lt;/div&gt;
+
+&lt;div class="fade-in-element"&gt;
+  このデモでは、要素が視界に25%入ったときにアニメーションが開始され、
+  70%表示されたときに完了します。
+&lt;/div&gt;
+
+&lt;div class="fade-in-element"&gt;
+  モダンブラウザでサポートされている新しい機能です。
+&lt;/div&gt;
 </code></pre>
 
         </details>
