@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>CSSのScroll-driven Animationを使ったスクロールでフェード・インするSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    .content-section {
+      min-height: 100vh;
+    }
+
+    .fade-in-element {
+      font-size: 1.5rem;
+      padding: 2rem;
+      margin: 2rem 0;
+      background-color: #e9f7fe;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      
+      /* 初期状態は透明 */
+      opacity: 0;
+      
+      /* アニメーションの設定 */
+      animation-timeline: view();
+      animation-name: fade-in;
+      
+      /* 要素が25%表示されたらアニメーション開始 */
+      animation-range: entry 25% cover 70%;
+      
+      /* アニメーションの他のプロパティ */
+      animation-fill-mode: both;
+      animation-duration: 1s;
+    }
+
+    /* フェードインアニメーションの定義 */
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* スクロールを促すスタイル */
+    .scroll-down {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>CSSのScroll-driven Animation</h1>
+      <h2>スクロールでフェード・インするSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- CSSの `Scroll-driven Animation` を使うことで、JavaScriptを使わずにスクロールをトリガーにしたアニメーションの実装が可能
+- 2025/03/19現在、対応ブラウザはChromeとEdgeで、SafariとFirefoxは未対応
+- `animation-timeline: view();`
+  - 要素の可視性に基づいたタイムラインを設定
+- `animation-range: entry 25% cover 70%;`
+  - 要素が25%表示されたらアニメーション開始、70%表示されたら完了
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div class="container">
+          <div class="content-section">
+            <div class="fade-in-element">
+              この要素は、スクロールして画面に表示されると、フェードインしながら現れます。
+            </div>
+            
+            <div class="fade-in-element">
+              Scroll-driven Animationを使うと、JavaScript不要で実装できます。
+            </div>
+            
+            <div class="fade-in-element">
+              animation-timelineとanimation-rangeプロパティを使って、
+              スクロール位置に基づいたアニメーションが可能です。
+            </div>
+            
+            <div class="fade-in-element">
+              このデモでは、要素が視界に25%入ったときにアニメーションが開始され、
+              70%表示されたときに完了します。
+            </div>
+            
+            <div class="fade-in-element">
+              モダンブラウザでサポートされている新しい機能です。
+            </div>
+          </div>
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://coliss.com/articles/build-websites/operation/work/scroll-driven-animations.html" ref="nofollow noreferrer noopener" target="_blank">
+              Scroll-driven AnimationsでCSSでの実装が大きく変わる！ スクロールをトリガーにしたアニメーションを実装する方法 | coliss
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/docs/css-ui/scroll-driven-animations?hl=ja" ref="nofollow noreferrer noopener" target="_blank">
+              スクロールドリブン アニメーションでスクロール時に要素をアニメーション化する | Chrome for Developers
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
