@@ -1,0 +1,269 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>CSSのtext-box-trimを使ったテキストの上下余白調整のSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+  <style>
+    /* Noto Sans Japanese のWebフォントを適用 */
+    .noto_sans {
+      font-family: "Noto Sans JP", sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    /* 確認するために、背景色を付けて文字サイズを拡大 */
+    .text_bg {
+      background-color: azure;
+      font-size: 4rem;
+    }
+    .block_bg {
+      background-color: beige;
+    }
+
+    /* ボタンのサンプル */
+    .sample_button {
+      padding: 0 24px;
+      display: inline-block;
+      background-color: darkslateblue;
+      color: #fff;
+      font-size: 2rem;
+      border-radius: 100vh;
+    }
+
+    /* サンプルのボタンがくっつかないようにするため */
+    td {
+      padding-block: 32px;
+    }
+
+    /* 画面幅が狭い場合用 */
+    @media (max-width: 799px) {
+      tbody,
+      thead,
+      tr,
+      th,
+      td {
+        display: block;
+      }
+      th {
+        width: auto !important;
+      }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>CSSのtext-box-trim</h1>
+      <h2>テキストの上下余白調整のSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- `text-box-trim` プロパティと `text-box-edge` プロパティを使うことで、テキスト要素の上下のスペースを調整が可能
+  - 2025/03/26現在、対応していないモダンブラウザはFirefoxのみ
+- `line-height: 1;` で余白調整した場合、改行が入った場合に行間が詰まって見える問題点があった
+- `text-box-trim` プロパティ: 上下のスペースのうち、どちらをトリミングするかを指定
+  - `none`: 初期値。スペースをトリミングしない
+  - `trim-both`: 上下両方のスペースをトリミングする
+  - `trim-start`: 上のスペースをトリミングする
+  - `trim-end`: 下のスペースをトリミングする
+- `text-box-edge` プロパティ: トリミングを開始する位置を指定
+  - `text`：初期値。上部を `text-over baseline` (フォントのアセンダーラインを含む)、下部を `text-under baseline` (フォントのディセンダーラインを含む) の位置でトリミング
+  - `cap`：上部を `cap-height baseline` (英大文字Xの上限) の位置でトリミング
+  - `alphabetic`：下部を `alphabetic baseline` (英小文字xの下限) の位置でトリミング
+- `text-box` プロパティを使用すると、`text-box-trim` プロパティと `text-box-edge` プロパティを一括で指定可能
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ1</h2></summary>
+
+        <div>
+          <h3><code>text-box-trim</code> プロパティ</h3>
+          <section>
+            <h4>● <code>text-box-trim: none;</code></h4>
+            <div style="text-box-trim: none;" class="block_bg">
+              <span class="text_bg">Text テキスト jp Text テキスト jp</span>
+            </div>
+          </section>
+          <br />
+          <section>
+            <h4>● <code>text-box-trim: trim-start;</code></h4>
+            <div style="text-box-trim: trim-start;" class="block_bg">
+              <span class="text_bg">Text テキスト jp Text テキスト jp</span>
+            </div>
+          </section>
+          <br />
+          <section>
+            <h4>● <code>text-box-trim: trim-end;</code></h4>
+            <div style="text-box-trim: trim-end;" class="block_bg">
+              <span class="text_bg">Text テキスト jp Text テキスト jp</span>
+            </div>
+          </section>
+          <br />
+          <section>
+            <h4>● <code>text-box-trim: trim-both;</code></h4>
+            <div style="text-box-trim: trim-both;" class="block_bg">
+              <span class="text_bg">Text テキスト jp Text テキスト jp</span>
+            </span>
+          </section>
+        </div>
+
+        <br />
+        <hr />
+        <br />
+
+        <div>
+          <h3><code>text-box-edge</code>プロパティ</h3>
+          <section>
+            <h4>● <code>text-box-trim: trim-both; text-box-edge: text;</code></h4><br /><br />
+            <div style="text-box-trim: trim-both; text-box-edge: text;" class="block_bg">
+              <span class="text_bg">Text テキスト jp Text テキスト jp</span>
+            </div>
+          </section>
+          <br />
+          <section>
+            <h4>● <code>text-box-trim: trim-both; text-box-edge: cap alphabetic;</code></h4><br /><br />
+            <div style="text-box-trim: trim-both; text-box-edge: cap alphabetic;" class="block_bg">
+              <span class="text_bg">Text テキスト jp Text テキスト jp</span>
+            </div>
+          </section>
+        </div>
+        <br />
+        <br />
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ2</h2></summary>
+
+        <table style="margin-inline: auto;">
+          <thead>
+            <tr>
+              <th style="width: 200px;">プロパティ</th>
+              <th>Defaultフォント</th>
+              <th>Noto Sans JP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>
+                <code>text-box: none;</code>
+                <small style="display: inline-block; color: #999;">(※未指定の場合)</small>
+              </th>
+              <td>
+                <span style="text-box: none;" class="sample_button">Loginボタン</span>
+              </td>
+              <td>
+                <span style="text-box: none;" class="sample_button noto_sans">Loginボタン</span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <code>text-box: trim-both text;</code>
+              </th>
+              <td>
+                <span style="text-box: trim-both text;" class="sample_button">Loginボタン</span>
+              </td>
+              <td >
+                <span style="text-box: trim-both text;" class="sample_button noto_sans">Loginボタン</span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <code>text-box: trim-both cap alphabetic;</code>
+              </th>
+              <td>
+                <span style="text-box: trim-both cap alphabetic;" class="sample_button">Loginボタン</span>
+              </td>
+              <td>
+                <span style="text-box: trim-both cap alphabetic;" class="sample_button noto_sans">Loginボタン</span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <code>text-box: trim-both cap alphabetic;</code>、上下均等に<code>padding</code>を追加
+              </th>
+              <td>
+                <span style="text-box: trim-both cap alphabetic; padding-block: 16px;" class="sample_button">Loginボタン</span>
+              </td>
+              <td>
+                <span style="text-box: trim-both cap alphabetic; padding-block: 16px;" class="sample_button noto_sans">Loginボタン</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </details>
+    </section>
+      
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://ics.media/entry/250319/" ref="nofollow noreferrer noopener" target="_blank">
+              CSSでテキストの上下余白が調整可能に！text-box-trimの使い方 | ICS MEDIA
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-box" ref="nofollow noreferrer noopener" target="_blank">
+              text-box | MDN
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=text-box" ref="nofollow noreferrer noopener" target="_blank">
+              Can I use "text-box" | caniuse.com
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
