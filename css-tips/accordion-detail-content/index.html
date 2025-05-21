@@ -1,0 +1,304 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>details-content疑似要素を使ったdetailsアコーディオンのアニメーションSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <!-- <link rel="stylesheet" href="/res/css/presentation.css?v=4" /> -->
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+  <style>
+    /* ↓details-content疑似要素を使ったdetailsアコーディオンのアニメーションCSS指定 ============ */
+    details.accordion {
+      --_duration: 300ms;
+
+      background-color: #fff;
+
+      &::details-content {
+        content-visibility: initial;
+        display: block grid;
+
+        @media (prefers-reduced-motion: no-preference) {
+          transition-duration: var(--_duration);
+          transition-property: grid-template-rows;
+        }
+      }
+
+      &:not([open])::details-content {
+        grid-template-rows: 0fr;
+      }
+
+      &[open]::details-content {
+        grid-template-rows: 1fr;
+      }
+    }
+
+    .accordion .content-wrapper {
+      overflow: hidden;
+    }
+    /* ↑details-content疑似要素を使ったdetailsアコーディオンのアニメーションCSS指定 ============ */
+
+    /* ↓表示調整 ------------------------------ */
+    .accordion summary {
+      --_foreground-default: #f7f7f7;
+      --_foreground-interactive: #f7f7f7;
+      --_foreground-opened: #f7f7f7;
+      --_background-default: #c41e3a;
+      --_background-interactive: oklch(
+        from var(--_background-default) calc(l - 0.1) c h
+      );
+      --_background-opened: oklch(
+        from var(--_background-default) calc(l - 0.2) c h
+      );
+
+      display: block grid;
+      grid-template: ". icon" / 1fr max-content;
+      column-gap: 1em;
+      align-items: center;
+      padding-block: 1em;
+      padding-inline: 1.5em;
+      background-color: var(--_background-default);
+      color: var(--_foreground-default);
+      font-size: calc(1rem * pow(var(--font-ratio), 1));
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition-duration: var(--_duration);
+      transition-property: background-color, color;
+
+      &::before,
+      &::after {
+        content: "";
+        grid-area: icon;
+        inline-size: 1em;
+        border-block-end: 1px solid;
+        writing-mode: initial;
+      }
+
+      &::after {
+        rotate: 90deg;
+      }
+
+      &:focus-visible {
+        background-color: var(--_background-interactive);
+        color: var(--_foreground-interactive);
+      }
+
+      &:hover {
+        @media (any-hover: hover) {
+          background-color: var(--_background-interactive);
+          color: var(--_foreground-interactive);
+        }
+      }
+
+      &:is([open] > &) {
+        background-color: var(--_background-opened);
+        color: var(--_foreground-opened);
+      }
+
+      &:is([open] > &)::after {
+        opacity: 0;
+      }
+    }
+
+    .content {
+      padding: 1.5em;
+      background-color: #f5f5f5;;
+    }
+    /* ↑表示調整 ------------------------------ */
+
+    #container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 16px;
+  }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>details-content疑似要素</h1>
+      <h2>detailsアコーディオンのアニメーションSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- 2025/05/21 現在、Safariで `details-content` 疑似要素がサポートされたため、detailsをCSSアニメーションが可能に
+  - Firefoxだけが未対応
+    - Interop 2025のFocus Areasに入ってるので今年中には対応するかも
+  - Safariは `transition-behavior: allow-discrete` しても `content-visibility` が `hidden` になった際の挙動に不具合があるため、常時 `visible` にする必要あり
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div class="wrapper">
+          <details class="accordion" name="sample" open>
+            <summary class="summary">
+              Details 1
+            </summary>
+            <div class="content-wrapper">
+              <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+              </div>
+            </div>
+          </details>
+          <details class="accordion" name="sample">
+            <summary class="summary">
+              Details 2
+            </summary>
+            <div class="content-wrapper">
+              <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+              </div>
+            </div>
+          </details>
+          <details class="accordion" name="sample">
+            <summary class="summary">
+              Details 3
+            </summary>
+            <div class="content-wrapper">
+              <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+              </div>
+            </div>
+          </details>
+          <details class="accordion" name="sample">
+            <summary class="summary">
+              Details 4
+            </summary>
+            <div class="content-wrapper">
+              <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+              </div>
+            </div>
+          </details>
+          <details class="accordion" name="sample">
+            <summary class="summary">
+              Details 5
+            </summary>
+            <div class="content-wrapper">
+              <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+              </div>
+            </div>
+          </details>
+          <details class="accordion" name="sample">
+            <summary class="summary">
+              Details 6
+            </summary>
+            <div class="content-wrapper">
+              <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing el</p>
+              </div>
+            </div>
+          </details>
+        </div>
+
+      </details>
+
+      <br />
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary>CSS</summary>
+<pre><code class="language-css">details.accordion {
+  --_duration: 300ms;
+
+  background-color: #fff;
+
+  &::details-content {
+    content-visibility: initial;
+    display: block grid;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition-duration: var(--_duration);
+      transition-property: grid-template-rows;
+    }
+  }
+
+  &:not([open])::details-content {
+    grid-template-rows: 0fr;
+  }
+
+  &[open]::details-content {
+    grid-template-rows: 1fr;
+  }
+}
+
+.accordion .content-wrapper {
+  overflow: hidden;
+}
+</code></pre>
+        </details>
+
+    </section>
+    
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://x.com/tak_dcxi/status/1920643631687598256?s=43&t=4uVON8HWcDEHvj6-HtDWcw" ref="nofollow noreferrer noopener" target="_blank">
+              Safari最新版、calc-sizeは使えないけどdetails-content疑似要素はサポートされたからdetailsをアニメーションできないかなと模索したところ、できた。 | TAK @tak_dcxi | X
+            </a>
+          </li>
+          <li>
+            <a href="https://codepen.io/tak-dcxi/pen/qEEyRZj" ref="nofollow noreferrer noopener" target="_blank">
+              Details using name attribute (grid-template-rows) | CodePen
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
