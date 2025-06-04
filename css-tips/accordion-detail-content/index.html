@@ -37,8 +37,6 @@
     details.accordion {
       --_duration: 300ms;
 
-      background-color: #fff;
-
       &::details-content {
         content-visibility: initial;
         display: block grid;
@@ -64,6 +62,9 @@
     /* ↑details-content疑似要素を使ったdetailsアコーディオンのアニメーションCSS指定 ============ */
 
     /* ↓表示調整 ------------------------------ */
+    details.accordion {
+      background-color: #fff;
+    }
     .accordion summary {
       --_foreground-default: #f7f7f7;
       --_foreground-interactive: #f7f7f7;
@@ -250,8 +251,6 @@
           <summary>CSS</summary>
 <pre><code class="language-css">details.accordion {
   --_duration: 300ms;
-
-  background-color: #fff;
 
   &::details-content {
     content-visibility: initial;
