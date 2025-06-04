@@ -1,0 +1,415 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>dialog要素のcommand属性とclosedby属性を使ったJSを使わないダイアログ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    /** ダイアログ開閉時のアニメーション */
+    dialog {
+      position: fixed; /* Safariで表示に不具合があるので明示 */
+      inset: 0; /* Safariで表示に不具合があるので明示 */
+      overscroll-behavior-block: contain;
+      transition-duration: 300ms;
+      transition-property: display, overlay, opacity;
+      transition-timing-function: ease-out;
+      transition-behavior: allow-discrete;
+
+      &::backdrop {
+        background-color: oklch(from black l c h / 50%);
+        backdrop-filter: blur(4px);
+        transition-duration: inherit;
+        transition-property: opacity;
+        transition-timing-function: inherit;
+      }
+
+      &:modal,
+      &:modal::backdrop {
+        @starting-style {
+          opacity: 0;
+        }
+      }
+
+      &:not(:modal),
+      &:not(:modal)::backdrop {
+        opacity: 0;
+      }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>dialog要素のcommand属性とclosedby属性</h1>
+      <h2>JSを使わないダイアログ</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `<dialog>` 要素の開閉は `command` 属性を使用
+  - 開く `button` 要素に `command` 属性を指定
+  - ボタンの `commandfor` 属性に、操作したい `dialog` 要素の `id` 値を指定
+- `command` 属性で指定できる値
+  - `command="show-modal"` : モーダルUIの展開
+  - `command="close"` : モーダルUIを閉じる
+  - `command="toggle-popover"` : ポップオーバーUIの開閉
+  - `command="show-popover"` : ポップオーバーUIの展開
+  - `command="hide-popover"` : ポップオーバーUIを閉じる
+  - `command="request-close"` : requestClose()の機能を提供（Chrome 139でリリース予定）
+- `<dialog>` 要素の外側をクリックした際に閉じる `Light dismiss` 機能は、 `closedby` 属性を使用
+- `closedby` 属性に指定できる値
+  - `closedby="any"`
+    - ダイアログの外側をクリックするか ESC キーを押すと `dialog` 要素が閉じる
+    - `popover="auto"` の動作に似たもの
+  - `closedby="closerequest"`
+    - `ESC` キーを押すと `dialog` 要素が閉じる
+    - `closedby` 属性が指定されていない場合の挙動に似ている
+  - `closedby="none"`
+    - `ESC` キーを押しても `dialog` 要素は閉じない
+- 2025/06/04 現在、 `closedby` に対応しているブラウザはChromeとEdge、Firefoxはプレビュー版で対応、そしてSafariは未対応
+- `command` 属性と `closedby` 属性の未対応ブラウザは、Polyfill を使用すれば対応可能
+- `<dialog>` 要素にはアクセシブルな名前を持つことが求められるため、 `<dialog>` 要素の`aria-labelledby` 属性に、ダイアログ内 `h1` 要素の `id` 値を指定
+  - ダイアログ内は、[WHATWGの仕様書](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element) に従うと、 `h1` 要素を使って問題なし
+    - モーダルが開いている際は背面が `inert` (不活性化) されるため、背面コンテンツの見出しはツリーに存在しないことになるため
+- 開閉時のアニメーション、背面のスクロール抑制、スクロールバーの有無によるガタツキの防止はCSSで指定
+        </div>
+      </details>
+    </section>
+
+    <section id="sample_01">
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <!-- Test 1: closedby="any" -->
+        <section class="Section">
+          <h2 class="Section__Heading">
+            Test 1: <code>closedby="any"</code> (default behavior)
+          </h2>
+          <p>Can be closed with ESC key, backdrop click, and close button.</p>
+          <div class="Section__Button">
+            <button type="button" class="BaseButton" id="openDialog1" commandfor="dialog1" command="show-modal">
+              Open Dialog
+            </button>
+          </div>
+          <p class="BaseStatus" id="status1">Status: Closed</p>
+        </section>
+
+        <dialog class="AppDialog" id="dialog1" closedby="any" aria-labelledby="dialog1-title" autofocus>
+          <div class="AppDialog__Layout">
+            <h1 id="dialog1-title" class="AppDialog__Heading">
+              Dialog with closedby="any"
+            </h1>
+            <p>This dialog can be closed by:</p>
+            <ul>
+              <li>Pressing ESC key</li>
+              <li>Clicking the backdrop</li>
+              <li>Clicking the close button</li>
+            </ul>
+            <button type="button" class="BaseButton" commandfor="dialog1" command="close">
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <!-- Test 2: closedby="closerequest" -->
+        <section class="Section">
+          <h2 class="Section__Heading">Test 2: <code>closedby="closerequest"</code></h2>
+          <p>
+            Can be closed with ESC key and close button only. Backdrop clicks are
+            ignored.
+          </p>
+          <div class="Section__Button">
+            <button type="button" class="BaseButton" id="openDialog2" commandfor="dialog2" command="show-modal">
+              Open Dialog
+            </button>
+          </div>
+          <p class="BaseStatus" id="status2">Status: Closed</p>
+        </section>
+
+        <dialog class="AppDialog" id="dialog2" closedby="closerequest" aria-labelledby="dialog2-title" autofocus>
+          <div class="AppDialog__Layout">
+            <h1 id="dialog2-title" class="AppDialog__Heading">
+              Dialog with closedby="closerequest"
+            </h1>
+            <p>This dialog can be closed by:</p>
+            <ul>
+              <li>Pressing ESC key ✓</li>
+              <li>Clicking the backdrop ✗</li>
+              <li>Clicking the close button ✓</li>
+            </ul>
+            <button type="button" class="BaseButton" commandfor="dialog2" command="close">
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <!-- Test 3: closedby="none" -->
+        <section class="Section">
+          <h2 class="Section__Heading">Test 3: <code>closedby="none"</code></h2>
+          <p>
+            Can only be closed with the close button. ESC key and backdrop clicks
+            are ignored.
+          </p>
+          <div class="Section__Button">
+            <button type="button" class="BaseButton" id="openDialog3" commandfor="dialog3" command="show-modal">
+              Open Dialog
+            </button>
+          </div>
+          <p class="BaseStatus" id="status3">Status: Closed</p>
+        </section>
+
+        <dialog class="AppDialog" id="dialog3" closedby="none" aria-labelledby="dialog3-title" autofocus>
+          <div class="AppDialog__Layout">
+            <h1 id="dialog3-title" class="AppDialog__Heading">
+              Dialog with closedby="none"
+            </h1>
+            <p>This dialog can be closed by:</p>
+            <ul>
+              <li>Pressing ESC key ✗</li>
+              <li>Clicking the backdrop ✗</li>
+              <li>Clicking the close button ✓</li>
+            </ul>
+            <button type="button" class="BaseButton" commandfor="dialog3" command="close">
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <!-- Test 4: Dynamic attribute changes -->
+        <section class="Section">
+          <h2 class="Section__Heading">Test 4: Dynamic Attribute Changes</h2>
+          <p>You can change the closedBy attribute while the dialog is open.</p>
+          <div class="Section__Button">
+            <button type="button" class="BaseButton" id="openDialog4" commandfor="dialog4" command="show-modal">
+              Open Dialog
+            </button>
+          </div>
+          <p class="BaseStatus" id="status4">Status: Closed</p>
+        </section>
+
+        <dialog class="AppDialog" id="dialog4" closedby="any" aria-labelledby="dialog4-title" autofocus>
+          <div class="AppDialog__Layout">
+            <h1 id="dialog4-title" class="AppDialog__Heading">
+              Dialog with Dynamic closedBy
+            </h1>
+            <p>Current setting: <code id="currentValue">closedby="any"</code></p>
+            <div class="AppDialog__ButtonGroup">
+              <button type="button" class="BaseButton" onclick="changeClosedBy('any')">
+                Set to any
+              </button>
+              <button type="button" class="BaseButton" onclick="changeClosedBy('closerequest')">
+                Set to closerequest
+              </button>
+              <button type="button" class="BaseButton" onclick="changeClosedBy('none')">
+                Set to none
+              </button>
+            </div>
+            <hr />
+            <button type="button" class="BaseButton" commandfor="dialog4" command="close">
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <script>
+          // Update dialog open/close status
+          function updateStatus(dialogId, statusId) {
+            const dialog = document.getElementById(dialogId);
+            const status = document.getElementById(statusId);
+            if (dialog.open) {
+              status.textContent = "Status: Open";
+              status.style.backgroundColor = "#d4edda";
+              status.style.color = "#155724";
+            } else {
+              status.textContent = "Status: Closed";
+              status.style.backgroundColor = "#e9ecef";
+              status.style.color = "#495057";
+            }
+          }
+
+          // Monitor dialog state changes only (no manual event handling)
+          ["dialog1", "dialog2", "dialog3", "dialog4"].forEach((id, index) => {
+            const dialog = document.getElementById(id);
+            const statusId = `status${index + 1}`;
+
+            // Monitor dialog state changes
+            dialog.addEventListener("close", () => {
+              updateStatus(id, statusId);
+              console.log(`${id} closed`);
+            });
+
+            // Monitor when dialog opens (via MutationObserver or polling)
+            const observer = new MutationObserver(() => {
+              updateStatus(id, statusId);
+            });
+
+            observer.observe(dialog, {
+              attributes: true,
+              attributeFilter: ["open"],
+            });
+
+            dialog.addEventListener("cancel", (e) => {
+              console.log(`${id} cancel event fired`);
+              // For closedby="none", the polyfill will preventDefault
+            });
+          });
+
+          // Test 4: Dynamically change closedBy attribute
+          window.changeClosedBy = function (value) {
+            const dialog = document.getElementById("dialog4");
+            dialog.setAttribute("closedby", value);
+            document.getElementById(
+              "currentValue"
+            ).textContent = `closedby="${value}"`;
+            console.log(`Changed closedby attribute to "${value}"`);
+          };
+
+          // Also test the detection directly
+          const directCheck = "closedBy" in HTMLDialogElement.prototype;
+          console.log(`Direct prototype check: ${directCheck ? "Yes" : "No"}`);
+        </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <details open>
+          <summary>
+            <h3>HTML</h3>
+          </summary>
+
+<pre><code class="language-html">&lt;button type="button" commandfor="my-dialog" command="show-modal"&gt;
+  モーダルを開く
+&lt;/button&gt;
+
+&lt;dialog
+  id="my-dialog"
+  closedby="any"
+  aria-labelledby="my-dialog-heading"
+  autofocus
+&gt;
+  &lt;h1 id="my-dialog-heading"&gt;Heading&lt;/h1&gt;
+  &lt;p&gt;Content&lt;/p&gt;
+  &lt;button type="button" commandfor="my-dialog" command="close"&gt;閉じる&lt;/button&gt;
+&lt;/dialog&gt;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary>
+            <h3>CSS</h3>
+          </summary>
+
+<pre><code class="language-css">/** ダイアログ開閉時のアニメーション */
+dialog {
+  position: fixed; /* Safariで表示に不具合があるので明示 */
+  inset: 0; /* Safariで表示に不具合があるので明示 */
+  overscroll-behavior-block: contain;
+  transition-duration: 300ms;
+  transition-property: display, overlay, opacity;
+  transition-timing-function: ease-out;
+  transition-behavior: allow-discrete;
+
+  &::backdrop {
+    background-color: oklch(from black l c h / 50%);
+    backdrop-filter: blur(4px);
+    transition-duration: inherit;
+    transition-property: opacity;
+    transition-timing-function: inherit;
+  }
+
+  &:modal,
+  &:modal::backdrop {
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  &:not(:modal),
+  &:not(:modal)::backdrop {
+    opacity: 0;
+  }
+}
+</code></pre>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>参照</h2>
+        </summary>
+
+        <ul>
+          <li>
+            <a href="https://www.tak-dcxi.com/article/modal-implementation-in-2025" ref="nofollow noreferrer noopener"
+              target="_blank">
+              JavaScriptを書かない2025年のモーダルの実装方法 | TAKLOG
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=closedby" ref="nofollow noreferrer noopener"
+              target="_blank">
+              closedby 属性の対応状況 | Can I use
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=button%20command" ref="nofollow noreferrer noopener"
+              target="_blank">
+              button 要素の command 属性の対応状況 | Can I use
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+
+</html>
