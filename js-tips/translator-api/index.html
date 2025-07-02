@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Translator APIを使った翻訳サンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+    }
+    textarea {
+      width: 100%;
+      height: 8rem;
+      box-sizing: border-box;
+    }
+    label,
+    button {
+      display: block;
+      margin-top: .75rem;
+    }
+    #status {
+      font-size: .9rem;
+      color: #555;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Translator APIを使った翻訳サンプル</h1>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `Translator API` を使うことで、ブラウザ内蔵の翻訳機能を使うことが可能
+  - ChromeのビルトインGemini nanoを使って翻訳
+- 2025/07/02現在、PC版のChrome 138 以降でのみ利用可能
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+          <h1>Translator API サンプル</h1>
+
+          <label>
+            Source language (BCP-47):
+            <input id="srcLang" value="en">
+          </label>
+
+          <label>
+            Target language (BCP-47):
+            <input id="tgtLang" value="ja">
+          </label>
+
+          <br />
+
+          <textarea id="input">Where is the next bus stop, please?</textarea>
+          <button id="translateBtn">Translate</button>
+          <p id="status"></p>
+
+          <h2>結果</h2>
+          <textarea id="output" readonly></textarea>
+
+        </div>
+
+        <script type="module">
+          const input   = document.getElementById('input');      // 元文
+          const output  = document.getElementById('output');     // 結果
+          const status  = document.getElementById('status');     // ステータス
+          const srcLang = document.getElementById('srcLang');
+
+          async function createTranslator(src, tgt) {
+            // ① 言語ペア対応状況を確認
+            const availability = await Translator.availability({ sourceLanguage: src, targetLanguage: tgt });
+            if (availability === 'unavailable') throw new Error('この言語ペアは未対応です。');
+
+            // ② Translator オブジェクト生成（モデル DL 進捗を監視）
+            return await Translator.create({
+              sourceLanguage: src,
+              targetLanguage: tgt,
+              monitor(m) {
+                m.addEventListener('downloadprogress', e => {
+                  status.textContent = `モデルをダウンロード中… ${(e.loaded * 100).toFixed(0)} %`;
+                });
+              }
+            });
+          }
+
+          document.getElementById('translateBtn').addEventListener('click', async () => {
+            const src = document.getElementById('srcLang').value.trim();
+            const tgt = document.getElementById('tgtLang').value.trim();
+            const text = document.getElementById('input').value;
+
+            if (!('Translator' in self)) {
+              alert('このブラウザは Translator API をサポートしていません。Chrome 138 以降をご利用ください。');
+              return;
+            }
+
+            try {
+              status.textContent = '準備中…';
+              const translator = await createTranslator(src, tgt);
+              status.textContent = '翻訳中…';
+              document.getElementById('output').value = await translator.translate(text);  // ③ 翻訳実行
+              status.textContent = '完了';
+            } catch (err) {
+              console.error(err);
+              alert(err.message);
+              status.textContent = '';
+            }
+          });
+        </script>
+
+
+      </details>
+    </section>
+
+    
+
+    <section>
+      <details open>
+        <summary>
+          <h2>参照</h2>
+        </summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/translator-api?hl=ja" ref="nofollow noreferrer noopener"
+              target="_blank">
+              AI を組み込んだ翻訳 | Chrome Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=Translator%20API" ref="nofollow noreferrer noopener"
+              target="_blank">
+              Translator API の対応状況 | Can I use
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+
+</html>
