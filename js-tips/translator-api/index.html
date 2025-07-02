@@ -31,11 +31,6 @@
 
   <!-- ↓このHTML専用の指定 -->
   <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 2rem auto;
-    }
     textarea {
       width: 100%;
       height: 8rem;
@@ -159,7 +154,61 @@
       </details>
     </section>
 
-    
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <h3>JavaScript</h3>
+
+<pre><code class="language-js">const input   = document.getElementById('input');      // 元文
+const output  = document.getElementById('output');     // 結果
+const status  = document.getElementById('status');     // ステータス
+const srcLang = document.getElementById('srcLang');
+
+async function createTranslator(src, tgt) {
+  // ① 言語ペア対応状況を確認
+  const availability = await Translator.availability({ sourceLanguage: src, targetLanguage: tgt });
+  if (availability === 'unavailable') throw new Error('この言語ペアは未対応です。');
+
+  // ② Translator オブジェクト生成（モデル DL 進捗を監視）
+  return await Translator.create({
+    sourceLanguage: src,
+    targetLanguage: tgt,
+    monitor(m) {
+      m.addEventListener('downloadprogress', e => {
+        status.textContent = `モデルをダウンロード中… ${(e.loaded * 100).toFixed(0)} %`;
+      });
+    }
+  });
+}
+
+document.getElementById('translateBtn').addEventListener('click', async () => {
+  const src = document.getElementById('srcLang').value.trim();
+  const tgt = document.getElementById('tgtLang').value.trim();
+  const text = document.getElementById('input').value;
+
+  if (!('Translator' in self)) {
+    alert('このブラウザは Translator API をサポートしていません。Chrome 138 以降をご利用ください。');
+    return;
+  }
+
+  try {
+    status.textContent = '準備中…';
+    const translator = await createTranslator(src, tgt);
+    status.textContent = '翻訳中…';
+    document.getElementById('output').value = await translator.translate(text);  // ③ 翻訳実行
+    status.textContent = '完了';
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+    status.textContent = '';
+  }
+});
+</code></pre>
+
+    </section>
 
     <section>
       <details open>
