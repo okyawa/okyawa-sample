@@ -1,0 +1,357 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Summarizer API + LanguageDetector API + TranslatorのAPIを使った要約サンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    textarea {
+      width: 100%;
+      height: 8rem;
+      box-sizing: border-box;
+    }
+    select,
+    button,
+    label {
+      margin-inline: .5rem;
+    }
+    .md-box {
+      border: 1px solid #ccc;
+      border-radius: .5rem;
+      padding: 1rem;
+      background: #fafafa;
+      max-width: 60rem;
+    }
+    .md-box h1,
+    .md-box h2,
+    .md-box h3 {
+      margin: .6em 0 .3em;
+    }
+    .md-box pre {
+      background: #f3f3f3;
+      padding: .5em;
+      overflow-x: auto;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>ブラウザ内蔵機能だけで日本語に要約</h1>
+      <h2>Summarizer API + LanguageDetector API + Translator API</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `Summarizer API` で要約すると、現状は英語で翻訳されるため、今後仕様が変わっても対応可能なように `LanguageDetector API` で翻訳結果の言語を判定し、その後に日本語へ翻訳することで、ブラウザの機能のみで多言語のテキストを日本語に要約が可能
+- `Summarizer API` `LanguageDetector API` `Translator API` は、2025/07/02現在、PC版のChrome 138 以降でのみ利用可能
+  - ChromeのビルトインGemini nanoを使うことで、モデルをダウンロードした後はブラウザ内で処理が完結
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+          <textarea id="input" rows="10" placeholder="ここに要約したいテキストを貼り付けてください"></textarea>
+
+          <div style="margin-block:1rem;">
+            <label>タイプ:
+              <select id="type">
+                <option value="tldr">TL;DR</option>
+                <option value="key-points" selected>Key points</option>
+                <option value="teaser">Teaser</option>
+                <option value="headline">Headline</option>
+              </select>
+            </label>
+
+            <label>長さ:
+              <select id="length">
+                <option value="short">Short</option>
+                <option value="medium" selected>Medium</option>
+                <option value="long">Long</option>
+              </select>
+            </label>
+
+            <label>
+              <input type="checkbox" id="streaming" checked> 要約をストリーミング表示
+            </label>
+
+            <button id="run">要約→言語判定→日本語訳</button>
+          </div>
+
+          <h2>結果</h2>
+
+          <p><strong>要約:</strong></p>
+          <div id="summary" class="md-box"></div>
+
+          <p><strong>検出言語:</strong> <span id="detected"></span></p>
+
+          <p><strong>日本語訳:</strong></p>
+          <div id="translation" class="md-box"></div>
+        </div>
+
+        <script>
+          /* 改行調整: 行内の * の直前に改行を入れる */
+          const insertBreakBeforeAsterisk = txt => txt.replace(/([^\n])\s*\*/g, '$1\n*');
+
+          /* API 初期化ヘルパ */
+          async function initSummarizer(opt) {
+            if (await Summarizer.availability() === 'unavailable')
+              throw new Error('Summarizer API 未対応です');
+            return Summarizer.create({...opt, format: 'plain-text'});
+          }
+          async function initLanguageDetector() {
+            if (await LanguageDetector.availability() === 'unavailable')
+              throw new Error('LanguageDetector API 未対応です');
+            return LanguageDetector.create();
+          }
+          async function initTranslator(src) {
+            if (await Translator.availability({sourceLanguage: src, targetLanguage: 'ja'}) === 'unavailable')
+              throw new Error('Translator API がこの言語ペアをサポートしていません');
+            return Translator.create({sourceLanguage: src, targetLanguage: 'ja'});
+          }
+
+          /* メイン処理 */
+          document.getElementById('run').addEventListener('click', async () => {
+            const raw = document.getElementById('input').value.trim();
+            if (!raw) return alert('テキストを入力してください');
+
+            const type   = document.getElementById('type').value;
+            const length = document.getElementById('length').value;
+            const useStreaming = document.getElementById('streaming').checked;
+
+            const summaryBox     = document.getElementById('summary');
+            const detectedBox    = document.getElementById('detected');
+            const translationBox = document.getElementById('translation');
+
+            summaryBox.innerHTML     = '⏳ 要約中...';
+            detectedBox.textContent  = '';
+            translationBox.innerHTML = '';
+
+            try {
+              const summarizer = await initSummarizer({type, length});
+              let summary = '';
+
+              /* --- 1) 要約 --- */
+              if (useStreaming && summarizer.summarizeStreaming) {
+                const stream = await summarizer.summarizeStreaming(raw);
+                const reader = stream.getReader();
+                while (true) {
+                  const {value, done} = await reader.read();
+                  if (done) break;
+                  summary += value;
+                  summaryBox.innerHTML = marked.parse(summary); // 部分更新
+                }
+              } else {
+                summary = await summarizer.summarize(raw);
+                summaryBox.innerHTML = marked.parse(summary);
+              }
+
+              /* --- 2) 言語判定 --- */
+              const detector = await initLanguageDetector();
+              const [best]   = await detector.detect(summary);
+              detectedBox.textContent =
+                `${best.detectedLanguage} (信頼度 ${best.confidence.toFixed(2)})`;
+
+              /* --- 3) 翻訳 --- */
+              if (best.detectedLanguage !== 'ja') {
+                const translator = await initTranslator(best.detectedLanguage);
+                const jpFixed = insertBreakBeforeAsterisk(await translator.translate(summary));
+                // markedでMarkdownフォーマットの表示
+                translationBox.innerHTML = marked.parse(jpFixed);
+              } else {
+                translationBox.innerHTML = marked.parse('要約はすでに日本語です。');
+              }
+            } catch (err) {
+              alert(err.message);
+              summaryBox.innerHTML = detectedBox.textContent =
+                translationBox.innerHTML = '';
+            }
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <h3>JavaScript</h3>
+
+<pre><code class="language-js">/* 改行調整: 行内の * の直前に改行を入れる */
+const insertBreakBeforeAsterisk = txt => txt.replace(/([^\n])\s*\*/g, '$1\n*');
+
+/* API 初期化ヘルパ */
+async function initSummarizer(opt) {
+  if (await Summarizer.availability() === 'unavailable')
+    throw new Error('Summarizer API 未対応です');
+  return Summarizer.create({...opt, format: 'plain-text'});
+}
+async function initLanguageDetector() {
+  if (await LanguageDetector.availability() === 'unavailable')
+    throw new Error('LanguageDetector API 未対応です');
+  return LanguageDetector.create();
+}
+async function initTranslator(src) {
+  if (await Translator.availability({sourceLanguage: src, targetLanguage: 'ja'}) === 'unavailable')
+    throw new Error('Translator API がこの言語ペアをサポートしていません');
+  return Translator.create({sourceLanguage: src, targetLanguage: 'ja'});
+}
+
+/* メイン処理 */
+document.getElementById('run').addEventListener('click', async () => {
+  const raw = document.getElementById('input').value.trim();
+  if (!raw) return alert('テキストを入力してください');
+
+  const type   = document.getElementById('type').value;
+  const length = document.getElementById('length').value;
+  const useStreaming = document.getElementById('streaming').checked;
+
+  const summaryBox     = document.getElementById('summary');
+  const detectedBox    = document.getElementById('detected');
+  const translationBox = document.getElementById('translation');
+
+  summaryBox.innerHTML     = '⏳ 要約中...';
+  detectedBox.textContent  = '';
+  translationBox.innerHTML = '';
+
+  try {
+    const summarizer = await initSummarizer({type, length});
+    let summary = '';
+
+    /* --- 1) 要約 --- */
+    if (useStreaming && summarizer.summarizeStreaming) {
+      const stream = await summarizer.summarizeStreaming(raw);
+      const reader = stream.getReader();
+      while (true) {
+        const {value, done} = await reader.read();
+        if (done) break;
+        summary += value;
+        summaryBox.innerHTML = marked.parse(summary); // 部分更新
+      }
+    } else {
+      summary = await summarizer.summarize(raw);
+      summaryBox.innerHTML = marked.parse(summary);
+    }
+
+    /* --- 2) 言語判定 --- */
+    const detector = await initLanguageDetector();
+    const [best]   = await detector.detect(summary);
+    detectedBox.textContent =
+      `${best.detectedLanguage} (信頼度 ${best.confidence.toFixed(2)})`;
+
+    /* --- 3) 翻訳 --- */
+    if (best.detectedLanguage !== 'ja') {
+      const translator = await initTranslator(best.detectedLanguage);
+      const jpFixed = insertBreakBeforeAsterisk(await translator.translate(summary));
+      // markedでMarkdownフォーマットの表示
+      translationBox.innerHTML = marked.parse(jpFixed);
+    } else {
+      translationBox.innerHTML = marked.parse('要約はすでに日本語です。');
+    }
+  } catch (err) {
+    alert(err.message);
+    summaryBox.innerHTML = detectedBox.textContent =
+      translationBox.innerHTML = '';
+  }
+});
+</code></pre>
+
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>参照</h2>
+        </summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/summarizer-api?hl=ja" ref="nofollow noreferrer noopener"
+              target="_blank">
+              組み込みの AI による要約 | Chrome Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=Summarizer%20API" ref="nofollow noreferrer noopener"
+              target="_blank">
+              Summarizer API の対応状況 | Can I use
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/language-detection?hl=ja" ref="nofollow noreferrer noopener"
+              target="_blank">
+              AI を組み込んだ言語検出 | Chrome Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=Language%20Detector%20API" ref="nofollow noreferrer noopener"
+              target="_blank">
+              Language Detector API の対応状況 | Can I use
+            </a>
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/translator-api?hl=ja" ref="nofollow noreferrer noopener"
+              target="_blank">
+              AI を組み込んだ翻訳 | Chrome Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=Translator%20API" ref="nofollow noreferrer noopener"
+              target="_blank">
+              Translator API の対応状況 | Can I use
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+
+</html>
