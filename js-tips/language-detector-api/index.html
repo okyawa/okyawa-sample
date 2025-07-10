@@ -70,6 +70,8 @@
 - `Language Detector API` を使うことで、ブラウザ内蔵の言語検出機能を使うことが可能
   - ChromeのビルトインGemini nanoを使って言語検出
 - 2025/07/02現在、PC版のChrome 138 以降でのみ利用可能
+  - 初回利用時に数百MB程度のモデルが端末にダウンロードされる
+- 検出した言語候補と信頼度（0〜1）が多い順に表示
         </div>
       </details>
     </section>
@@ -145,6 +147,23 @@
         </script>
 
 
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>ポイント</h2>
+        </summary>
+
+        <div class="markdown_content">
+| ステップ | 役割 | 主な API |
+|----------|------|----------|
+| ① 機能検出 | `LanguageDetector` が存在するか確認 | `if ('LanguageDetector' in self)` |
+| ② 利用可否判定 | モデルの有無・DL 必要性を取得 | `LanguageDetector.availability()` |
+| ③ セッション生成 | 必要ならモデルを DL し、進捗を監視 | `LanguageDetector.create({ monitor })` |
+| ④ 言語判定 | テキストを渡して候補を取得 | `detector.detect(text)` |
+        </div>
       </details>
     </section>
 

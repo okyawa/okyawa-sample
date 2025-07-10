@@ -158,6 +158,30 @@
     <section>
       <details open>
         <summary>
+          <h2>ポイント</h2>
+        </summary>
+
+        <div class="markdown_content">
+| 項目               | ポイント                                                                                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **対応環境**         | *Chrome 138 以降*、デスクトップのみ。モバイル Chrome は未対応                                                                          |
+| **セキュリティ**       | Secure Context（HTTPS または `localhost`）必須。HTTP では `Translator` が未定義 ([Stack Overflow][2])                                                        |
+| **ハードウェア要件**     | Windows 10/11・macOS 13+・Linux、<br>VRAM > 4 GB、Chrome プロファイルのあるドライブに *22 GB 以上* の空き。空きが 10 GB 未満になるとモデルは自動削除        |
+| **機能検出**         | `if ('Translator' in self) { … }` でサポート確認                                                                          |
+| **言語ペアの可用性**     | `Translator.availability()` → `'unavailable' / 'downloadable' / 'downloading' / 'available'` の 4 値を返す              |
+| **インスタンス生成**     | `Translator.create({ sourceLanguage, targetLanguage, monitor })` で生成。`monitor` で `downloadprogress` を監視し UI に進捗表示  |
+| **翻訳実行**         | `await translator.translate(text)` で翻訳。処理は逐次実行→大量テキストはチャンク化推奨                                                      |
+| **言語コード**        | BCP-47 形式（例: `ja`, `en`, `zh-Hant`）を使用                                                                             |
+| **他 API 連携**     | ソース言語不明時は Language Detector API → Translator API の順が便利                                                             |
+| **UX 改善**        | ①モデル DL 中/翻訳中のステータス表示<br>②エラー時に空き容量やネット状況を案内<br>③モデルは一度 DL すればキャッシュされ 2 回目以降高速                                     |
+| **プライバシー / コスト** | 翻訳は完全に *端末内* で完結 → テキストをクラウドへ送信しない。外部翻訳 API の利用料も不要                                                                |
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
           <h2>コード</h2>
         </summary>
 
