@@ -153,6 +153,13 @@
             return Translator.create({sourceLanguage: src, targetLanguage: 'ja'});
           }
 
+          // localhost以外でのHTTPアクセス時の早期リジェクト
+          /*
+          if (location.protocol === 'http:') {
+            alert('HTTPS でアクセスしてください');
+          }
+          */
+
           /* メイン処理 */
           document.getElementById('run').addEventListener('click', async () => {
             const raw = document.getElementById('input').value.trim();
@@ -336,6 +343,13 @@ async function initTranslator(src) {
     throw new Error('Translator API がこの言語ペアをサポートしていません');
   return Translator.create({sourceLanguage: src, targetLanguage: 'ja'});
 }
+
+// localhost以外でのHTTPアクセス時の早期リジェクト
+/*
+if (location.protocol === 'http:') {
+  alert('HTTPS でアクセスしてください');
+}
+*/
 
 /* メイン処理 */
 document.getElementById('run').addEventListener('click', async () => {

@@ -127,6 +127,20 @@
             });
           }
 
+          // 大量テキストを 2 kB ごとにチャンクして逐次翻訳
+          async function translateLarge(text, translator, size = 2048) {
+            for (const chunk of text.match(new RegExp(`(.|[\\r\\n]){1,${size}}`, 'g'))) {
+              document.getElementById('output').value += await translator.translate(chunk);
+            }
+          }
+
+          // localhost以外でのHTTPアクセス時の早期リジェクト
+          /*
+          if (location.protocol === 'http:') {
+            alert('HTTPS でアクセスしてください');
+          }
+          */
+
           document.getElementById('translateBtn').addEventListener('click', async () => {
             const src = document.getElementById('srcLang').value.trim();
             const tgt = document.getElementById('tgtLang').value.trim();
@@ -142,6 +156,7 @@
               const translator = await createTranslator(src, tgt);
               status.textContent = '翻訳中…';
               document.getElementById('output').value = await translator.translate(text);  // ③ 翻訳実行
+              // translateLarge(text, translator); // 大量テキストはチャンク化して翻訳
               status.textContent = '完了';
             } catch (err) {
               console.error(err);
@@ -209,6 +224,20 @@ async function createTranslator(src, tgt) {
   });
 }
 
+// 大量テキストを 2 kB ごとにチャンクして逐次翻訳
+async function translateLarge(text, translator, size = 2048) {
+  for (const chunk of text.match(new RegExp(`(.|[\\r\\n]){1,${size}}`, 'g'))) {
+    document.getElementById('output').value += await translator.translate(chunk);
+  }
+}
+
+// localhost以外でのHTTPアクセス時の早期リジェクト
+/*
+if (location.protocol === 'http:') {
+  alert('HTTPS でアクセスしてください');
+}
+*/
+
 document.getElementById('translateBtn').addEventListener('click', async () => {
   const src = document.getElementById('srcLang').value.trim();
   const tgt = document.getElementById('tgtLang').value.trim();
@@ -224,6 +253,7 @@ document.getElementById('translateBtn').addEventListener('click', async () => {
     const translator = await createTranslator(src, tgt);
     status.textContent = '翻訳中…';
     document.getElementById('output').value = await translator.translate(text);  // ③ 翻訳実行
+    // translateLarge(text, translator); // 大量テキストはチャンク化して翻訳
     status.textContent = '完了';
   } catch (err) {
     console.error(err);
