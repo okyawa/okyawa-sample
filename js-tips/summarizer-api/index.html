@@ -1,0 +1,287 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Chrome Summarizer APIを使った要約サンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      box-sizing: border-box;
+    }
+    #output {
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Chrome Summarizer API</h1>
+      <h2>ブラウザ内蔵の要約機能</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `Summarizer API` を使うことで、ブラウザ内蔵の要約機能を使うことが可能
+  - ChromeのビルトインGemini nanoを使って要約
+- 2025/07/02現在、PC版のChrome 138 以降でのみ利用可能
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+          <p>長文を貼り付けて「要約」ボタンを押してください。  
+          対応 OS／ハード要件は公式ドキュメントを参照してください。</p>
+
+          <div id="nosupport" class="hidden" style="color:red">
+            このブラウザは Summarizer API をサポートしていません。
+          </div>
+          <div id="download" class="hidden">
+            モデルをダウンロード中… <span id="progress"></span>
+          </div>
+
+          <label for="input">入力テキスト:</label>
+          <textarea id="input" placeholder="ここに要約したいテキストを貼り付け"></textarea>
+
+          <div style="margin-top:1rem">
+            <label>タイプ:
+              <select id="type">
+                <option value="key-points">key-points</option>
+                <option value="tldr">tldr</option>
+                <option value="teaser">teaser</option>
+                <option value="headline">headline</option>
+              </select>
+            </label>
+
+            <label>長さ:
+              <select id="length">
+                <option value="short">short</option>
+                <option value="medium" selected>medium</option>
+                <option value="long">long</option>
+              </select>
+            </label>
+
+            <label><input type="checkbox" id="streaming"> ストリーミングで出力</label>
+            <button id="summarize">要約</button>
+          </div>
+
+          <h2>結果</h2>
+          <div id="output"></div>
+        </div>
+
+        <script type="module">
+          (async () => {
+            /* --- 1. Summarizer API 対応検出 --- */
+            if (!('Summarizer' in self)) {           // :contentReference[oaicite:0]{index=0}
+              document.getElementById('nosupport').classList.remove('hidden');
+              return;
+            }
+
+            const downloadPane = document.getElementById('download');
+            const progress     = document.getElementById('progress');
+
+            async function createSummarizer(opts) {
+              // availability() で状態確認（unavailable / downloadable / downloading / available）
+              // :contentReference[oaicite:1]{index=1}
+              const avail = await Summarizer.availability();
+              const summarizer = await Summarizer.create({
+                ...opts,
+                monitor(m) {                              // ダウンロード進捗イベント
+                  m.addEventListener('downloadprogress', e => {
+                    downloadPane.classList.remove('hidden');
+                    progress.textContent = `${Math.round(e.loaded * 100)} %`;
+                  });
+                }
+              });
+              await summarizer.ready;                     // モデル準備完了を待つ
+              downloadPane.classList.add('hidden');
+              return summarizer;
+            }
+
+            /* --- 2. UI ハンドラ --- */
+            document.getElementById('summarize').addEventListener('click', async () => {
+              const text   = document.getElementById('input').value.trim();
+              if (!text) return;
+
+              const type     = document.getElementById('type').value;
+              const length   = document.getElementById('length').value;
+              const streaming= document.getElementById('streaming').checked;
+              const out      = document.getElementById('output');
+              out.textContent = '';
+
+              /* --- 3. Summarizer 作成 & 実行 --- */
+              const summarizer = await createSummarizer({
+                type,
+                length,
+              });
+
+              if (streaming) {
+                // summarizeStreaming() 例
+                const stream = summarizer.summarizeStreaming(text);
+                for await (const chunk of stream) {
+                  out.textContent += chunk;
+                }
+              } else {
+                // summarize() 例（バッチ）
+                const summary = await summarizer.summarize(text, {
+                  context: '出力は日本語で行ってください',
+                });
+                out.textContent = summary;
+              }
+            });
+          })();
+        </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <h3>JavaScript</h3>
+
+<pre><code class="language-js">(async () => {
+  /* --- 1. Summarizer API 対応検出 --- */
+  if (!('Summarizer' in self)) {           // :contentReference[oaicite:0]{index=0}
+    document.getElementById('nosupport').classList.remove('hidden');
+    return;
+  }
+
+  const downloadPane = document.getElementById('download');
+  const progress     = document.getElementById('progress');
+
+  async function createSummarizer(opts) {
+    // availability() で状態確認（unavailable / downloadable / downloading / available）
+    // :contentReference[oaicite:1]{index=1}
+    const avail = await Summarizer.availability();
+    const summarizer = await Summarizer.create({
+      ...opts,
+      monitor(m) {                              // ダウンロード進捗イベント
+        m.addEventListener('downloadprogress', e => {
+          downloadPane.classList.remove('hidden');
+          progress.textContent = `${Math.round(e.loaded * 100)} %`;
+        });
+      }
+    });
+    await summarizer.ready;                     // モデル準備完了を待つ
+    downloadPane.classList.add('hidden');
+    return summarizer;
+  }
+
+  /* --- 2. UI ハンドラ --- */
+  document.getElementById('summarize').addEventListener('click', async () => {
+    const text   = document.getElementById('input').value.trim();
+    if (!text) return;
+
+    const type     = document.getElementById('type').value;
+    const length   = document.getElementById('length').value;
+    const streaming= document.getElementById('streaming').checked;
+    const out      = document.getElementById('output');
+    out.textContent = '';
+
+    /* --- 3. Summarizer 作成 & 実行 --- */
+    const summarizer = await createSummarizer({
+      type,
+      length,
+    });
+
+    if (streaming) {
+      // summarizeStreaming() 例
+      const stream = summarizer.summarizeStreaming(text);
+      for await (const chunk of stream) {
+        out.textContent += chunk;
+      }
+    } else {
+      // summarize() 例（バッチ）
+      const summary = await summarizer.summarize(text, {
+        context: '出力は日本語で行ってください',
+      });
+      out.textContent = summary;
+    }
+  });
+})();
+</code></pre>
+
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>参照</h2>
+        </summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/summarizer-api?hl=ja" ref="nofollow noreferrer noopener"
+              target="_blank">
+              組み込みの AI による要約 | Chrome Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=Summarizer%20API" ref="nofollow noreferrer noopener"
+              target="_blank">
+              Summarizer API の対応状況 | Can I use
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+
+</html>
