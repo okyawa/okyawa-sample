@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Language Detector APIを使った言語検出サンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    textarea {
+      width: 100%;
+      height: 8rem;
+      box-sizing: border-box;
+    }
+    label,
+    button {
+      display: block;
+      margin-top: .75rem;
+    }
+    #status {
+      font-size: .9rem;
+      color: #555;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Language Detector API</h1>
+      <h2>ブラウザ内蔵の言語検出機能</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `Language Detector API` を使うことで、ブラウザ内蔵の言語検出機能を使うことが可能
+  - ChromeのビルトインGemini nanoを使って言語検出
+- 2025/07/02現在、PC版のChrome 138 以降でのみ利用可能
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+          <!-- 入力欄 -->
+          <label for="input">Detect したいテキスト</label><br />
+          <textarea id="input" placeholder="Here is some sample text."></textarea>
+          <button id="detectBtn">Detect</button>
+          <p id="unsupported" hidden>このブラウザは Language Detector API に対応していません。</p>
+
+          <!-- 結果表示 -->
+          <h2>結果</h2>
+          <ul id="results"></ul>
+        </div>
+
+        <script>
+          (async () => {
+            // 1) 機能検出
+            if (!('LanguageDetector' in self)) {
+              document.getElementById('unsupported').hidden = false;
+              return;
+            }
+
+            // 2) 利用可否の取得
+            const availability = await LanguageDetector.availability(); // 4 つの状態を返す:contentReference[oaicite:1]{index=1}
+            if (availability === 'unavailable') {
+              alert('Language Detector は利用できません。');
+              return;
+            }
+
+            // 3) セッション生成（必要ならモデル DL の進捗をモニタ）
+            const detector = await LanguageDetector.create({
+              monitor(monitor) {
+                monitor.addEventListener('downloadprogress', e => {
+                  console.log(`Model download: ${(e.loaded * 100).toFixed(1)}%`);
+                });
+              }
+            });
+            await detector.ready;      // DL 中はここで待機:contentReference[oaicite:2]{index=2}
+
+            // 4) Detect ボタン押下時の処理
+            document.getElementById('detectBtn').addEventListener('click', async () => {
+              const text = document.getElementById('input').value.trim();
+              if (!text) return;
+
+              // detect() は [{detectedLanguage, confidence}, …] を返す:contentReference[oaicite:3]{index=3}
+              const candidates = await detector.detect(text);
+              const list = document.getElementById('results');
+              list.innerHTML = ''; // クリア
+
+              // 上位候補を表示（閾値 0.2 未満は除外する例）
+              candidates
+                .filter(c => c.confidence >= 0.2)
+                .forEach(({ detectedLanguage, confidence }) => {
+                  const li = document.createElement('li');
+                  li.innerHTML = `<span class="lang">${detectedLanguage}</span> 
+                                  <span class="conf">(${confidence.toFixed(3)})</span>`;
+                  list.appendChild(li);
+                });
+
+              if (!list.children.length) {
+                list.innerHTML = '<li>十分な信頼度で判定できませんでした。</li>';
+              }
+            });
+          })();
+        </script>
+
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <h3>JavaScript</h3>
+
+<pre><code class="language-js">(async () => {
+  // 1) 機能検出
+  if (!('LanguageDetector' in self)) {
+    document.getElementById('unsupported').hidden = false;
+    return;
+  }
+
+  // 2) 利用可否の取得
+  const availability = await LanguageDetector.availability(); // 4 つの状態を返す:contentReference[oaicite:1]{index=1}
+  if (availability === 'unavailable') {
+    alert('Language Detector は利用できません。');
+    return;
+  }
+
+  // 3) セッション生成（必要ならモデル DL の進捗をモニタ）
+  const detector = await LanguageDetector.create({
+    monitor(monitor) {
+      monitor.addEventListener('downloadprogress', e => {
+        console.log(`Model download: ${(e.loaded * 100).toFixed(1)}%`);
+      });
+    }
+  });
+  await detector.ready;      // DL 中はここで待機:contentReference[oaicite:2]{index=2}
+
+  // 4) Detect ボタン押下時の処理
+  document.getElementById('detectBtn').addEventListener('click', async () => {
+    const text = document.getElementById('input').value.trim();
+    if (!text) return;
+
+    // detect() は [{detectedLanguage, confidence}, …] を返す:contentReference[oaicite:3]{index=3}
+    const candidates = await detector.detect(text);
+    const list = document.getElementById('results');
+    list.innerHTML = ''; // クリア
+
+    // 上位候補を表示（閾値 0.2 未満は除外する例）
+    candidates
+      .filter(c => c.confidence >= 0.2)
+      .forEach(({ detectedLanguage, confidence }) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="lang">${detectedLanguage}</span> 
+                        <span class="conf">(${confidence.toFixed(3)})</span>`;
+        list.appendChild(li);
+      });
+
+    if (!list.children.length) {
+      list.innerHTML = '<li>十分な信頼度で判定できませんでした。</li>';
+    }
+  });
+})();
+</code></pre>
+
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>参照</h2>
+        </summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/language-detection?hl=ja" ref="nofollow noreferrer noopener"
+              target="_blank">
+              AI を組み込んだ言語検出 | Chrome Developers
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=Language%20Detector%20API" ref="nofollow noreferrer noopener"
+              target="_blank">
+              Language Detector API の対応状況 | Can I use
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+
+</html>
