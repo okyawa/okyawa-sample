@@ -110,6 +110,13 @@
           const status  = document.getElementById('status');     // ステータス
           const srcLang = document.getElementById('srcLang');
 
+          /**
+           * Translator オブジェクトを生成
+           *
+           * @param {string} src - ソース言語コード（BCP-47形式）
+           * @param {string} tgt - ターゲット言語コード（BCP-47形式）
+           * @returns {Promise<Translator>} - Translator オブジェクト
+           */
           async function createTranslator(src, tgt) {
             // ① 言語ペア対応状況を確認
             const availability = await Translator.availability({ sourceLanguage: src, targetLanguage: tgt });
@@ -128,11 +135,13 @@
           }
 
           // 大量テキストを 2 kB ごとにチャンクして逐次翻訳
+          /*
           async function translateLarge(text, translator, size = 2048) {
             for (const chunk of text.match(new RegExp(`(.|[\\r\\n]){1,${size}}`, 'g'))) {
               document.getElementById('output').value += await translator.translate(chunk);
             }
           }
+            */
 
           // localhost以外でのHTTPアクセス時の早期リジェクト
           /*
@@ -207,6 +216,13 @@ const output  = document.getElementById('output');     // 結果
 const status  = document.getElementById('status');     // ステータス
 const srcLang = document.getElementById('srcLang');
 
+/**
+  * Translator オブジェクトを生成
+  * 
+  * @param {string} src - ソース言語コード（BCP-47形式）
+  * @param {string} tgt - ターゲット言語コード（BCP-47形式）
+  * @returns {Promise<Translator>} - Translator オブジェクト
+  */
 async function createTranslator(src, tgt) {
   // ① 言語ペア対応状況を確認
   const availability = await Translator.availability({ sourceLanguage: src, targetLanguage: tgt });
@@ -225,11 +241,13 @@ async function createTranslator(src, tgt) {
 }
 
 // 大量テキストを 2 kB ごとにチャンクして逐次翻訳
+/*
 async function translateLarge(text, translator, size = 2048) {
   for (const chunk of text.match(new RegExp(`(.|[\\r\\n]){1,${size}}`, 'g'))) {
     document.getElementById('output').value += await translator.translate(chunk);
   }
 }
+*/
 
 // localhost以外でのHTTPアクセス時の早期リジェクト
 /*

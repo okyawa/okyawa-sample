@@ -131,6 +131,14 @@
             const downloadPane = document.getElementById('download');
             const progress     = document.getElementById('progress');
 
+            /**
+             * Summarizer オブジェクトを生成
+             * 
+             * @param {Object} opts - オプション
+             * @param {string} opts.type - 要約タイプ（`key-points`, `tldr`, `teaser`, `headline`）
+             * @param {string} opts.length - 要約の長さ（`short`, `medium`, `long`）
+             * @returns {Promise<Summarizer>} - Summarizer オブジェクト
+             */
             async function createSummarizer(opts) {
               // availability() で状態確認（unavailable / downloadable / downloading / available）
               // :contentReference[oaicite:1]{index=1}
@@ -256,6 +264,14 @@
   const downloadPane = document.getElementById('download');
   const progress     = document.getElementById('progress');
 
+  /**
+   * Summarizer オブジェクトを生成
+   * 
+   * @param {Object} opts - オプション
+   * @param {string} opts.type - 要約タイプ（`key-points`, `tldr`, `teaser`, `headline`）
+   * @param {string} opts.length - 要約の長さ（`short`, `medium`, `long`）
+   * @returns {Promise<Summarizer>} - Summarizer オブジェクト
+   */
   async function createSummarizer(opts) {
     // availability() で状態確認（unavailable / downloadable / downloading / available）
     // :contentReference[oaicite:1]{index=1}
