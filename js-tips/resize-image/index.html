@@ -1,0 +1,388 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>JavaScriptで画像リサイズのサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.6; padding: 16px; }
+    #preview { max-width: 100%; height: auto; display: block; margin-top: 12px; }
+    .info { font-size: 0.9rem; color: #555; }
+    .dropzone {
+      border: 2px dashed #aaa; padding: 16px; border-radius: 8px;
+      text-align: center; color: #666;
+    }
+    .dropzone.dragover { border-color: #333; color: #000; }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>JavaScriptで画像リサイズ</h1>
+      <h2>ブラウザ内蔵の翻訳機能</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `input[type="file"]` で選んだ画像を 長辺が最大 `1600px` になるようにリサイズして、画面に表示する最小構成のサンプル
+  - `createImageBitmap` が使える環境では高速に、未対応でも `<img>` ロードでフォールバック）
+
+- ポイント
+  - 長辺が `1600px` を超える場合だけ縮小（アスペクト比維持）
+  - `canvas.toBlob()` で生成した `Blob` を `<img>` に表示（`dataURL` より低メモリ）
+  - 元が `PNG` なら `PNG`、それ以外は `JPEG` で出力（品質は `0.9`）
+- 補足
+  - `EXIF` の回転情報（`Orientation`） はこの簡易版では反映していない
+    - スマホ撮影 `JPEG` で縦横が合わない場合は、`EXIF` を読んで回転させる処理（例：`exifreader` 等のライブラリで角度を取得し、`ctx.rotate()` で補正）を追加
+  - 表示だけなら `<canvas>` をそのまま `DOM` に挿入しても良いがが、上記は再利用しやすいように `<img>` に出力
+  - 画質と容量のバランスを調整したい場合は、`quality`（`JPEG` のみ）や `MAX_LONG_EDGE` を変更
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+
+            <h3>画像を長辺1600pxにリサイズして表示</h3>
+
+            <label>
+              画像を選択: <input id="fileInput" type="file" accept="image/*">
+            </label>
+
+            <div class="dropzone" id="dropzone" title="ここに画像ファイルをドラッグ&ドロップ">
+              ここに画像をドラッグ&ドロップしてもOK
+            </div>
+
+            <p class="info" id="info"></p>
+            <img id="preview" alt="リサイズ後のプレビュー" />
+
+          <script>
+            const MAX_LONG_EDGE = 1600;
+            const fileInput = document.getElementById('fileInput');
+            const preview  = document.getElementById('preview');
+            const infoEl   = document.getElementById('info');
+            const dropzone = document.getElementById('dropzone');
+
+            let currentObjectURL = null; // 表示中の Blob URL を後で解放
+
+            fileInput.addEventListener('change', async (e) => {
+              const file = e.target.files?.[0];
+              if (file) await handleFile(file);
+              // 同じファイル選択でも change が発火するように value をクリア
+              e.target.value = '';
+            });
+
+            // ドラッグ&ドロップ対応
+            ['dragenter','dragover'].forEach(type => {
+              dropzone.addEventListener(type, (ev) => {
+                ev.preventDefault(); ev.stopPropagation();
+                dropzone.classList.add('dragover');
+              });
+            });
+            ['dragleave','drop'].forEach(type => {
+              dropzone.addEventListener(type, (ev) => {
+                ev.preventDefault(); ev.stopPropagation();
+                dropzone.classList.remove('dragover');
+              });
+            });
+            dropzone.addEventListener('drop', async (ev) => {
+              const file = ev.dataTransfer?.files?.[0];
+              if (file) await handleFile(file);
+            });
+
+            async function handleFile(file) {
+              if (!file.type.startsWith('image/')) {
+                alert('画像ファイルを選択してください。');
+                return;
+              }
+              try {
+                // 1) 画像の読み込み（createImageBitmap があれば高速）
+                const { width, height, drawToCanvas } = await loadImage(file);
+
+                // 2) 縮小スケール計算（長辺が MAX_LONG_EDGE を超える場合のみ縮小）
+                const longEdge = Math.max(width, height);
+                const scale    = longEdge > MAX_LONG_EDGE ? (MAX_LONG_EDGE / longEdge) : 1;
+                const outW     = Math.round(width * scale);
+                const outH     = Math.round(height * scale);
+
+                // 3) 描画用キャンバス
+                const canvas = document.createElement('canvas');
+                canvas.width = outW;
+                canvas.height = outH;
+                const ctx = canvas.getContext('2d', { alpha: true });
+
+                // 高品質縮小（ブラウザ依存）
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // 4) 実描画
+                await drawToCanvas(ctx, outW, outH);
+
+                // 5) Blob 化して <img> に表示（PNG か JPEG を選択）
+                const outType = file.type.includes('png') ? 'image/png' : 'image/jpeg';
+                const quality = outType === 'image/jpeg' ? 0.9 : 1.0;
+
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, outType, quality));
+                if (!blob) throw new Error('toBlob に失敗しました');
+
+                // 既存の URL を解放
+                if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+
+                const url = URL.createObjectURL(blob);
+                currentObjectURL = url;
+                preview.src = url;
+
+                // 情報表示
+                const kb = (blob.size / 1024).toFixed(1);
+                infoEl.textContent =
+                  `元サイズ: ${width}×${height} → 出力: ${outW}×${outH}, ` +
+                  `形式: ${outType}, 約 ${kb} KB`;
+              } catch (err) {
+                console.error(err);
+                alert('画像の処理に失敗しました。別の画像でお試しください。');
+              }
+            }
+
+            /**
+             * 画像を読み込み、任意のキャンバスに描画する関数を返す。
+             * createImageBitmap 利用時は ImageBitmap を、フォールバックは HTMLImageElement を利用。
+             */
+            async function loadImage(file) {
+              if ('createImageBitmap' in window) {
+                const bitmap = await createImageBitmap(file); // 高速デコード
+                const width  = bitmap.width;
+                const height = bitmap.height;
+                return {
+                  width, height,
+                  drawToCanvas: async (ctx, w, h) => {
+                    ctx.drawImage(bitmap, 0, 0, w, h);
+                    bitmap.close?.();
+                  }
+                };
+              } else {
+                // フォールバック: <img> + Object URL
+                const url = URL.createObjectURL(file);
+                try {
+                  const img = await loadImageElement(url);
+                  const width  = img.naturalWidth || img.width;
+                  const height = img.naturalHeight || img.height;
+                  return {
+                    width, height,
+                    drawToCanvas: async (ctx, w, h) => {
+                      ctx.drawImage(img, 0, 0, w, h);
+                    }
+                  };
+                } finally {
+                  // 読み込み用 URL は不要になったら解放
+                  URL.revokeObjectURL(url);
+                }
+              }
+            }
+
+            function loadImageElement(url) {
+              return new Promise((resolve, reject) => {
+                const img = new Image();
+                // CORS 回避が必要な外部 URL を使う場合は crossOrigin 設定が必要
+                // img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = url;
+              });
+            }
+          </script>
+
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <h3>JavaScript</h3>
+
+<pre><code class="language-js">const MAX_LONG_EDGE = 1600;
+const fileInput = document.getElementById('fileInput');
+const preview  = document.getElementById('preview');
+const infoEl   = document.getElementById('info');
+const dropzone = document.getElementById('dropzone');
+
+let currentObjectURL = null; // 表示中の Blob URL を後で解放
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (file) await handleFile(file);
+  // 同じファイル選択でも change が発火するように value をクリア
+  e.target.value = '';
+});
+
+// ドラッグ&ドロップ対応
+['dragenter','dragover'].forEach(type => {
+  dropzone.addEventListener(type, (ev) => {
+    ev.preventDefault(); ev.stopPropagation();
+    dropzone.classList.add('dragover');
+  });
+});
+['dragleave','drop'].forEach(type => {
+  dropzone.addEventListener(type, (ev) => {
+    ev.preventDefault(); ev.stopPropagation();
+    dropzone.classList.remove('dragover');
+  });
+});
+dropzone.addEventListener('drop', async (ev) => {
+  const file = ev.dataTransfer?.files?.[0];
+  if (file) await handleFile(file);
+});
+
+async function handleFile(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('画像ファイルを選択してください。');
+    return;
+  }
+  try {
+    // 1) 画像の読み込み（createImageBitmap があれば高速）
+    const { width, height, drawToCanvas } = await loadImage(file);
+
+    // 2) 縮小スケール計算（長辺が MAX_LONG_EDGE を超える場合のみ縮小）
+    const longEdge = Math.max(width, height);
+    const scale    = longEdge > MAX_LONG_EDGE ? (MAX_LONG_EDGE / longEdge) : 1;
+    const outW     = Math.round(width * scale);
+    const outH     = Math.round(height * scale);
+
+    // 3) 描画用キャンバス
+    const canvas = document.createElement('canvas');
+    canvas.width = outW;
+    canvas.height = outH;
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    // 高品質縮小（ブラウザ依存）
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // 4) 実描画
+    await drawToCanvas(ctx, outW, outH);
+
+    // 5) Blob 化して <img> に表示（PNG か JPEG を選択）
+    const outType = file.type.includes('png') ? 'image/png' : 'image/jpeg';
+    const quality = outType === 'image/jpeg' ? 0.9 : 1.0;
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, outType, quality));
+    if (!blob) throw new Error('toBlob に失敗しました');
+
+    // 既存の URL を解放
+    if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+
+    const url = URL.createObjectURL(blob);
+    currentObjectURL = url;
+    preview.src = url;
+
+    // 情報表示
+    const kb = (blob.size / 1024).toFixed(1);
+    infoEl.textContent =
+      `元サイズ: ${width}×${height} → 出力: ${outW}×${outH}, ` +
+      `形式: ${outType}, 約 ${kb} KB`;
+  } catch (err) {
+    console.error(err);
+    alert('画像の処理に失敗しました。別の画像でお試しください。');
+  }
+}
+
+/**
+  * 画像を読み込み、任意のキャンバスに描画する関数を返す。
+  * createImageBitmap 利用時は ImageBitmap を、フォールバックは HTMLImageElement を利用。
+  */
+async function loadImage(file) {
+  if ('createImageBitmap' in window) {
+    const bitmap = await createImageBitmap(file); // 高速デコード
+    const width  = bitmap.width;
+    const height = bitmap.height;
+    return {
+      width, height,
+      drawToCanvas: async (ctx, w, h) => {
+        ctx.drawImage(bitmap, 0, 0, w, h);
+        bitmap.close?.();
+      }
+    };
+  } else {
+    // フォールバック: <img> + Object URL
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await loadImageElement(url);
+      const width  = img.naturalWidth || img.width;
+      const height = img.naturalHeight || img.height;
+      return {
+        width, height,
+        drawToCanvas: async (ctx, w, h) => {
+          ctx.drawImage(img, 0, 0, w, h);
+        }
+      };
+    } finally {
+      // 読み込み用 URL は不要になったら解放
+      URL.revokeObjectURL(url);
+    }
+  }
+}
+
+function loadImageElement(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    // CORS 回避が必要な外部 URL を使う場合は crossOrigin 設定が必要
+    // img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+</code></pre>
+
+    </section>
+
+  </div>
+</body>
+
+</html>
