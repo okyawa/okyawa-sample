@@ -1,0 +1,496 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>JavaScriptでWeb Workerを使った画像リサイズのサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.6; padding: 16px; }
+    #preview { max-width: 100%; height: auto; display: block; margin-top: 12px; }
+    .info { font-size: 0.9rem; color: #555; }
+    .dropzone {
+      border: 2px dashed #aaa; padding: 16px; border-radius: 8px;
+      text-align: center; color: #666;
+    }
+    .dropzone.dragover { border-color: #333; color: #000; }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>JavaScriptで画像リサイズ</h1>
+      <h2>Web WorkerとOffscreenCanvasを使用</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `input[type="file"]` で選んだ画像を 長辺が最大 `1600px` になるようにリサイズして、画面に表示する最小構成のサンプル
+  - `createImageBitmap` が使える環境では高速に、未対応でも `<img>` ロードでフォールバック）
+
+- ポイント
+  - 長辺が `1600px` を超える場合だけ縮小（アスペクト比維持）
+  - `canvas.toBlob()` で生成した `Blob` を `<img>` に表示（`dataURL` より低メモリ）
+  - 元が `PNG` なら `PNG`、それ以外は `JPEG` で出力（品質は `0.9`）
+- 補足
+  - `EXIF` の回転情報（`Orientation`） はこの簡易版では反映していない
+    - スマホ撮影 `JPEG` で縦横が合わない場合は、`EXIF` を読んで回転させる処理（例：`exifreader` 等のライブラリで角度を取得し、`ctx.rotate()` で補正）を追加
+  - 表示だけなら `<canvas>` をそのまま `DOM` に挿入しても良いがが、上記は再利用しやすいように `<img>` に出力
+  - 画質と容量のバランスを調整したい場合は、`quality`（`JPEG` のみ）や `MAX_LONG_EDGE` を変更
+- `Web Worker` + `OffscreenCanvas` を使えば、デコード〜リサイズ〜エンコード（`JPEG/PNG`） をワーカースレッドで行い、UIスレッドのカクつきを抑えることが可能
+  - `OffscreenCanvas` は、 `canvas` をDOMが無い環境でも描画でき、`canvas` の描画処理をメインスレッド以外で実行できる仕組み
+  - iPhone（iOS Safari）でも iOS `16.4` 以降なら `OffscreenCanvas` が使えるため、この構成が有効
+- サンプルコードの構成
+  - 画像を選択 → Workerでリサイズ → 画面プレビュー
+  - さらに、リサイズ後のファイルを `<form>` の `input[type=file]` にセット（`DataTransfer`）して、通常の `multipart/form-data` で送信
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+
+            <h3>画像を長辺1600pxにリサイズして表示</h3>
+
+            <label>
+              画像を選択: <input id="fileInput" type="file" accept="image/*">
+            </label>
+
+            <div class="dropzone" id="dropzone" title="ここに画像ファイルをドラッグ&ドロップ">
+              ここに画像をドラッグ&ドロップしてもOK
+            </div>
+
+            <p class="info" id="info"></p>
+            <img id="preview" alt="リサイズ後のプレビュー" />
+
+            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+              <!-- CSRFトークンが必要なフレームワークは適宜追加 -->
+              <input type="file" name="image" id="resizedFile" hidden>
+              <input type="hidden" name="width" id="metaW">
+              <input type="hidden" name="height" id="metaH">
+              <input type="hidden" name="original_name" id="metaOrig">
+              <!-- <button id="submitBtn" type="submit" disabled>この内容でフォーム送信</button> -->
+            </form>
+
+            <script type="module">
+              const MAX_LONG_EDGE = 1600;
+              const fileInput  = document.getElementById('fileInput');
+              const preview    = document.getElementById('preview');
+              const infoEl     = document.getElementById('info');
+              const resizedInp = document.getElementById('resizedFile');
+              const metaW      = document.getElementById('metaW');
+              const metaH      = document.getElementById('metaH');
+              const metaOrig   = document.getElementById('metaOrig');
+
+              let currentObjectURL = null;
+
+              /** ① Worker本体を「普通の関数」として定義（外部スコープに依存しないことが大事） */
+              function workerMain() {
+                self.onmessage = async (e) => {
+                  const { file, maxEdge } = e.data;
+                  const outType = (file.type && file.type.includes('png')) ? 'image/png' : 'image/jpeg';
+                  const quality = (outType === 'image/jpeg') ? 0.9 : 1.0;
+
+                  try {
+                    if (typeof OffscreenCanvas !== 'undefined' && 'createImageBitmap' in self) {
+                      const bitmap = await createImageBitmap(file);
+                      const width  = bitmap.width;
+                      const height = bitmap.height;
+                      const longEdge = Math.max(width, height);
+                      const scale  = longEdge > maxEdge ? (maxEdge / longEdge) : 1;
+                      const outW   = Math.round(width * scale);
+                      const outH   = Math.round(height * scale);
+
+                      const canvas = new OffscreenCanvas(outW, outH);
+                      const ctx = canvas.getContext('2d', { alpha: true });
+                      ctx.imageSmoothingEnabled = true;
+                      ctx.imageSmoothingQuality = 'high';
+                      ctx.drawImage(bitmap, 0, 0, outW, outH);
+                      bitmap.close?.();
+
+                      const blob = await canvas.convertToBlob({ type: outType, quality });
+                      self.postMessage({ ok: true, blob, outW, outH, outType });
+                      return;
+                    }
+                    // フォールバック指示（メインスレッドで実行してもらう）
+                    infoEl.textContent = 'メインスレッドで処理中...';
+                    self.postMessage({ ok: false, needFallback: true, reason: 'No OffscreenCanvas or createImageBitmap' });
+                  } catch (err) {
+                    self.postMessage({ ok: false, error: err?.message || String(err) });
+                  }
+                };
+              }
+
+              /** ② 関数を toString() して Blob URL から Worker を生成 */
+              function createWorkerFromFunction(fn) {
+                // 直に IIFE してワーカー側で関数を起動
+                const src = `(${fn.toString()})();`;
+                const blob = new Blob([src], { type: 'text/javascript' });
+                const url  = URL.createObjectURL(blob);
+                const worker = new Worker(url);
+                // 後で掃除できるようURLを持たせておく（任意）
+                worker.__url = url;
+                return worker;
+              }
+
+              const worker = createWorkerFromFunction(workerMain);
+              window.addEventListener('unload', () => {
+                try { worker.terminate(); } catch {}
+                if (worker.__url) URL.revokeObjectURL(worker.__url);
+              });
+
+              /** 古環境向けフォールバック（メインスレッドでリサイズ） */
+              async function resizeOnMainThread(file) {
+                const img = await new Promise((resolve, reject) => {
+                  const url = URL.createObjectURL(file);
+                  const el = new Image();
+                  el.onload = () => { URL.revokeObjectURL(url); resolve(el); };
+                  el.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+                  el.src = url;
+                });
+                const width = img.naturalWidth || img.width;
+                const height = img.naturalHeight || img.height;
+                const longEdge = Math.max(width, height);
+                const scale  = longEdge > MAX_LONG_EDGE ? (MAX_LONG_EDGE / longEdge) : 1;
+                const outW   = Math.round(width * scale);
+                const outH   = Math.round(height * scale);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = outW; canvas.height = outH;
+                const ctx = canvas.getContext('2d', { alpha: true });
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(img, 0, 0, outW, outH);
+
+                const outType = (file.type && file.type.includes('png')) ? 'image/png' : 'image/jpeg';
+                const quality = (outType === 'image/jpeg') ? 0.9 : 1.0;
+                const blob = await new Promise(res => canvas.toBlob(res, outType, quality));
+                if (!blob) throw new Error('toBlob failed');
+
+                return { blob, outW, outH, outType };
+              }
+
+              fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                infoEl.textContent = '処理中...';
+
+                try {
+                  const result = await resizeInWorkerOrFallback(file);
+                  await updatePreviewAndForm(file, result);
+                } catch (err) {
+                  console.error(err);
+                  infoEl.textContent = '処理に失敗しました。別の画像でお試しください。';
+                } finally {
+                  e.target.value = ''; // 同じファイルでも再選択可
+                }
+              });
+
+              function resizeInWorkerOrFallback(file) {
+                return new Promise((resolve, reject) => {
+                  const onMsg = (ev) => {
+                    worker.removeEventListener('message', onMsg);
+                    const d = ev.data;
+                    if (d.ok) {
+                      resolve({ blob: d.blob, outW: d.outW, outH: d.outH, outType: d.outType });
+                    } else if (d.needFallback) {
+                      resizeOnMainThread(file).then(resolve, reject);
+                    } else {
+                      reject(new Error(d.error || 'worker failed'));
+                    }
+                  };
+                  worker.addEventListener('message', onMsg);
+                  worker.postMessage({ file, maxEdge: MAX_LONG_EDGE });
+                });
+              }
+
+              async function updatePreviewAndForm(originalFile, { blob, outW, outH, outType }) {
+                // プレビュー
+                if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+                currentObjectURL = URL.createObjectURL(blob);
+                preview.src = currentObjectURL;
+
+                // 情報
+                const kb = (blob.size / 1024).toFixed(1);
+                infoEl.textContent = `出力: ${outW}×${outH}, 形式: ${outType}, 約 ${kb} KB`;
+
+                // フォームへセット（DataTransferで file input に入れる）
+                const ext  = (outType === 'image/png') ? 'png' : 'jpg';
+                const base = (originalFile.name || 'image').replace(/\.[^.]+$/, '');
+                const filename = `${base}_resized_${outW}x${outH}.${ext}`;
+                const resizedFile = new File([blob], filename, { type: outType });
+
+                let attached = false;
+                if (window.DataTransfer) {
+                  try {
+                    const dt = new DataTransfer();
+                    dt.items.add(resizedFile);
+                    resizedInp.files = dt.files;
+                    attached = resizedInp.files && resizedInp.files.length > 0;
+                  } catch {
+                    console.error('ERROR :: Failed to attach resized file to input');
+                  }
+                }
+
+                metaW.value = String(outW);
+                metaH.value = String(outH);
+                metaOrig.value = originalFile.name || '';
+              }
+            </script>
+
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;label&gt;
+  画像を選択: &lt;input id="fileInput" type="file" accept="image/*"&gt;
+&lt;/label&gt;
+
+&lt;div class="dropzone" id="dropzone" title="ここに画像ファイルをドラッグ&amp;ドロップ"&gt;
+  ここに画像をドラッグ&amp;ドロップしてもOK
+&lt;/div&gt;
+
+&lt;p class="info" id="info"&gt;&lt;/p&gt;
+&lt;img id="preview" alt="リサイズ後のプレビュー" /&gt;
+
+&lt;form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data"&gt;
+  &lt;!-- CSRFトークンが必要なフレームワークは適宜追加 --&gt;
+  &lt;input type="file" name="image" id="resizedFile" hidden&gt;
+  &lt;input type="hidden" name="width" id="metaW"&gt;
+  &lt;input type="hidden" name="height" id="metaH"&gt;
+  &lt;input type="hidden" name="original_name" id="metaOrig"&gt;
+  &lt;!-- &lt;button id="submitBtn" type="submit" disabled&gt;この内容でフォーム送信&lt;/button&gt; --&gt;
+&lt;/form&gt;
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>JavaScript</h3></summary>
+
+<pre><code class="language-js">const MAX_LONG_EDGE = 1600;
+const fileInput  = document.getElementById('fileInput');
+const preview    = document.getElementById('preview');
+const infoEl     = document.getElementById('info');
+const resizedInp = document.getElementById('resizedFile');
+const metaW      = document.getElementById('metaW');
+const metaH      = document.getElementById('metaH');
+const metaOrig   = document.getElementById('metaOrig');
+
+let currentObjectURL = null;
+
+/** ① Worker本体を「普通の関数」として定義（外部スコープに依存しないことが大事） */
+function workerMain() {
+  self.onmessage = async (e) => {
+    const { file, maxEdge } = e.data;
+    const outType = (file.type && file.type.includes('png')) ? 'image/png' : 'image/jpeg';
+    const quality = (outType === 'image/jpeg') ? 0.9 : 1.0;
+
+    try {
+      if (typeof OffscreenCanvas !== 'undefined' && 'createImageBitmap' in self) {
+        const bitmap = await createImageBitmap(file);
+        const width  = bitmap.width;
+        const height = bitmap.height;
+        const longEdge = Math.max(width, height);
+        const scale  = longEdge > maxEdge ? (maxEdge / longEdge) : 1;
+        const outW   = Math.round(width * scale);
+        const outH   = Math.round(height * scale);
+
+        const canvas = new OffscreenCanvas(outW, outH);
+        const ctx = canvas.getContext('2d', { alpha: true });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(bitmap, 0, 0, outW, outH);
+        bitmap.close?.();
+
+        const blob = await canvas.convertToBlob({ type: outType, quality });
+        self.postMessage({ ok: true, blob, outW, outH, outType });
+        return;
+      }
+      // フォールバック指示（メインスレッドで実行してもらう）
+      infoEl.textContent = 'メインスレッドで処理中...';
+      self.postMessage({ ok: false, needFallback: true, reason: 'No OffscreenCanvas or createImageBitmap' });
+    } catch (err) {
+      self.postMessage({ ok: false, error: err?.message || String(err) });
+    }
+  };
+}
+
+/** ② 関数を toString() して Blob URL から Worker を生成 */
+function createWorkerFromFunction(fn) {
+  // 直に IIFE してワーカー側で関数を起動
+  const src = `(${fn.toString()})();`;
+  const blob = new Blob([src], { type: 'text/javascript' });
+  const url  = URL.createObjectURL(blob);
+  const worker = new Worker(url);
+  // 後で掃除できるようURLを持たせておく（任意）
+  worker.__url = url;
+  return worker;
+}
+
+const worker = createWorkerFromFunction(workerMain);
+window.addEventListener('unload', () => {
+  try { worker.terminate(); } catch {}
+  if (worker.__url) URL.revokeObjectURL(worker.__url);
+});
+
+/** 古環境向けフォールバック（メインスレッドでリサイズ） */
+async function resizeOnMainThread(file) {
+  const img = await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const el = new Image();
+    el.onload = () => { URL.revokeObjectURL(url); resolve(el); };
+    el.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+    el.src = url;
+  });
+  const width = img.naturalWidth || img.width;
+  const height = img.naturalHeight || img.height;
+  const longEdge = Math.max(width, height);
+  const scale  = longEdge > MAX_LONG_EDGE ? (MAX_LONG_EDGE / longEdge) : 1;
+  const outW   = Math.round(width * scale);
+  const outH   = Math.round(height * scale);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = outW; canvas.height = outH;
+  const ctx = canvas.getContext('2d', { alpha: true });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, outW, outH);
+
+  const outType = (file.type && file.type.includes('png')) ? 'image/png' : 'image/jpeg';
+  const quality = (outType === 'image/jpeg') ? 0.9 : 1.0;
+  const blob = await new Promise(res => canvas.toBlob(res, outType, quality));
+  if (!blob) throw new Error('toBlob failed');
+
+  return { blob, outW, outH, outType };
+}
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  infoEl.textContent = '処理中...';
+
+  try {
+    const result = await resizeInWorkerOrFallback(file);
+    await updatePreviewAndForm(file, result);
+  } catch (err) {
+    console.error(err);
+    infoEl.textContent = '処理に失敗しました。別の画像でお試しください。';
+  } finally {
+    e.target.value = ''; // 同じファイルでも再選択可
+  }
+});
+
+function resizeInWorkerOrFallback(file) {
+  return new Promise((resolve, reject) => {
+    const onMsg = (ev) => {
+      worker.removeEventListener('message', onMsg);
+      const d = ev.data;
+      if (d.ok) {
+        resolve({ blob: d.blob, outW: d.outW, outH: d.outH, outType: d.outType });
+      } else if (d.needFallback) {
+        resizeOnMainThread(file).then(resolve, reject);
+      } else {
+        reject(new Error(d.error || 'worker failed'));
+      }
+    };
+    worker.addEventListener('message', onMsg);
+    worker.postMessage({ file, maxEdge: MAX_LONG_EDGE });
+  });
+}
+
+async function updatePreviewAndForm(originalFile, { blob, outW, outH, outType }) {
+  // プレビュー
+  if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+  currentObjectURL = URL.createObjectURL(blob);
+  preview.src = currentObjectURL;
+
+  // 情報
+  const kb = (blob.size / 1024).toFixed(1);
+  infoEl.textContent = `出力: ${outW}×${outH}, 形式: ${outType}, 約 ${kb} KB`;
+
+  // フォームへセット（DataTransferで file input に入れる）
+  const ext  = (outType === 'image/png') ? 'png' : 'jpg';
+  const base = (originalFile.name || 'image').replace(/\.[^.]+$/, '');
+  const filename = `${base}_resized_${outW}x${outH}.${ext}`;
+  const resizedFile = new File([blob], filename, { type: outType });
+
+  let attached = false;
+  if (window.DataTransfer) {
+    try {
+      const dt = new DataTransfer();
+      dt.items.add(resizedFile);
+      resizedInp.files = dt.files;
+      attached = resizedInp.files && resizedInp.files.length > 0;
+    } catch {
+      console.error('ERROR :: Failed to attach resized file to input');
+    }
+  }
+
+  metaW.value = String(outW);
+  metaH.value = String(outH);
+  metaOrig.value = originalFile.name || '';
+}
+</code></pre>
+
+          </details>
+
+        </details>
+
+    </section>
+
+  </div>
+</body>
+
+</html>
