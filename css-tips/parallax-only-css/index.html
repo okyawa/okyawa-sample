@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>CSS Only Parallax Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    /* ---- base ---- */
+    * {
+      box-sizing: border-box;
+    }
+  
+    html,
+    body {
+      height: 100%;
+    }
+  
+    body {
+      margin: 0;
+      /* スクロール量をしっかり確保（viewport のスクロールを使う） */
+      min-height: 500vh;
+    }
+  
+    .site-header {
+      position: sticky;
+      top: 0;
+      padding: 14px 20px;
+      color: #fff;
+      background: color-mix(in oklab, #0b1220 70%, transparent);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      z-index: 1000;
+    }
+  
+    /* ---- stage ---- */
+    .wrapper {
+      position: relative;
+      height: 450vh;
+      /* root のスクロールを使うので wrapper は overflow させない */
+      overflow: visible;
+    }
+  
+    .parallax {
+      position: absolute;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+      will-change: transform;
+    }
+  
+    .large {
+      width: 140px;
+      background: #A9E34B;
+    }
+  
+    /* 近景（速い） */
+    .medium {
+      width: 100px;
+      background: #4DABF7;
+    }
+  
+    /* 中景（基準） */
+    .small {
+      width: 70px;
+      background: #FFD43B;
+    }
+  
+    /* 遠景（遅い） */
+  
+    /* ---- keyframes ---- */
+    @keyframes parallax-fast {
+      from {
+        transform: translateY(600px);
+      }
+  
+      to {
+        transform: translateY(0);
+      }
+    }
+  
+    @keyframes parallax-slow {
+      from {
+        transform: translateY(-600px);
+      }
+  
+      to {
+        transform: translateY(0);
+      }
+    }
+  
+    /* ---- scroll-driven（ルートを明示）----
+       longhandで宣言 → 最後に animation-timeline を指定
+       ※ Firefox 対策で duration: 1ms を付与
+    */
+    .large {
+      animation-name: parallax-fast;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: 1ms;
+      animation-timeline: scroll(root block);
+    }
+  
+    .small {
+      animation-name: parallax-slow;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: 1ms;
+      animation-timeline: scroll(root block);
+    }
+  
+    /* .medium は基準速度 → アニメなし */
+  
+    /* ---- fallback（未対応ブラウザ） ---- */
+    @supports not (animation-timeline: scroll()) {
+      .wrapper {
+        display: none;
+      }
+  
+      .fixed-parallax {
+        min-height: 70vh;
+        display: grid;
+        place-items: center;
+        font-size: clamp(24px, 4vw, 42px);
+        font-weight: 700;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+      }
+  
+      .fixed-1 {
+        background-image: linear-gradient(135deg, #3b82f6, #0ea5e9);
+      }
+  
+      .fixed-2 {
+        background-image: linear-gradient(135deg, #a78bfa, #ec4899);
+      }
+  
+      .fixed-3 {
+        background-image: linear-gradient(135deg, #22c55e, #84cc16);
+      }
+    }
+  
+    /* 対応ブラウザではフォールバック・セクションを消す */
+    @supports (animation-timeline: scroll()) {
+      .fixed-parallax {
+        display: none;
+      }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>CSS Only Parallax Sample</h1>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div>
+            <header class="site-header">CSS Only Parallax（スクロールしてください👇）</header>
+
+            <main class="wrapper" aria-label="parallax stage">
+              <!-- 遠景（遅い） -->
+              <div style="top: 80vh;  left: calc(50% - 220px)" class="parallax small"></div>
+              <div style="top: 120vh; left: calc(50% + 140px)" class="parallax small"></div>
+              <div style="top: 160vh; left: calc(50% -  60px)" class="parallax small"></div>
+
+              <!-- 中景（基準） -->
+              <div style="top: 40vh;  left: calc(50% -  50px)" class="parallax medium"></div>
+              <div style="top: 100vh; left: calc(50% - 180px)" class="parallax medium"></div>
+              <div style="top: 200vh; left: calc(50% + 220px)" class="parallax medium"></div>
+
+              <!-- 近景（速い） -->
+              <div style="top: -20vh; left: calc(50% - 300px)" class="parallax large"></div>
+              <div style="top: 30vh;  left: calc(50% + 180px)" class="parallax large"></div>
+              <div style="top: 220vh; left: calc(50% - 150px)" class="parallax large"></div>
+            </main>
+
+            <!-- フォールバック -->
+            <section class="fixed-parallax fixed-1">Parallax Section A</section>
+            <section class="fixed-parallax fixed-2">Parallax Section B</section>
+            <section class="fixed-parallax fixed-3">Parallax Section C</section>
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://qiita.com/degudegu2510/items/8af66ccdfe3ccb227866" ref="nofollow noreferrer noopener" target="_blank">
+              【CSS】CSSだけでパララックスを再現する | Qiita
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+    <br />
+    <br />
+
+  </div>
+</body>
+</html>
