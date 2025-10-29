@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Scroll-Driven Animationsを使ってCSSで横スクロールがある場合の判定表示Sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    :root {
+      --hint-w: 44px;
+      --hint-bg: rgba(255,255,255,0.95);
+      --hint-fg: #333;
+    }
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+
+    .scroll-area {
+      position: relative;
+      max-inline-size: 560px;            /* デモ用。不要なら削除OK */
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      /* 兄弟 (.right-hint) から --x タイムラインを参照できるように */
+      timeline-scope: --x;
+    }
+
+    /* ====== 要素内の横スクロールを確実に起こす構造 ====== */
+    .scroller {
+      overflow-x: auto;                  /* ご要望の overflow-x:auto */
+      overflow-y: hidden;
+      display: block;                    /* ビューポート化（幅固定） */
+      inline-size: 100%;
+      padding: 12px;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+      overscroll-behavior-x: contain;
+
+      /* スクロール進捗タイムライン（横方向） */
+      scroll-timeline-name: --x;
+      scroll-timeline-axis: inline;
+    }
+    .track {
+      display: inline-flex;
+      gap: 12px;
+      /* 中身の合計幅に合わせて広がる＝scroller幅を超えやすくする */
+      min-inline-size: max-content;
+    }
+
+    .card {
+      inline-size: 200px;
+      block-size: 100px;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+      padding: 12px;
+      box-sizing: border-box;
+      flex: 0 0 auto;
+    }
+
+    /* 右端の矢印ヒント（フォールバックでは非表示のまま） */
+    .right-hint {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;               /* 右端 */
+      inline-size: var(--hint-w);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      color: var(--hint-fg);
+      background: linear-gradient(to left, var(--hint-bg) 45%, rgba(255,255,255,0));
+      border-radius: 8px;
+      opacity: 0;                        /* タイムライン未対応 or 非スクロール時は非表示 */
+    }
+    .right-hint::before {
+      content: "➔";                      /* お好みで "→" など */
+      font-size: 20px;
+      line-height: 1;
+      animation: nudge 1.6s ease-in-out infinite;
+    }
+    @keyframes nudge {
+      0%, 100% { transform: translateX(2px); opacity: .9; }
+      50%      { transform: translateX(6px); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .right-hint::before { animation: none; }
+    }
+
+    /* ===== Scroll-Driven Animations に対応している場合だけ有効化 ===== */
+    @supports (animation-timeline: scroll()) or (scroll-timeline-name: --dummy) {
+      .right-hint {
+        /* スクロール進捗に同期して可視状態→不可視へ */
+        animation-name: fadeRightHint;
+        animation-timeline: --x;         /* .scroller のスクロール進捗 */
+        /* 0%〜96%の間は 0% キーフレーム（=表示）を維持し、
+          96%→100% で 1 まで進んでフェードアウト。
+          範囲外は fill:both で端の状態を保持。 */
+        animation-range: 0% 96%;
+        animation-duration: 1ms;         /* 時間値はダミー（タイムライン駆動） */
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+      }
+      @keyframes fadeRightHint {
+        0%   { opacity: 1; }             /* まだ右に余地あり → 表示 */
+        100% { opacity: 0; }             /* 末尾付近〜末尾 → 消える */
+      }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>CSSのScroll-driven Animation</h1>
+      <h2>横スクロールがある場合の判定表示Sample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- CSSの `Scroll-driven Animation` を使うことで、JavaScriptを使わずにスクロールをトリガーにしたアニメーションの実装が可能
+- 2025/10/29現在、Firefoxが未対応
+- `scroll-timeline` を使って スクロール進捗（0%→100%） に同期させ、96%以降で矢印を0にフェードする
+- オーバーフローが無い場合はタイムライン自体が無効なので、矢印は最初から出ない（JSは不要）
+-	`animation-range: 0% 96%` の `96%` を変えると「どのくらい末尾に近づいたら消すか」を調整可能（例：98% でより末端だけに）
+-	オーバーフローが無い場合は、`scroll-timeline` が無効になり矢印は出ない（初期 opacity:0 のまま）
+-	RTLや縦書きに合わせたい場合は scroll-timeline-axis を block に変えたり、direction を考慮
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div class="scroll-area">
+          <div class="scroller" aria-label="横スクロール領域">
+            <div class="track">
+              <div class="card">Item 1</div>
+              <div class="card">Item 2</div>
+              <div class="card">Item 3</div>
+              <div class="card">Item 4</div>
+              <div class="card">Item 5</div>
+              <div class="card">Item 6</div>
+              <div class="card">Item 7</div>
+            </div>
+          </div>
+          <div class="right-hint" aria-hidden="true" title="横にスクロールできます"></div>
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">:root {
+  --hint-w: 44px;
+  --hint-bg: rgba(255,255,255,0.95);
+  --hint-fg: #333;
+}
+body { font-family: system-ui, sans-serif; margin: 24px; }
+
+.scroll-area {
+  position: relative;
+  max-inline-size: 560px;            /* デモ用。不要なら削除OK */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  /* 兄弟 (.right-hint) から --x タイムラインを参照できるように */
+  timeline-scope: --x;
+}
+
+/* ====== 要素内の横スクロールを確実に起こす構造 ====== */
+.scroller {
+  overflow-x: auto;                  /* ご要望の overflow-x:auto */
+  overflow-y: hidden;
+  display: block;                    /* ビューポート化（幅固定） */
+  inline-size: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+
+  /* スクロール進捗タイムライン（横方向） */
+  scroll-timeline-name: --x;
+  scroll-timeline-axis: inline;
+}
+.track {
+  display: inline-flex;
+  gap: 12px;
+  /* 中身の合計幅に合わせて広がる＝scroller幅を超えやすくする */
+  min-inline-size: max-content;
+}
+
+.card {
+  inline-size: 200px;
+  block-size: 100px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  background: #fafafa;
+  padding: 12px;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+}
+
+/* 右端の矢印ヒント（フォールバックでは非表示のまま） */
+.right-hint {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;               /* 右端 */
+  inline-size: var(--hint-w);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--hint-fg);
+  background: linear-gradient(to left, var(--hint-bg) 45%, rgba(255,255,255,0));
+  border-radius: 8px;
+  opacity: 0;                        /* タイムライン未対応 or 非スクロール時は非表示 */
+}
+.right-hint::before {
+  content: "➔";                      /* お好みで "→" など */
+  font-size: 20px;
+  line-height: 1;
+  animation: nudge 1.6s ease-in-out infinite;
+}
+@keyframes nudge {
+  0%, 100% { transform: translateX(2px); opacity: .9; }
+  50%      { transform: translateX(6px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .right-hint::before { animation: none; }
+}
+
+/* ===== Scroll-Driven Animations に対応している場合だけ有効化 ===== */
+@supports (animation-timeline: scroll()) or (scroll-timeline-name: --dummy) {
+  .right-hint {
+    /* スクロール進捗に同期して可視状態→不可視へ */
+    animation-name: fadeRightHint;
+    animation-timeline: --x;         /* .scroller のスクロール進捗 */
+    /* 0%〜96%の間は 0% キーフレーム（=表示）を維持し、
+      96%→100% で 1 まで進んでフェードアウト。
+      範囲外は fill:both で端の状態を保持。 */
+    animation-range: 0% 96%;
+    animation-duration: 1ms;         /* 時間値はダミー（タイムライン駆動） */
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+  }
+  @keyframes fadeRightHint {
+    0%   { opacity: 1; }             /* まだ右に余地あり → 表示 */
+    100% { opacity: 0; }             /* 末尾付近〜末尾 → 消える */
+  }
+}
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div class="scroll-area"&gt;
+  &lt;div class="scroller" aria-label="横スクロール領域"&gt;
+    &lt;div class="track"&gt;
+      &lt;div class="card"&gt;Item 1&lt;/div&gt;
+      &lt;div class="card"&gt;Item 2&lt;/div&gt;
+      &lt;div class="card"&gt;Item 3&lt;/div&gt;
+      &lt;div class="card"&gt;Item 4&lt;/div&gt;
+      &lt;div class="card"&gt;Item 5&lt;/div&gt;
+      &lt;div class="card"&gt;Item 6&lt;/div&gt;
+      &lt;div class="card"&gt;Item 7&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="right-hint" aria-hidden="true" title="横にスクロールできます"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://caniuse.com/?search=Scroll-Driven+Animations" ref="nofollow noreferrer noopener" target="_blank">
+              Scroll-Driven Animations | Can I use Search
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
