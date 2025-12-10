@@ -1,0 +1,910 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Swiperの枚数が少ない場合でもループ可能にするサンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+
+    .swiper {
+      max-width: 800px;
+      margin: 0 auto 16px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding-bottom: 48px;
+      position: relative;
+    }
+
+    .swiper-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      width: 220px; /* slidesPerView: 'auto' 用の例 */
+    }
+
+    .swiper-slide:nth-child(1) { background: #007bff; }
+    .swiper-slide:nth-child(2) { background: #28a745; }
+    .swiper-slide:nth-child(3) { background: #ffc107; }
+    .swiper-slide:nth-child(4) { background: #e83e8c; }
+    .swiper-slide:nth-child(5) { background: #17a2b8; }
+    .swiper-slide:nth-child(6) { background: #6f42c1; }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+      color: #333;
+    }
+
+    .swiper-pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 8px;
+    }
+
+    .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #ccc;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: transform 0.2s, opacity 0.2s, background 0.2s;
+      border: none;
+    }
+
+    .swiper-pagination-bullet-active {
+      background: #007bff;
+      opacity: 1;
+      transform: scale(1.3);
+    }
+
+    .controls {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .controls button {
+      padding: 8px 16px;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Swiperの枚数が少ない場合でもループ可能にするサンプル</h1>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary>
+          <h2>概要</h2>
+        </summary>
+
+        <div class="markdown_content">
+- `loop: true` のときだけ事前クローンして loop 条件を満たし、bullets は元枚数分にする
+- `loop: false` のときはクローン処理をスキップ
+- `destroy()` で Swiper を破棄すると、自前クローンも削除
+- 複製スライドには `data-duplicated="true"` を付与
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>デモ</h2>
+        </summary>
+
+        <div class="demo_wrapper">
+          <h1>Swiper / ループ用ラッパー</h1>
+
+          <div class="swiper" id="my-swiper">
+            <div class="swiper-wrapper">
+              <!-- ★元スライド -->
+              <div class="swiper-slide">Slide 1</div>
+              <div class="swiper-slide">Slide 2</div>
+              <div class="swiper-slide">Slide 3</div>
+            </div>
+
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+
+            <div class="swiper-pagination"></div>
+          </div>
+
+          <div class="controls">
+            <button id="destroy-btn" type="button">Destroy Swiper</button>
+            <button id="init-btn" type="button">Re-init Swiper</button>
+          </div>
+
+          <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+          <script>
+            /********************************************************************
+             * 1. 計算だけの純粋関数群（DOM / Swiper に依存しない）★テスト対象
+             ********************************************************************/
+
+            /** breakpoints をマージした 1設定に正規化 */
+            function normalizeConfig(base, override) {
+              const bp = override || {};
+              const slidesPerView =
+                bp.slidesPerView !== undefined ? bp.slidesPerView : base.slidesPerView;
+              const slidesPerGroup =
+                bp.slidesPerGroup !== undefined ? bp.slidesPerGroup : base.slidesPerGroup;
+              const centeredSlides =
+                bp.centeredSlides !== undefined ? bp.centeredSlides : base.centeredSlides;
+
+              return { slidesPerView, slidesPerGroup, centeredSlides };
+            }
+
+            /**
+             * ある1つの設定（spv/spg/centered）について
+             * 「loop が破綻しにくい最低スライド数」を返す
+             */
+            function getRequiredSlidesForConfig(config, autoVisibleEstimate) {
+              const isAuto = config.slidesPerView === 'auto';
+
+              const spvRaw = isAuto ? autoVisibleEstimate : config.slidesPerView;
+              const spv = typeof spvRaw === 'number' && spvRaw > 0 ? spvRaw : 1;
+              const spg = config.slidesPerGroup && config.slidesPerGroup > 0
+                ? config.slidesPerGroup
+                : 1;
+              const centered = !!config.centeredSlides;
+
+              // 基本条件: totalSlides >= slidesPerView + slidesPerGroup
+              let min = spv + spg;
+
+              // centeredSlides 調整
+              if (centered && !isAuto) {
+                // slidesPerView が数値のとき:
+                //   左右に見切れを出すぶん +1 しつつ、「spv*2 + spg」くらいまで持ち上げる
+                const safeCentered = spv * 2 + spg;
+                min = Math.max(min + 1, safeCentered);
+              } else if (centered && isAuto) {
+                // auto のときは少し控えめに
+                min = Math.max(min + 1, spv * 2);
+              }
+
+              // auto のときは余裕を少し盛る
+              if (isAuto) {
+                const safeAuto = spv + spg * 2;
+                min = Math.max(min, safeAuto);
+              }
+
+              // この設定の中では slidesPerGroup で割り切れるように
+              const remainder = min % spg;
+              if (remainder !== 0) {
+                min += spg - remainder;
+              }
+
+              return min;
+            }
+
+            /** base + 全 breakpoints の設定リストを返す */
+            function getAllConfigs(swiperOptions) {
+              const base = normalizeConfig(swiperOptions, null);
+              const configs = [base];
+
+              const bps = swiperOptions.breakpoints || {};
+              Object.values(bps).forEach((bp) => {
+                configs.push(normalizeConfig(swiperOptions, bp));
+              });
+
+              return configs;
+            }
+
+            /**
+             * 全 breakpoints の中で
+             * 「必要枚数が最大のパターン」を取り、それより多く、
+             * かつ全 slidesPerGroup で割り切れるスライド数にそろえる
+             */
+            function getGlobalRequiredSlides(swiperOptions, autoVisibleEstimate) {
+              const configs = getAllConfigs(swiperOptions);
+
+              let maxRequired = 0;
+              const groups = new Set();
+
+              configs.forEach((cfg) => {
+                const required = getRequiredSlidesForConfig(cfg, autoVisibleEstimate);
+                if (required > maxRequired) maxRequired = required;
+
+                const spg =
+                  cfg.slidesPerGroup && cfg.slidesPerGroup > 0
+                    ? cfg.slidesPerGroup
+                    : 1;
+                groups.add(spg);
+              });
+
+              // 最大 requiredSlides 以上かつ、全 slidesPerGroup で割り切れる値に持ち上げる
+              let globalRequired = maxRequired;
+              groups.forEach((spg) => {
+                if (spg <= 1) return;
+                const remainder = globalRequired % spg;
+                if (remainder !== 0) {
+                  globalRequired += spg - remainder;
+                }
+              });
+
+              return globalRequired;
+            }
+
+            /** Swiper.realIndex → 「元スライド index」に変換するマッピング */
+            function mapRealIndexToLogical(realIndex, originalCount) {
+              if (originalCount <= 0) return 0;
+              return realIndex % originalCount;
+            }
+
+            /********************************************************************
+             * 2. DOM を触る処理（テスト時はモックしてもOKな層）
+             ********************************************************************/
+
+            /** bullets を元スライド数ぶん生成して返す */
+            function createPaginationBullets(paginationEl, originalCount) {
+              paginationEl.innerHTML = '';
+              const bullets = [];
+
+              for (let i = 0; i < originalCount; i++) {
+                const bullet = document.createElement('button');
+                bullet.type = 'button';
+                bullet.className = 'swiper-pagination-bullet';
+                bullet.setAttribute('aria-label', `スライド ${i + 1} へ`);
+                paginationEl.appendChild(bullet);
+                bullets.push(bullet);
+              }
+
+              return bullets;
+            }
+
+            /** bullets の active を更新 */
+            function updatePaginationBullets(bullets, logicalIndex) {
+              bullets.forEach((bullet, i) => {
+                bullet.classList.toggle(
+                  'swiper-pagination-bullet-active',
+                  i === logicalIndex
+                );
+              });
+            }
+
+            /********************************************************************
+             * 3. Swiper 初期化ラッパー
+             *    - loop: true のときだけ事前クローン
+             *    - destroy() 時にクローンを掃除
+             ********************************************************************/
+
+            function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
+              const wrapperEl = swiperEl.querySelector('.swiper-wrapper');
+              const paginationEl = swiperEl.querySelector('.swiper-pagination');
+
+              const originalSlides = Array.from(
+                wrapperEl.querySelectorAll('.swiper-slide')
+              );
+              const originalCount = originalSlides.length;
+
+              // 元スライドにフラグを付けておくと DevTools で分かりやすい
+              originalSlides.forEach((slide) => {
+                slide.dataset.duplicated = 'false';
+              });
+
+              const clonedSlides = [];
+              let swiper = null;
+              let bullets = [];
+
+              // loop:true && 枚数>1 のときだけ「loop 前提」の調整をする
+              const shouldLoopByOption = baseSwiperOptions.loop === true;
+              const shouldLoop = shouldLoopByOption && originalCount > 1;
+
+              // Swiper に渡すオプション（元を壊したくないので浅いコピー）
+              const swiperOptions = {
+                ...baseSwiperOptions,
+                loop: shouldLoop,
+                breakpoints: baseSwiperOptions.breakpoints
+                  ? { ...baseSwiperOptions.breakpoints }
+                  : undefined,
+              };
+
+              // slidesPerView: 'auto' のときの「だいたい見えている枚数」の目安
+              const AUTO_VISIBLE_ESTIMATE = 3;
+
+              if (shouldLoop) {
+                // loop 用に必要なスライド枚数を計算
+                const requiredSlides = getGlobalRequiredSlides(
+                  swiperOptions,
+                  AUTO_VISIBLE_ESTIMATE,
+                );
+
+                if (originalCount < requiredSlides) {
+                  let currentCount = originalCount;
+                  let i = 0;
+                  while (currentCount < requiredSlides) {
+                    const baseSlide = originalSlides[i % originalCount];
+                    const clone = baseSlide.cloneNode(true);
+                    clone.dataset.duplicated = 'true';
+                    wrapperEl.appendChild(clone);
+                    clonedSlides.push(clone);
+                    i++;
+                    currentCount++;
+                  }
+                }
+              }
+
+              // Swiper インスタンス生成
+              swiper = new Swiper(swiperEl, swiperOptions);
+
+              // bullets 生成 & クリックイベント
+              bullets = createPaginationBullets(paginationEl, originalCount);
+              bullets.forEach((bullet, index) => {
+                bullet.addEventListener('click', () => {
+                  if (!swiper) return;
+                  if (shouldLoop) {
+                    swiper.slideToLoop(index);
+                  } else {
+                    swiper.slideTo(index);
+                  }
+                });
+              });
+
+              // bullets の active 更新ハンドラ
+              function handleUpdateBullets() {
+                if (!swiper) return;
+                const realIndex = swiper.realIndex;
+                const logicalIndex = mapRealIndexToLogical(realIndex, originalCount);
+                updatePaginationBullets(bullets, logicalIndex);
+              }
+
+              handleUpdateBullets();
+              swiper.on('slideChange', handleUpdateBullets);
+              swiper.on('resize', handleUpdateBullets);
+
+              // destroy 時に Swiper とクローンを掃除
+              function destroy() {
+                if (!swiper) return;
+                swiper.destroy(true, true);
+                swiper = null;
+
+                clonedSlides.forEach((node) => {
+                  if (node.parentNode) node.parentNode.removeChild(node);
+                });
+                clonedSlides.length = 0;
+
+                updatePaginationBullets(bullets, -1); // 全部 inactive に
+              }
+
+              return { swiper, destroy };
+            }
+
+            /********************************************************************
+             * 4. 実際の呼び出し（プロジェクト側から使う想定）
+             ********************************************************************/
+
+            (function bootstrap() {
+              const swiperEl = document.getElementById('my-swiper');
+
+              // プロジェクト側で普通に Swiper オプションを定義
+              const baseSwiperOptions = {
+                loop: true,                // ★ここを false にすると完全に非ループモード（クローン処理も走らない）
+                slidesPerView: 1,
+                slidesPerGroup: 1,
+                centeredSlides: true,
+                spaceBetween: 16,
+                breakpoints: {
+                  768: {
+                    slidesPerView: 'auto',
+                    slidesPerGroup: 1,
+                    centeredSlides: true,
+                  },
+                  1024: {
+                    slidesPerView: 3,
+                    slidesPerGroup: 2,
+                    centeredSlides: false,
+                  },
+                },
+                navigation: {
+                  nextEl: '.swiper-button-next',
+                  prevEl: '.swiper-button-prev',
+                },
+              };
+
+              let controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
+
+              // デモ用に destroy / 再初期化ボタンを付けておく
+              const destroyBtn = document.getElementById('destroy-btn');
+              const initBtn = document.getElementById('init-btn');
+
+              destroyBtn.addEventListener('click', () => {
+                controller.destroy();
+              });
+
+              initBtn.addEventListener('click', () => {
+                controller.destroy();
+                controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
+              });
+            })();
+          </script>
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>コード</h2>
+        </summary>
+
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-js">&lt;div class="swiper-wrapper"&gt;
+  &lt;!-- ★元スライド --&gt;
+  &lt;div class="swiper-slide"&gt;Slide 1&lt;/div&gt;
+  &lt;div class="swiper-slide"&gt;Slide 2&lt;/div&gt;
+  &lt;div class="swiper-slide"&gt;Slide 3&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="swiper-button-prev"&gt;&lt;/div&gt;
+&lt;div class="swiper-button-next"&gt;&lt;/div&gt;
+
+&lt;div class="swiper-pagination"&gt;&lt;/div&gt;
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>JavaScript</h3></summary>
+
+<pre><code class="language-js">/********************************************************************
+  * 1. 計算だけの純粋関数群（DOM / Swiper に依存しない）★テスト対象
+  ********************************************************************/
+
+/** breakpoints をマージした 1設定に正規化 */
+function normalizeConfig(base, override) {
+  const bp = override || {};
+  const slidesPerView =
+    bp.slidesPerView !== undefined ? bp.slidesPerView : base.slidesPerView;
+  const slidesPerGroup =
+    bp.slidesPerGroup !== undefined ? bp.slidesPerGroup : base.slidesPerGroup;
+  const centeredSlides =
+    bp.centeredSlides !== undefined ? bp.centeredSlides : base.centeredSlides;
+
+  return { slidesPerView, slidesPerGroup, centeredSlides };
+}
+
+/**
+  * ある1つの設定（spv/spg/centered）について
+  * 「loop が破綻しにくい最低スライド数」を返す
+  */
+function getRequiredSlidesForConfig(config, autoVisibleEstimate) {
+  const isAuto = config.slidesPerView === 'auto';
+
+  const spvRaw = isAuto ? autoVisibleEstimate : config.slidesPerView;
+  const spv = typeof spvRaw === 'number' && spvRaw > 0 ? spvRaw : 1;
+  const spg = config.slidesPerGroup && config.slidesPerGroup > 0
+    ? config.slidesPerGroup
+    : 1;
+  const centered = !!config.centeredSlides;
+
+  // 基本条件: totalSlides >= slidesPerView + slidesPerGroup
+  let min = spv + spg;
+
+  // centeredSlides 調整
+  if (centered && !isAuto) {
+    // slidesPerView が数値のとき:
+    //   左右に見切れを出すぶん +1 しつつ、「spv*2 + spg」くらいまで持ち上げる
+    const safeCentered = spv * 2 + spg;
+    min = Math.max(min + 1, safeCentered);
+  } else if (centered && isAuto) {
+    // auto のときは少し控えめに
+    min = Math.max(min + 1, spv * 2);
+  }
+
+  // auto のときは余裕を少し盛る
+  if (isAuto) {
+    const safeAuto = spv + spg * 2;
+    min = Math.max(min, safeAuto);
+  }
+
+  // この設定の中では slidesPerGroup で割り切れるように
+  const remainder = min % spg;
+  if (remainder !== 0) {
+    min += spg - remainder;
+  }
+
+  return min;
+}
+
+/** base + 全 breakpoints の設定リストを返す */
+function getAllConfigs(swiperOptions) {
+  const base = normalizeConfig(swiperOptions, null);
+  const configs = [base];
+
+  const bps = swiperOptions.breakpoints || {};
+  Object.values(bps).forEach((bp) => {
+    configs.push(normalizeConfig(swiperOptions, bp));
+  });
+
+  return configs;
+}
+
+/**
+  * 全 breakpoints の中で
+  * 「必要枚数が最大のパターン」を取り、それより多く、
+  * かつ全 slidesPerGroup で割り切れるスライド数にそろえる
+  */
+function getGlobalRequiredSlides(swiperOptions, autoVisibleEstimate) {
+  const configs = getAllConfigs(swiperOptions);
+
+  let maxRequired = 0;
+  const groups = new Set();
+
+  configs.forEach((cfg) => {
+    const required = getRequiredSlidesForConfig(cfg, autoVisibleEstimate);
+    if (required > maxRequired) maxRequired = required;
+
+    const spg =
+      cfg.slidesPerGroup && cfg.slidesPerGroup > 0
+        ? cfg.slidesPerGroup
+        : 1;
+    groups.add(spg);
+  });
+
+  // 最大 requiredSlides 以上かつ、全 slidesPerGroup で割り切れる値に持ち上げる
+  let globalRequired = maxRequired;
+  groups.forEach((spg) => {
+    if (spg <= 1) return;
+    const remainder = globalRequired % spg;
+    if (remainder !== 0) {
+      globalRequired += spg - remainder;
+    }
+  });
+
+  return globalRequired;
+}
+
+/** Swiper.realIndex → 「元スライド index」に変換するマッピング */
+function mapRealIndexToLogical(realIndex, originalCount) {
+  if (originalCount <= 0) return 0;
+  return realIndex % originalCount;
+}
+
+/********************************************************************
+  * 2. DOM を触る処理（テスト時はモックしてもOKな層）
+  ********************************************************************/
+
+/** bullets を元スライド数ぶん生成して返す */
+function createPaginationBullets(paginationEl, originalCount) {
+  paginationEl.innerHTML = '';
+  const bullets = [];
+
+  for (let i = 0; i < originalCount; i++) {
+    const bullet = document.createElement('button');
+    bullet.type = 'button';
+    bullet.className = 'swiper-pagination-bullet';
+    bullet.setAttribute('aria-label', `スライド ${i + 1} へ`);
+    paginationEl.appendChild(bullet);
+    bullets.push(bullet);
+  }
+
+  return bullets;
+}
+
+/** bullets の active を更新 */
+function updatePaginationBullets(bullets, logicalIndex) {
+  bullets.forEach((bullet, i) => {
+    bullet.classList.toggle(
+      'swiper-pagination-bullet-active',
+      i === logicalIndex
+    );
+  });
+}
+
+/********************************************************************
+  * 3. Swiper 初期化ラッパー
+  *    - loop: true のときだけ事前クローン
+  *    - destroy() 時にクローンを掃除
+  ********************************************************************/
+
+function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
+  const wrapperEl = swiperEl.querySelector('.swiper-wrapper');
+  const paginationEl = swiperEl.querySelector('.swiper-pagination');
+
+  const originalSlides = Array.from(
+    wrapperEl.querySelectorAll('.swiper-slide')
+  );
+  const originalCount = originalSlides.length;
+
+  // 元スライドにフラグを付けておくと DevTools で分かりやすい
+  originalSlides.forEach((slide) => {
+    slide.dataset.duplicated = 'false';
+  });
+
+  const clonedSlides = [];
+  let swiper = null;
+  let bullets = [];
+
+  // loop:true && 枚数>1 のときだけ「loop 前提」の調整をする
+  const shouldLoopByOption = baseSwiperOptions.loop === true;
+  const shouldLoop = shouldLoopByOption && originalCount > 1;
+
+  // Swiper に渡すオプション（元を壊したくないので浅いコピー）
+  const swiperOptions = {
+    ...baseSwiperOptions,
+    loop: shouldLoop,
+    breakpoints: baseSwiperOptions.breakpoints
+      ? { ...baseSwiperOptions.breakpoints }
+      : undefined,
+  };
+
+  // slidesPerView: 'auto' のときの「だいたい見えている枚数」の目安
+  const AUTO_VISIBLE_ESTIMATE = 3;
+
+  if (shouldLoop) {
+    // loop 用に必要なスライド枚数を計算
+    const requiredSlides = getGlobalRequiredSlides(
+      swiperOptions,
+      AUTO_VISIBLE_ESTIMATE,
+    );
+
+    if (originalCount < requiredSlides) {
+      let currentCount = originalCount;
+      let i = 0;
+      while (currentCount < requiredSlides) {
+        const baseSlide = originalSlides[i % originalCount];
+        const clone = baseSlide.cloneNode(true);
+        clone.dataset.duplicated = 'true';
+        wrapperEl.appendChild(clone);
+        clonedSlides.push(clone);
+        i++;
+        currentCount++;
+      }
+    }
+  }
+
+  // Swiper インスタンス生成
+  swiper = new Swiper(swiperEl, swiperOptions);
+
+  // bullets 生成 & クリックイベント
+  bullets = createPaginationBullets(paginationEl, originalCount);
+  bullets.forEach((bullet, index) => {
+    bullet.addEventListener('click', () => {
+      if (!swiper) return;
+      if (shouldLoop) {
+        swiper.slideToLoop(index);
+      } else {
+        swiper.slideTo(index);
+      }
+    });
+  });
+
+  // bullets の active 更新ハンドラ
+  function handleUpdateBullets() {
+    if (!swiper) return;
+    const realIndex = swiper.realIndex;
+    const logicalIndex = mapRealIndexToLogical(realIndex, originalCount);
+    updatePaginationBullets(bullets, logicalIndex);
+  }
+
+  handleUpdateBullets();
+  swiper.on('slideChange', handleUpdateBullets);
+  swiper.on('resize', handleUpdateBullets);
+
+  // destroy 時に Swiper とクローンを掃除
+  function destroy() {
+    if (!swiper) return;
+    swiper.destroy(true, true);
+    swiper = null;
+
+    clonedSlides.forEach((node) => {
+      if (node.parentNode) node.parentNode.removeChild(node);
+    });
+    clonedSlides.length = 0;
+
+    updatePaginationBullets(bullets, -1); // 全部 inactive に
+  }
+
+  return { swiper, destroy };
+}
+
+/********************************************************************
+  * 4. 実際の呼び出し（プロジェクト側から使う想定）
+  ********************************************************************/
+
+(function bootstrap() {
+  const swiperEl = document.getElementById('my-swiper');
+
+  // プロジェクト側で普通に Swiper オプションを定義
+  const baseSwiperOptions = {
+    loop: true,                // ★ここを false にすると完全に非ループモード（クローン処理も走らない）
+    slidesPerView: 1,
+    slidesPerGroup: 1,
+    centeredSlides: true,
+    spaceBetween: 16,
+    breakpoints: {
+      768: {
+        slidesPerView: 'auto',
+        slidesPerGroup: 1,
+        centeredSlides: true,
+      },
+      1024: {
+        slidesPerView: 3,
+        slidesPerGroup: 2,
+        centeredSlides: false,
+      },
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+  };
+
+  let controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
+
+  // デモ用に destroy / 再初期化ボタンを付けておく
+  const destroyBtn = document.getElementById('destroy-btn');
+  const initBtn = document.getElementById('init-btn');
+
+  destroyBtn.addEventListener('click', () => {
+    controller.destroy();
+  });
+
+  initBtn.addEventListener('click', () => {
+    controller.destroy();
+    controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
+  });
+})();
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">body {
+  font-family: system-ui, sans-serif;
+  padding: 40px;
+  background: #f5f5f5;
+}
+
+.swiper {
+  max-width: 800px;
+  margin: 0 auto 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding-bottom: 48px;
+  position: relative;
+}
+
+.swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  width: 220px; /* slidesPerView: 'auto' 用の例 */
+}
+
+.swiper-slide:nth-child(1) { background: #007bff; }
+.swiper-slide:nth-child(2) { background: #28a745; }
+.swiper-slide:nth-child(3) { background: #ffc107; }
+.swiper-slide:nth-child(4) { background: #e83e8c; }
+.swiper-slide:nth-child(5) { background: #17a2b8; }
+.swiper-slide:nth-child(6) { background: #6f42c1; }
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: #333;
+}
+
+.swiper-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ccc;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: transform 0.2s, opacity 0.2s, background 0.2s;
+  border: none;
+}
+
+.swiper-pagination-bullet-active {
+  background: #007bff;
+  opacity: 1;
+  transform: scale(1.3);
+}
+
+.controls {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  gap: 8px;
+}
+
+.controls button {
+  padding: 8px 16px;
+}
+</code></pre>
+
+        </details>
+
+      </details>
+
+    </section>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>参照</h2>
+        </summary>
+
+        <ul>
+          <li><a href="https://swiperjs.com/swiper-api" ref="nofollow noreferrer noopener">Swiper API</a></li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+
+</html>
