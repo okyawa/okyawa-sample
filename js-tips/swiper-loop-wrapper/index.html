@@ -132,6 +132,7 @@
         <div class="markdown_content">
 - `loop: true` のときだけ事前クローンして loop 条件を満たし、bullets は元枚数分にする
 - `loop: false` のときはクローン処理をスキップ
+  - 実用する際、`loop: false` のときは、そもそも今回のラッパーを通さないようにした方が、不要な処理を通らずに良さそう
 - `destroy()` で Swiper を破棄すると、自前クローンも削除
 - 複製スライドには `data-duplicated="true"` を付与
         </div>
@@ -169,6 +170,7 @@
           <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
           <script>
+
             /********************************************************************
              * 1. 計算だけの純粋関数群（DOM / Swiper に依存しない）★テスト対象
              ********************************************************************/
@@ -288,15 +290,15 @@
              ********************************************************************/
 
             /** bullets を元スライド数ぶん生成して返す */
-            function createPaginationBullets(paginationEl, originalCount) {
+            function createPaginationBullets(paginationEl, count) {
               paginationEl.innerHTML = '';
               const bullets = [];
 
-              for (let i = 0; i < originalCount; i++) {
+              for (let i = 0; i < count; i++) {
                 const bullet = document.createElement('button');
                 bullet.type = 'button';
                 bullet.className = 'swiper-pagination-bullet';
-                bullet.setAttribute('aria-label', `スライド ${i + 1} へ`);
+                bullet.setAttribute('aria-label', `ページ ${i + 1} へ`);
                 paginationEl.appendChild(bullet);
                 bullets.push(bullet);
               }
@@ -305,13 +307,41 @@
             }
 
             /** bullets の active を更新 */
-            function updatePaginationBullets(bullets, logicalIndex) {
+            function updatePaginationBullets(bullets, activeIndex) {
               bullets.forEach((bullet, i) => {
                 bullet.classList.toggle(
                   'swiper-pagination-bullet-active',
-                  i === logicalIndex
+                  i === activeIndex
                 );
               });
+            }
+
+            /**
+             * 「今のグループサイズ」を Swiper から取る関数
+             */
+            function getCurrentSlidesPerGroup(swiper) {
+              // v11 だと「最終的に解決された params」がここに入ってる
+              const spg = swiper.params.slidesPerGroup;
+              return typeof spg === 'number' && spg > 0 ? spg : 1;
+            }
+
+            /**
+             * bullet を「ページ数ぶん」生成する
+             */
+            function createPaginationBullets(paginationEl, count) {
+              paginationEl.innerHTML = '';
+              const bullets = [];
+
+              for (let i = 0; i < count; i++) {
+                const bullet = document.createElement('button');
+                bullet.type = 'button';
+                bullet.className = 'swiper-pagination-bullet';
+                bullet.setAttribute('aria-label', `ページ ${i + 1} へ`);
+                paginationEl.appendChild(bullet);
+                bullets.push(bullet);
+              }
+
+              return bullets;
             }
 
             /********************************************************************
@@ -329,7 +359,6 @@
               );
               const originalCount = originalSlides.length;
 
-              // 元スライドにフラグを付けておくと DevTools で分かりやすい
               originalSlides.forEach((slide) => {
                 slide.dataset.duplicated = 'false';
               });
@@ -337,12 +366,13 @@
               const clonedSlides = [];
               let swiper = null;
               let bullets = [];
+              let currentGroupSize = 1;
 
-              // loop:true && 枚数>1 のときだけ「loop 前提」の調整をする
-              const shouldLoopByOption = baseSwiperOptions.loop === true;
-              const shouldLoop = shouldLoopByOption && originalCount > 1;
+              const loopRequested = baseSwiperOptions.loop === true;
+              const shouldLoop = loopRequested && originalCount > 1;
 
-              // Swiper に渡すオプション（元を壊したくないので浅いコピー）
+              // Swiperに渡すオプション
+              // pagination は全部こちらでやるので削除しておく
               const swiperOptions = {
                 ...baseSwiperOptions,
                 loop: shouldLoop,
@@ -350,15 +380,15 @@
                   ? { ...baseSwiperOptions.breakpoints }
                   : undefined,
               };
+              delete swiperOptions.pagination;
 
-              // slidesPerView: 'auto' のときの「だいたい見えている枚数」の目安
               const AUTO_VISIBLE_ESTIMATE = 3;
 
+              // ★ loop:true のときだけ「事前クローン」する
               if (shouldLoop) {
-                // loop 用に必要なスライド枚数を計算
                 const requiredSlides = getGlobalRequiredSlides(
                   swiperOptions,
-                  AUTO_VISIBLE_ESTIMATE,
+                  AUTO_VISIBLE_ESTIMATE
                 );
 
                 if (originalCount < requiredSlides) {
@@ -376,46 +406,145 @@
                 }
               }
 
-              // Swiper インスタンス生成
+              // Swiper 初期化
               swiper = new Swiper(swiperEl, swiperOptions);
 
-              // bullets 生成 & クリックイベント
-              bullets = createPaginationBullets(paginationEl, originalCount);
-              bullets.forEach((bullet, index) => {
-                bullet.addEventListener('click', () => {
-                  if (!swiper) return;
-                  if (shouldLoop) {
-                    swiper.slideToLoop(index);
-                  } else {
-                    swiper.slideTo(index);
-                  }
-                });
-              });
+              // ▼ 自前で prev/next ボタンを Swiper に紐づける
+              const prevBtn = swiperEl.querySelector('.swiper-button-prev');
+              const nextBtn = swiperEl.querySelector('.swiper-button-next');
 
-              // bullets の active 更新ハンドラ
-              function handleUpdateBullets() {
-                if (!swiper) return;
-                const realIndex = swiper.realIndex;
-                const logicalIndex = mapRealIndexToLogical(realIndex, originalCount);
-                updatePaginationBullets(bullets, logicalIndex);
+              // destroy 時に removeEventListener するためにハンドラを保持
+              let onPrevClick = null;
+              let onNextClick = null;
+
+              if (prevBtn) {
+                onPrevClick = () => {
+                  if (!swiper) return;
+                  swiper.slidePrev();
+                };
+                prevBtn.addEventListener('click', onPrevClick);
               }
 
-              handleUpdateBullets();
-              swiper.on('slideChange', handleUpdateBullets);
-              swiper.on('resize', handleUpdateBullets);
+              if (nextBtn) {
+                onNextClick = () => {
+                  if (!swiper) return;
+                  swiper.slideNext();
+                };
+                nextBtn.addEventListener('click', onNextClick);
+              }
 
-              // destroy 時に Swiper とクローンを掃除
+              // 現在の slidesPerGroup を Swiper から取得
+              function getCurrentSlidesPerGroup(swiperInstance) {
+                const spg = swiperInstance.params.slidesPerGroup;
+                return typeof spg === 'number' && spg > 0 ? spg : 1;
+              }
+
+              // bullets を再生成（ページ数 or スライド数ぶん）
+              function rebuildBullets() {
+                if (!swiper) return;
+
+                const group = getCurrentSlidesPerGroup(swiper);
+                currentGroupSize = group;
+
+                const pageCount =
+                  group > 1 ? Math.ceil(originalCount / group) : originalCount;
+
+                bullets = createPaginationBullets(paginationEl, pageCount);
+
+                bullets.forEach((bullet, pageIndex) => {
+                  bullet.addEventListener('click', () => {
+                    if (!swiper) return;
+                    const targetLogicalIndex = pageIndex * currentGroupSize;
+                    if (shouldLoop) {
+                      swiper.slideToLoop(targetLogicalIndex);
+                    } else {
+                      swiper.slideTo(targetLogicalIndex);
+                    }
+                  });
+                });
+
+                handleUpdateBullets();
+              }
+
+              // bullets の active を更新する
+              function handleUpdateBullets() {
+                if (!swiper || bullets.length === 0) return;
+
+                let logicalIndex;
+
+                if (shouldLoop) {
+                  // loop:true のときは realIndex を mod で戻す
+                  const realIndex = swiper.realIndex;
+                  logicalIndex = mapRealIndexToLogical(realIndex, originalCount);
+                } else {
+                  // loop:false のときは activeIndex を素直に使う
+                  logicalIndex =
+                    typeof swiper.activeIndex === 'number'
+                      ? swiper.activeIndex
+                      : swiper.realIndex;
+                }
+
+                const group = currentGroupSize > 0 ? currentGroupSize : 1;
+
+                let pageIndex;
+
+                if (!shouldLoop && group > 1) {
+                  // 非ループ + ページUIのとき、最後のページだけ特別扱い
+                  const spvParam = swiper.params.slidesPerView;
+                  const isAutoSpv = spvParam === 'auto';
+                  const spvNumeric = isAutoSpv
+                    ? AUTO_VISIBLE_ESTIMATE
+                    : typeof spvParam === 'number' && spvParam > 0
+                      ? spvParam
+                      : 1;
+
+                  const lastStart = Math.max(originalCount - spvNumeric, 0);
+                  const pageCount = bullets.length;
+
+                  if (logicalIndex >= lastStart && pageCount > 0) {
+                    pageIndex = pageCount - 1; // 末尾ゾーンは全部「最後のページ」
+                  } else {
+                    pageIndex = Math.floor(logicalIndex / group);
+                  }
+                } else {
+                  // loop:true または group=1 のときは普通に割る
+                  pageIndex = group > 1
+                    ? Math.floor(logicalIndex / group)
+                    : logicalIndex;
+                }
+
+                updatePaginationBullets(bullets, pageIndex);
+              }
+
+              rebuildBullets();
+              swiper.on('slideChange', handleUpdateBullets);
+              swiper.on('resize', rebuildBullets);
+              swiper.on('breakpoint', rebuildBullets);
+
+              // 破棄時にクローンと bullets を掃除
               function destroy() {
                 if (!swiper) return;
+
+                // ▼ 先にナビゲーションのイベントを外す
+                if (prevBtn && onPrevClick) {
+                  prevBtn.removeEventListener('click', onPrevClick);
+                }
+                if (nextBtn && onNextClick) {
+                  nextBtn.removeEventListener('click', onNextClick);
+                }
+
+                // Swiper 本体の destroy
                 swiper.destroy(true, true);
                 swiper = null;
 
+                // ループ用に自前で追加したクローンを削除
                 clonedSlides.forEach((node) => {
                   if (node.parentNode) node.parentNode.removeChild(node);
                 });
                 clonedSlides.length = 0;
 
-                updatePaginationBullets(bullets, -1); // 全部 inactive に
+                // bullets の active をリセット（-1 で全 off）
+                updatePaginationBullets(bullets, -1);
               }
 
               return { swiper, destroy };
@@ -430,14 +559,14 @@
 
               // プロジェクト側で普通に Swiper オプションを定義
               const baseSwiperOptions = {
-                loop: true,                // ★ここを false にすると完全に非ループモード（クローン処理も走らない）
+                loop: true, // ← ここを true/false 切り替えるだけでOK
                 slidesPerView: 1,
                 slidesPerGroup: 1,
                 centeredSlides: true,
                 spaceBetween: 16,
                 breakpoints: {
                   768: {
-                    slidesPerView: 'auto',
+                    slidesPerView: 2,
                     slidesPerGroup: 1,
                     centeredSlides: true,
                   },
@@ -447,13 +576,10 @@
                     centeredSlides: false,
                   },
                 },
-                navigation: {
-                  nextEl: '.swiper-button-next',
-                  prevEl: '.swiper-button-prev',
-                },
+                // pagination は指定しない（全部このラッパー側でやる）
               };
 
-              let controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
+              const controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
 
               // デモ用に destroy / 再初期化ボタンを付けておく
               const destroyBtn = document.getElementById('destroy-btn');
@@ -621,15 +747,15 @@ function mapRealIndexToLogical(realIndex, originalCount) {
   ********************************************************************/
 
 /** bullets を元スライド数ぶん生成して返す */
-function createPaginationBullets(paginationEl, originalCount) {
+function createPaginationBullets(paginationEl, count) {
   paginationEl.innerHTML = '';
   const bullets = [];
 
-  for (let i = 0; i < originalCount; i++) {
+  for (let i = 0; i < count; i++) {
     const bullet = document.createElement('button');
     bullet.type = 'button';
     bullet.className = 'swiper-pagination-bullet';
-    bullet.setAttribute('aria-label', `スライド ${i + 1} へ`);
+    bullet.setAttribute('aria-label', `ページ ${i + 1} へ`);
     paginationEl.appendChild(bullet);
     bullets.push(bullet);
   }
@@ -638,13 +764,41 @@ function createPaginationBullets(paginationEl, originalCount) {
 }
 
 /** bullets の active を更新 */
-function updatePaginationBullets(bullets, logicalIndex) {
+function updatePaginationBullets(bullets, activeIndex) {
   bullets.forEach((bullet, i) => {
     bullet.classList.toggle(
       'swiper-pagination-bullet-active',
-      i === logicalIndex
+      i === activeIndex
     );
   });
+}
+
+/**
+  * 「今のグループサイズ」を Swiper から取る関数
+  */
+function getCurrentSlidesPerGroup(swiper) {
+  // v11 だと「最終的に解決された params」がここに入ってる
+  const spg = swiper.params.slidesPerGroup;
+  return typeof spg === 'number' && spg > 0 ? spg : 1;
+}
+
+/**
+  * bullet を「ページ数ぶん」生成する
+  */
+function createPaginationBullets(paginationEl, count) {
+  paginationEl.innerHTML = '';
+  const bullets = [];
+
+  for (let i = 0; i < count; i++) {
+    const bullet = document.createElement('button');
+    bullet.type = 'button';
+    bullet.className = 'swiper-pagination-bullet';
+    bullet.setAttribute('aria-label', `ページ ${i + 1} へ`);
+    paginationEl.appendChild(bullet);
+    bullets.push(bullet);
+  }
+
+  return bullets;
 }
 
 /********************************************************************
@@ -662,7 +816,6 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
   );
   const originalCount = originalSlides.length;
 
-  // 元スライドにフラグを付けておくと DevTools で分かりやすい
   originalSlides.forEach((slide) => {
     slide.dataset.duplicated = 'false';
   });
@@ -670,12 +823,13 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
   const clonedSlides = [];
   let swiper = null;
   let bullets = [];
+  let currentGroupSize = 1;
 
-  // loop:true && 枚数>1 のときだけ「loop 前提」の調整をする
-  const shouldLoopByOption = baseSwiperOptions.loop === true;
-  const shouldLoop = shouldLoopByOption && originalCount > 1;
+  const loopRequested = baseSwiperOptions.loop === true;
+  const shouldLoop = loopRequested && originalCount > 1;
 
-  // Swiper に渡すオプション（元を壊したくないので浅いコピー）
+  // Swiperに渡すオプション
+  // pagination は全部こちらでやるので削除しておく
   const swiperOptions = {
     ...baseSwiperOptions,
     loop: shouldLoop,
@@ -683,15 +837,15 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
       ? { ...baseSwiperOptions.breakpoints }
       : undefined,
   };
+  delete swiperOptions.pagination;
 
-  // slidesPerView: 'auto' のときの「だいたい見えている枚数」の目安
   const AUTO_VISIBLE_ESTIMATE = 3;
 
+  // ★ loop:true のときだけ「事前クローン」する
   if (shouldLoop) {
-    // loop 用に必要なスライド枚数を計算
     const requiredSlides = getGlobalRequiredSlides(
       swiperOptions,
-      AUTO_VISIBLE_ESTIMATE,
+      AUTO_VISIBLE_ESTIMATE
     );
 
     if (originalCount < requiredSlides) {
@@ -709,46 +863,145 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
     }
   }
 
-  // Swiper インスタンス生成
+  // Swiper 初期化
   swiper = new Swiper(swiperEl, swiperOptions);
 
-  // bullets 生成 & クリックイベント
-  bullets = createPaginationBullets(paginationEl, originalCount);
-  bullets.forEach((bullet, index) => {
-    bullet.addEventListener('click', () => {
-      if (!swiper) return;
-      if (shouldLoop) {
-        swiper.slideToLoop(index);
-      } else {
-        swiper.slideTo(index);
-      }
-    });
-  });
+  // ▼ 自前で prev/next ボタンを Swiper に紐づける
+  const prevBtn = swiperEl.querySelector('.swiper-button-prev');
+  const nextBtn = swiperEl.querySelector('.swiper-button-next');
 
-  // bullets の active 更新ハンドラ
-  function handleUpdateBullets() {
-    if (!swiper) return;
-    const realIndex = swiper.realIndex;
-    const logicalIndex = mapRealIndexToLogical(realIndex, originalCount);
-    updatePaginationBullets(bullets, logicalIndex);
+  // destroy 時に removeEventListener するためにハンドラを保持
+  let onPrevClick = null;
+  let onNextClick = null;
+
+  if (prevBtn) {
+    onPrevClick = () => {
+      if (!swiper) return;
+      swiper.slidePrev();
+    };
+    prevBtn.addEventListener('click', onPrevClick);
   }
 
-  handleUpdateBullets();
-  swiper.on('slideChange', handleUpdateBullets);
-  swiper.on('resize', handleUpdateBullets);
+  if (nextBtn) {
+    onNextClick = () => {
+      if (!swiper) return;
+      swiper.slideNext();
+    };
+    nextBtn.addEventListener('click', onNextClick);
+  }
 
-  // destroy 時に Swiper とクローンを掃除
+  // 現在の slidesPerGroup を Swiper から取得
+  function getCurrentSlidesPerGroup(swiperInstance) {
+    const spg = swiperInstance.params.slidesPerGroup;
+    return typeof spg === 'number' && spg > 0 ? spg : 1;
+  }
+
+  // bullets を再生成（ページ数 or スライド数ぶん）
+  function rebuildBullets() {
+    if (!swiper) return;
+
+    const group = getCurrentSlidesPerGroup(swiper);
+    currentGroupSize = group;
+
+    const pageCount =
+      group > 1 ? Math.ceil(originalCount / group) : originalCount;
+
+    bullets = createPaginationBullets(paginationEl, pageCount);
+
+    bullets.forEach((bullet, pageIndex) => {
+      bullet.addEventListener('click', () => {
+        if (!swiper) return;
+        const targetLogicalIndex = pageIndex * currentGroupSize;
+        if (shouldLoop) {
+          swiper.slideToLoop(targetLogicalIndex);
+        } else {
+          swiper.slideTo(targetLogicalIndex);
+        }
+      });
+    });
+
+    handleUpdateBullets();
+  }
+
+  // bullets の active を更新する
+  function handleUpdateBullets() {
+    if (!swiper || bullets.length === 0) return;
+
+    let logicalIndex;
+
+    if (shouldLoop) {
+      // loop:true のときは realIndex を mod で戻す
+      const realIndex = swiper.realIndex;
+      logicalIndex = mapRealIndexToLogical(realIndex, originalCount);
+    } else {
+      // loop:false のときは activeIndex を素直に使う
+      logicalIndex =
+        typeof swiper.activeIndex === 'number'
+          ? swiper.activeIndex
+          : swiper.realIndex;
+    }
+
+    const group = currentGroupSize > 0 ? currentGroupSize : 1;
+
+    let pageIndex;
+
+    if (!shouldLoop && group > 1) {
+      // 非ループ + ページUIのとき、最後のページだけ特別扱い
+      const spvParam = swiper.params.slidesPerView;
+      const isAutoSpv = spvParam === 'auto';
+      const spvNumeric = isAutoSpv
+        ? AUTO_VISIBLE_ESTIMATE
+        : typeof spvParam === 'number' && spvParam > 0
+          ? spvParam
+          : 1;
+
+      const lastStart = Math.max(originalCount - spvNumeric, 0);
+      const pageCount = bullets.length;
+
+      if (logicalIndex >= lastStart && pageCount > 0) {
+        pageIndex = pageCount - 1; // 末尾ゾーンは全部「最後のページ」
+      } else {
+        pageIndex = Math.floor(logicalIndex / group);
+      }
+    } else {
+      // loop:true または group=1 のときは普通に割る
+      pageIndex = group > 1
+        ? Math.floor(logicalIndex / group)
+        : logicalIndex;
+    }
+
+    updatePaginationBullets(bullets, pageIndex);
+  }
+
+  rebuildBullets();
+  swiper.on('slideChange', handleUpdateBullets);
+  swiper.on('resize', rebuildBullets);
+  swiper.on('breakpoint', rebuildBullets);
+
+  // 破棄時にクローンと bullets を掃除
   function destroy() {
     if (!swiper) return;
+
+    // ▼ 先にナビゲーションのイベントを外す
+    if (prevBtn && onPrevClick) {
+      prevBtn.removeEventListener('click', onPrevClick);
+    }
+    if (nextBtn && onNextClick) {
+      nextBtn.removeEventListener('click', onNextClick);
+    }
+
+    // Swiper 本体の destroy
     swiper.destroy(true, true);
     swiper = null;
 
+    // ループ用に自前で追加したクローンを削除
     clonedSlides.forEach((node) => {
       if (node.parentNode) node.parentNode.removeChild(node);
     });
     clonedSlides.length = 0;
 
-    updatePaginationBullets(bullets, -1); // 全部 inactive に
+    // bullets の active をリセット（-1 で全 off）
+    updatePaginationBullets(bullets, -1);
   }
 
   return { swiper, destroy };
@@ -763,14 +1016,14 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
 
   // プロジェクト側で普通に Swiper オプションを定義
   const baseSwiperOptions = {
-    loop: true,                // ★ここを false にすると完全に非ループモード（クローン処理も走らない）
+    loop: true, // ← ここを true/false 切り替えるだけでOK
     slidesPerView: 1,
     slidesPerGroup: 1,
     centeredSlides: true,
     spaceBetween: 16,
     breakpoints: {
       768: {
-        slidesPerView: 'auto',
+        slidesPerView: 2,
         slidesPerGroup: 1,
         centeredSlides: true,
       },
@@ -780,13 +1033,10 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
         centeredSlides: false,
       },
     },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
+    // pagination は指定しない（全部このラッパー側でやる）
   };
 
-  let controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
+  const controller = initLoopFriendlySwiper(swiperEl, baseSwiperOptions);
 
   // デモ用に destroy / 再初期化ボタンを付けておく
   const destroyBtn = document.getElementById('destroy-btn');
@@ -840,6 +1090,9 @@ function initLoopFriendlySwiper(swiperEl, baseSwiperOptions) {
 .swiper-slide:nth-child(4) { background: #e83e8c; }
 .swiper-slide:nth-child(5) { background: #17a2b8; }
 .swiper-slide:nth-child(6) { background: #6f42c1; }
+.swiper-slide:nth-child(7) { background: #fd7e14; }
+.swiper-slide:nth-child(8) { background: #20c997; }
+.swiper-slide:nth-child(9) { background: #343a40; }
 
 .swiper-button-prev,
 .swiper-button-next {
