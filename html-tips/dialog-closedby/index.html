@@ -103,7 +103,8 @@
     - `closedby` 属性が指定されていない場合の挙動に似ている
   - `closedby="none"`
     - `ESC` キーを押しても `dialog` 要素は閉じない
-- 2025/06/04 現在、 `closedby` に対応しているブラウザはChromeとEdge、Firefoxはプレビュー版で対応、そしてSafariは未対応
+- 2025/12/12、Safariが26で対応したことにより、全モダンブラウザで `closedby` が使えるようになった
+- 2025/12/12現在、 `closedby` 属性はSafariだけが未対応
 - `command` 属性と `closedby` 属性の未対応ブラウザは、Polyfill を使用すれば対応可能
 - `<dialog>` 要素にはアクセシブルな名前を持つことが求められるため、 `<dialog>` 要素の`aria-labelledby` 属性に、ダイアログ内 `h1` 要素の `id` 値を指定
   - ダイアログ内は、[WHATWGの仕様書](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element) に従うと、 `h1` 要素を使って問題なし
