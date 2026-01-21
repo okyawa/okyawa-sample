@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Anchor Positioningで画面からはみ出ないPopoverのツールチップSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    :root {
+      --gap: 12px;      /* アンカーとツールチップの隙間 */
+      --pad: 12px;      /* 画面端の余白（最大幅計算に使う） */
+      --tip-max: 360px; /* ツールチップの最大幅 */
+    }
+
+    .board {
+      height: min(520px, calc(100vh - 2rem));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 28px;
+      position: relative;
+      background: #cccccc99;
+    }
+
+    .anchor-btn {
+      position: absolute;
+      padding: .7rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: #f5f5f5;
+      color: inherit;
+      cursor: pointer; /* クリックで開くので pointer に */
+      backdrop-filter: blur(8px);
+    }
+    .tl { top: 18px; left: 18px; }
+    .tr { top: 18px; right: 18px; }
+    .bl { bottom: 18px; left: 18px; }
+    .br { bottom: 18px; right: 18px; }
+
+    /* Popover は UA 既定で中央寄せ等が入るので、まずリセット */
+    .tip[popover] {
+      inset: auto; /* ←重要：popover既定のinsetを無効化 */
+      border: 0;
+      padding: .9rem 1rem;
+      border-radius: 14px;
+      background-color: #666666ee;
+      color: #eaf0ff;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      line-height: 1.45;
+      max-inline-size: min(var(--tip-max), calc(100vw - (var(--pad) * 2)));
+      overflow-wrap: anywhere;
+    }
+
+    @supports (anchor-name: --a) {
+      .tip[popover] {
+        position: fixed;
+        bottom: anchor(top);
+        justify-self: anchor-center;
+        margin-bottom: var(--gap);
+
+        /* 溢れたら順に試す（左右端対策→上下反転→さらに左右端） */
+        position-try:
+          --top-start,
+          --top-end,
+          --bottom-center,
+          --bottom-start,
+          --bottom-end;
+      }
+
+      /* 上：左寄せ */
+      @position-try --top-start {
+        bottom: anchor(top);
+        left: anchor(left);
+        margin-bottom: var(--gap);
+      }
+      /* 上：右寄せ */
+      @position-try --top-end {
+        bottom: anchor(top);
+        right: anchor(right);
+        margin-bottom: var(--gap);
+      }
+
+      /* 下：中央 */
+      @position-try --bottom-center {
+        top: anchor(bottom);
+        justify-self: anchor-center;
+        margin-top: var(--gap);
+      }
+      /* 下：左寄せ */
+      @position-try --bottom-start {
+        top: anchor(bottom);
+        left: anchor(left);
+        margin-top: var(--gap);
+      }
+      /* 下：右寄せ */
+      @position-try --bottom-end {
+        top: anchor(bottom);
+        right: anchor(right);
+        margin-top: var(--gap);
+      }
+    }
+
+    /* 非対応ブラウザ用（最低限） */
+    @supports not (anchor-name: --a) {
+      .tip[popover] { position: fixed; top: 12px; left: 12px; }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Anchor Positioning</h1>
+      <h2>画面からはみ出ないPopoverのツールチップSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div class="board">
+          <!-- anchors (click to toggle popover) -->
+          <button class="anchor-btn tl"
+                  style="anchor-name: --tl"
+                  aria-describedby="tip-tl"
+                  popovertarget="tip-tl">
+            左上
+          </button>
+
+          <button class="anchor-btn tr"
+                  style="anchor-name: --tr"
+                  aria-describedby="tip-tr"
+                  popovertarget="tip-tr">
+            右上
+          </button>
+
+          <button class="anchor-btn bl"
+                  style="anchor-name: --bl"
+                  aria-describedby="tip-bl"
+                  popovertarget="tip-bl">
+            左下
+          </button>
+
+          <button class="anchor-btn br"
+                  style="anchor-name: --br"
+                  aria-describedby="tip-br"
+                  popovertarget="tip-br">
+            右下
+          </button>
+
+          <!-- tooltips (popover) -->
+          <div id="tip-tl" class="tip" popover="auto" role="tooltip" style="position-anchor: --tl">
+            左上のツールチップ（狭い幅でも画面外に出ないように try します）
+          </div>
+
+          <div id="tip-tr" class="tip" popover="auto" role="tooltip" style="position-anchor: --tr">
+            右上のツールチップ（必要なら左右寄せ→上下反転で回避）
+          </div>
+
+          <div id="tip-bl" class="tip" popover="auto" role="tooltip" style="position-anchor: --bl">
+            左下のツールチップ（下端が足りない場合は上側へ）
+          </div>
+
+          <div id="tip-br" class="tip" popover="auto" role="tooltip" style="position-anchor: --br">
+            右下のツールチップ（端でもはみ出しにくい）
+          </div>
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">
+
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://www.tak-dcxi.com/article/summary-of-css-techniques-posted-on-x-in-june-2024/#anchor-positioning%E3%81%A7%E3%82%AB%E3%83%BC%E3%83%89%E3%81%AE%E8%83%8C%E6%99%AF%E3%82%92%E3%83%9B%E3%83%90%E3%83%BC%E3%81%A7%E8%BF%BD%E5%BE%93%E3%81%95%E3%81%9B%E3%82%8B" ref="nofollow noreferrer noopener" target="_blank">
+              Anchor Positioningでカードの背景をホバーで追従させる - 2024年6月にXに投稿したCSSテクニックのまとめ | TAKLOG
+            </a>
+          </li>
+          <li>
+            <a href="https://zenn.dev/ubie_dev/articles/anchor-positioning-popover" ref="nofollow noreferrer noopener" target="_blank">
+              anchor-name | MDN
+            </a>: Anchor Positioningが全対応。HTML・CSSだけのポップオーバーが完全体に - Zenn
+          </li>
+          <li>
+            <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/anchor-name" ref="nofollow noreferrer noopener" target="_blank">
+              anchor-name | MDN
+            </a>: アンカー名を指定して、要素をアンカー要素として定義
+          </li>
+          <li>
+            <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/anchor-size" ref="nofollow noreferrer noopener" target="_blank">
+              anchor() | MDN
+            </a>: アンカー要素の寸法を基準にしてアンカー配置要素のサイズを変更
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=anchor-positioning" ref="nofollow noreferrer noopener" target="_blank">
+              anchor() | MDN
+            </a>: Can I use "anchor-positioning"
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
