@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>sibling-index / sibling-count を使ったスタッガーアニメーションのSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    ul.cards > li {
+      --stagger: 70ms;
+      --duration: 460ms;
+      --ease: cubic-bezier(.2,.8,.2,1);
+
+      /* “消えている状態”をデフォルトにしておく */
+      opacity: 0;
+      transform: translateY(14px) scale(.98);
+      filter: blur(2px);
+
+      transition-property: opacity, transform, filter;
+      transition-duration: var(--duration);
+      transition-timing-function: var(--ease);
+
+      /* 非表示へ戻る（=クラスが外れる）時は “逆順” に遅延させたいので sibling-count() を使う */
+      transition-delay: calc((sibling-count() - sibling-index()) * var(--stagger));
+    }
+
+    /* 表示時：上から順に遅延（0始まりにしたいので -1） */
+    ul.cards.is_show > li {
+      opacity: 1;
+      transform: none;
+      filter: none;
+      transition-delay: calc((sibling-index() - 1) * var(--stagger));
+    }
+
+    /* ユーザーがユーザーが余計な動きを最少化するOSの設定を有効化している場合は、アニメーションを無効化 */
+    @media (prefers-reduced-motion: reduce){
+      ul.cards > li { transition: none; }
+    }
+
+    /* 以下、表示調整用 */
+
+    .wrap {
+      margin: 0 auto;
+      padding: 16px;
+      border-radius: 5px;
+      background: #ddd;
+    }
+
+    button {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    ul.cards {
+      list-style: none;
+      padding: 0;
+      margin: 18px 0 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    ul.cards > li {
+      margin: 0;
+      padding: 14px 16px;
+      border: 1px solid #e6e6e6;
+      border-radius: 14px;
+      background: #fafafa;
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>スタッガーアニメーション</h1>
+      <h2>sibling-index / sibling-count を使ったSample</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- `sibling-index()` 関数と `sibling-count()` 関数は、兄弟要素の「並び順」や「総数」を整数として返すCSS関数
+  - 数値として使えるので、 `calc()` 関数などと組み合わせて利用可能
+  - どちらの関数も、実際に返される数値をブラウザの開発ツール上で確認可能
+- `sibling-index()` 関数
+  - 指定した要素が「兄弟要素のなかで何番目か」を整数で返す
+  - 番号のカウントは、 `nth-child()` 疑似クラスと同じく1から始まる
+- `sibling-count()` 関数
+  - 「兄弟要素の総数」を整数で返す
+  - 要素自身もカウントに含む（兄弟要素＋自分）
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <p>
+          少し回転しながら順番にぱらぱらと表示されるアニメーション (スタッガーアニメーション) の例。<br />
+          ボタンを押して枠に <code>is_show</code> のクラス名が付与されると、スタッガーアニメーションで表示される形式。
+        </p>
+
+        <div class="wrap">
+          <button id="toggle" type="button">表示する</button>
+
+          <ul id="list" class="cards" aria-live="polite">
+            <li>Card A</li>
+            <li>Card B</li>
+            <li>Card C</li>
+            <li>Card D</li>
+            <li>Card E</li>
+            <li>Card F</li>
+          </ul>
+        </div>
+
+        <script>
+          const btn = document.getElementById("toggle");
+          const list = document.getElementById("list");
+
+          btn.addEventListener("click", () => {
+            const show = list.classList.toggle("is_show");
+            btn.textContent = show ? "隠す" : "表示する";
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div class="wrap"&gt;
+  &lt;button id="toggle" type="button"&gt;表示する&lt;/button&gt;
+
+  &lt;ul id="list" class="cards" aria-live="polite"&gt;
+    &lt;li&gt;Card A&lt;/li&gt;
+    &lt;li&gt;Card B&lt;/li&gt;
+    &lt;li&gt;Card C&lt;/li&gt;
+    &lt;li&gt;Card D&lt;/li&gt;
+    &lt;li&gt;Card E&lt;/li&gt;
+    &lt;li&gt;Card F&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>CSS</h3></summary>
+
+<pre><code class="language-css">ul.cards > li {
+  --stagger: 70ms;
+  --duration: 460ms;
+  --ease: cubic-bezier(.2,.8,.2,1);
+
+  /* “消えている状態”をデフォルトにしておく */
+  opacity: 0;
+  transform: translateY(14px) scale(.98);
+  filter: blur(2px);
+
+  transition-property: opacity, transform, filter;
+  transition-duration: var(--duration);
+  transition-timing-function: var(--ease);
+
+  /* 非表示へ戻る（=クラスが外れる）時は “逆順” に遅延させたいので sibling-count() を使う */
+  transition-delay: calc((sibling-count() - sibling-index()) * var(--stagger));
+}
+
+/* 表示時：上から順に遅延（0始まりにしたいので -1） */
+ul.cards.is_show > li {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition-delay: calc((sibling-index() - 1) * var(--stagger));
+}
+
+/* ユーザーがユーザーが余計な動きを最少化するOSの設定を有効化している場合は、アニメーションを無効化 */
+@media (prefers-reduced-motion: reduce){
+  ul.cards > li { transition: none; }
+}
+
+/* 以下、表示調整用 */
+
+.wrap {
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 5px;
+  background: #ddd;
+}
+
+button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+ul.cards {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+ul.cards > li {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  background: #fafafa;
+}
+</code></pre>
+
+        </details>
+
+        <details open>
+          <summary><h3>JavaScript</h3></summary>
+
+<pre><code class="language-js">const btn = document.getElementById("toggle");
+const list = document.getElementById("list");
+
+btn.addEventListener("click", () => {
+  const show = list.classList.toggle("is_show");
+  btn.textContent = show ? "隠す" : "表示する";
+});
+</code></pre>
+
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://ics.media/entry/260116/" ref="nofollow noreferrer noopener" target="_blank">
+              CSSでスタッガーアニメーションがつくれる！　sibling-index() / sibling-count()の活用アイデア | ICS MEDIA
+            </a>
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=sibling-index" ref="nofollow noreferrer noopener" target="_blank">
+              sibling-index() | Can I use
+            </a>: Can I use "sibling-index"
+          </li>
+          <li>
+            <a href="https://caniuse.com/?search=sibling-count" ref="nofollow noreferrer noopener" target="_blank">
+              sibling-count() | Can I use
+            </a>: Can I use "sibling-count"
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
