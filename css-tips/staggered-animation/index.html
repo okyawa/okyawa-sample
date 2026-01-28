@@ -34,13 +34,14 @@
       --stagger: 70ms;
       --duration: 460ms;
       --ease: cubic-bezier(.2,.8,.2,1);
+      --rotate-deg: calc((sibling-index() - 1) * 1.5deg);
 
       /* “消えている状態”をデフォルトにしておく */
       opacity: 0;
-      transform: translateY(14px) scale(.98);
+      transform: translateY(14px) scale(.98) rotate(var(--rotate-deg));
       filter: blur(2px);
 
-      transition-property: opacity, transform, filter;
+      transition-property: opacity, transform, filter, rotate;
       transition-duration: var(--duration);
       transition-timing-function: var(--ease);
 
@@ -132,11 +133,12 @@
 
         <p>
           少し回転しながら順番にぱらぱらと表示されるアニメーション (スタッガーアニメーション) の例。<br />
-          ボタンを押して枠に <code>is_show</code> のクラス名が付与されると、スタッガーアニメーションで表示される形式。
+          ボタンを押して枠に <code>is_show</code> のクラス名が付与されると、スタッガーアニメーションで表示される形式。<br />
+          また、スクロールして要素が画面に表示された際にも、 <code>Intersection Observer</code>を使い、自動でクラス名が付与されて表示される仕組みを併用。
         </p>
 
         <div class="wrap">
-          <button id="toggle" type="button">表示する</button>
+          <button id="toggle_button" type="button">表示する</button>
 
           <ul id="list" class="cards" aria-live="polite">
             <li>Card A</li>
@@ -153,7 +155,7 @@
            * 表示/非表示切り替えボタンの初期化
            */
           function setupToggleButton() {
-            const btn = document.getElementById('toggle');
+            const btn = document.getElementById('toggle_button');
             const list = document.getElementById('list');
 
             btn.addEventListener('click', () => {
@@ -179,7 +181,7 @@
                 entry.target.classList.add('is_show');
 
                 // ボタンの文言も変更
-                const btn = document.getElementById('toggle');
+                const btn = document.getElementById('toggle_button');
                 btn.textContent = '隠す';
 
                 // 一度表示したら二度と非表示に戻さない（監視解除）
@@ -211,7 +213,7 @@
           <summary><h3>HTML</h3></summary>
 
 <pre><code class="language-html">&lt;div class="wrap"&gt;
-  &lt;button id="toggle" type="button"&gt;表示する&lt;/button&gt;
+  &lt;button id="toggle_button" type="button"&gt;表示する&lt;/button&gt;
 
   &lt;ul id="list" class="cards" aria-live="polite"&gt;
     &lt;li&gt;Card A&lt;/li&gt;
@@ -233,13 +235,14 @@
   --stagger: 70ms;
   --duration: 460ms;
   --ease: cubic-bezier(.2,.8,.2,1);
+  --rotate-deg: calc((sibling-index() - 1) * 1.5deg);
 
   /* “消えている状態”をデフォルトにしておく */
   opacity: 0;
-  transform: translateY(14px) scale(.98);
+  transform: translateY(14px) scale(.98) rotate(var(--rotate-deg));
   filter: blur(2px);
 
-  transition-property: opacity, transform, filter;
+  transition-property: opacity, transform, filter, rotate;
   transition-duration: var(--duration);
   transition-timing-function: var(--ease);
 
@@ -299,12 +302,54 @@ ul.cards > li {
         <details open>
           <summary><h3>JavaScript</h3></summary>
 
-<pre><code class="language-js">const btn = document.getElementById('toggle');
-const list = document.getElementById('list');
+<pre><code class="language-js">/**
+  * 表示/非表示切り替えボタンの初期化
+  */
+function setupToggleButton() {
+  const btn = document.getElementById('toggle_button');
+  const list = document.getElementById('list');
 
-btn.addEventListener('click', () => {
-  const show = list.classList.toggle('is_show');
-  btn.textContent = show ? '隠す' : '表示する';
+  btn.addEventListener('click', () => {
+    const show = list.classList.toggle('is_show');
+    btn.textContent = show ? '隠す' : '表示する';
+  });
+}
+
+/**
+  * スクロールして表示されたら表示するクラスを付与する Intersection Observer の初期化
+  */
+function setupIntersectionObserver() {
+  const targets = document.querySelectorAll('.cards');
+
+  const io = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) {
+        // 画面に表示されていない状態
+        continue;
+      }
+
+      // 表示されたらクラスを付与
+      entry.target.classList.add('is_show');
+
+      // ボタンの文言も変更
+      const btn = document.getElementById('toggle_button');
+      btn.textContent = '隠す';
+
+      // 一度表示したら二度と非表示に戻さない（監視解除）
+      observer.unobserve(entry.target);
+    }
+  }, {
+    root: null,
+    threshold: 0.15, // 15%が見えたら発火
+    rootMargin: '0px 0px -10% 0px' // 少し早め/遅め調整したい時に便利
+  });
+
+  targets.forEach(el => io.observe(el));
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setupToggleButton();
+  setupIntersectionObserver();
 });
 </code></pre>
 
