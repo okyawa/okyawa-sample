@@ -149,12 +149,54 @@
         </div>
 
         <script>
-          const btn = document.getElementById("toggle");
-          const list = document.getElementById("list");
+          /**
+           * 表示/非表示切り替えボタンの初期化
+           */
+          function setupToggleButton() {
+            const btn = document.getElementById('toggle');
+            const list = document.getElementById('list');
 
-          btn.addEventListener("click", () => {
-            const show = list.classList.toggle("is_show");
-            btn.textContent = show ? "隠す" : "表示する";
+            btn.addEventListener('click', () => {
+              const show = list.classList.toggle('is_show');
+              btn.textContent = show ? '隠す' : '表示する';
+            });
+          }
+
+          /**
+           * スクロールして表示されたら表示するクラスを付与する Intersection Observer の初期化
+           */
+          function setupIntersectionObserver() {
+            const targets = document.querySelectorAll('.cards');
+
+            const io = new IntersectionObserver((entries, observer) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) {
+                  // 画面に表示されていない状態
+                  continue;
+                }
+
+                // 表示されたらクラスを付与
+                entry.target.classList.add('is_show');
+
+                // ボタンの文言も変更
+                const btn = document.getElementById('toggle');
+                btn.textContent = '隠す';
+
+                // 一度表示したら二度と非表示に戻さない（監視解除）
+                observer.unobserve(entry.target);
+              }
+            }, {
+              root: null,
+              threshold: 0.15, // 15%が見えたら発火
+              rootMargin: '0px 0px -10% 0px' // 少し早め/遅め調整したい時に便利
+            });
+
+            targets.forEach(el => io.observe(el));
+          }
+
+          window.addEventListener('DOMContentLoaded', () => {
+            setupToggleButton();
+            setupIntersectionObserver();
           });
         </script>
 
@@ -257,12 +299,12 @@ ul.cards > li {
         <details open>
           <summary><h3>JavaScript</h3></summary>
 
-<pre><code class="language-js">const btn = document.getElementById("toggle");
-const list = document.getElementById("list");
+<pre><code class="language-js">const btn = document.getElementById('toggle');
+const list = document.getElementById('list');
 
-btn.addEventListener("click", () => {
-  const show = list.classList.toggle("is_show");
-  btn.textContent = show ? "隠す" : "表示する";
+btn.addEventListener('click', () => {
+  const show = list.classList.toggle('is_show');
+  btn.textContent = show ? '隠す' : '表示する';
 });
 </code></pre>
 
