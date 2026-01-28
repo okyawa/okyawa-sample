@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>Anchor Positioningでposition-tryを使って画面からはみ出ないPopoverのツールチップSample</title>
+  <title>Anchor Positioningでposition-try-fallbacksを使って画面からはみ出ないPopoverのツールチップSample</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="author" content="okyawa">
   <meta name="robots" content="noindex">
@@ -40,6 +40,7 @@
     .tip[popover] {
       inset: auto; /* ←重要：popover既定のinsetを無効化 */
       border: 0;
+      margin-inline: 8px;
       padding: .9rem 1rem;
       border-radius: 14px;
       background-color: #666666ee;
@@ -57,46 +58,10 @@
         justify-self: anchor-center;
         margin-bottom: var(--gap);
 
-        /* 溢れたら順に試す（左右端対策→上下反転→さらに左右端） */
-        position-try:
-          --top-start,
-          --top-end,
-          --bottom-center,
-          --bottom-start,
-          --bottom-end;
+        /* はみ出したら上下左右を反転 */
+        position-try-fallbacks: flip-block flip-inline;
       }
 
-      /* 上：左寄せ */
-      @position-try --top-start {
-        bottom: anchor(top);
-        left: anchor(left);
-        margin-bottom: var(--gap);
-      }
-      /* 上：右寄せ */
-      @position-try --top-end {
-        bottom: anchor(top);
-        right: anchor(right);
-        margin-bottom: var(--gap);
-      }
-
-      /* 下：中央 */
-      @position-try --bottom-center {
-        top: anchor(bottom);
-        justify-self: anchor-center;
-        margin-top: var(--gap);
-      }
-      /* 下：左寄せ */
-      @position-try --bottom-start {
-        top: anchor(bottom);
-        left: anchor(left);
-        margin-top: var(--gap);
-      }
-      /* 下：右寄せ */
-      @position-try --bottom-end {
-        top: anchor(bottom);
-        right: anchor(right);
-        margin-top: var(--gap);
-      }
     }
 
     /* 非対応ブラウザ用（最低限） */
@@ -137,8 +102,8 @@
   <div id="container">
 
     <header>
-      <h1>Anchor Positioning &amp; position-try</h1>
-      <h2>画面からはみ出ないPopoverのツールチップSample</h2>
+      <h1>Anchor Positioning と Popover のツールチップ</h1>
+      <h2>position-try-fallbacks を使って画面からはみ出ないSample</h2>
     </header>
 
     <br />
@@ -218,19 +183,19 @@
 
           <!-- tooltips (popover) -->
           <div id="tip-tl" class="tip" popover="auto" role="tooltip" style="position-anchor: --tl">
-            左上のツールチップ（狭い幅でも画面外に出ないように try します）
+            左上のツールチップ
           </div>
 
           <div id="tip-tr" class="tip" popover="auto" role="tooltip" style="position-anchor: --tr">
-            右上のツールチップ（必要なら左右寄せ→上下反転で回避）
+            右上のツールチップ
           </div>
 
           <div id="tip-bl" class="tip" popover="auto" role="tooltip" style="position-anchor: --bl">
-            左下のツールチップ（下端が足りない場合は上側へ）
+            左下のツールチップ
           </div>
 
           <div id="tip-br" class="tip" popover="auto" role="tooltip" style="position-anchor: --br">
-            右下のツールチップ（端でもはみ出しにくい）
+            右下のツールチップ
           </div>
         </div>
 
@@ -244,7 +209,8 @@
         <details open>
           <summary><h3>CSS</h3></summary>
 
-<pre><code class="language-css">:root {
+<pre><code class="language-css">
+:root {
   --gap: 12px;      /* アンカーとツールチップの隙間 */
   --pad: 12px;      /* 画面端の余白（最大幅計算に使う） */
   --tip-max: 360px; /* ツールチップの最大幅 */
@@ -254,6 +220,7 @@
 .tip[popover] {
   inset: auto; /* ←重要：popover既定のinsetを無効化 */
   border: 0;
+  margin-inline: 8px;
   padding: .9rem 1rem;
   border-radius: 14px;
   background-color: #666666ee;
@@ -271,46 +238,10 @@
     justify-self: anchor-center;
     margin-bottom: var(--gap);
 
-    /* 溢れたら順に試す（左右端対策→上下反転→さらに左右端） */
-    position-try:
-      --top-start,
-      --top-end,
-      --bottom-center,
-      --bottom-start,
-      --bottom-end;
+    /* はみ出したら上下左右を反転 */
+    position-try-fallbacks: flip-block flip-inline;
   }
 
-  /* 上：左寄せ */
-  @position-try --top-start {
-    bottom: anchor(top);
-    left: anchor(left);
-    margin-bottom: var(--gap);
-  }
-  /* 上：右寄せ */
-  @position-try --top-end {
-    bottom: anchor(top);
-    right: anchor(right);
-    margin-bottom: var(--gap);
-  }
-
-  /* 下：中央 */
-  @position-try --bottom-center {
-    top: anchor(bottom);
-    justify-self: anchor-center;
-    margin-top: var(--gap);
-  }
-  /* 下：左寄せ */
-  @position-try --bottom-start {
-    top: anchor(bottom);
-    left: anchor(left);
-    margin-top: var(--gap);
-  }
-  /* 下：右寄せ */
-  @position-try --bottom-end {
-    top: anchor(bottom);
-    right: anchor(right);
-    margin-top: var(--gap);
-  }
 }
 
 /* 非対応ブラウザ用（最低限） */
@@ -382,19 +313,19 @@
 
   &lt;!-- tooltips (popover) --&gt;
   &lt;div id="tip-tl" class="tip" popover="auto" role="tooltip" style="position-anchor: --tl"&gt;
-    左上のツールチップ（狭い幅でも画面外に出ないように try します）
+    左上のツールチップ
   &lt;/div&gt;
 
   &lt;div id="tip-tr" class="tip" popover="auto" role="tooltip" style="position-anchor: --tr"&gt;
-    右上のツールチップ（必要なら左右寄せ→上下反転で回避）
+    右上のツールチップ
   &lt;/div&gt;
 
   &lt;div id="tip-bl" class="tip" popover="auto" role="tooltip" style="position-anchor: --bl"&gt;
-    左下のツールチップ（下端が足りない場合は上側へ）
+    左下のツールチップ
   &lt;/div&gt;
 
   &lt;div id="tip-br" class="tip" popover="auto" role="tooltip" style="position-anchor: --br"&gt;
-    右下のツールチップ（端でもはみ出しにくい）
+    右下のツールチップ
   &lt;/div&gt;
 &lt;/div&gt;
 </code></pre>
@@ -411,11 +342,6 @@
           <li>
             <a href="https://zenn.dev/ubie_dev/articles/anchor-positioning-popover" ref="nofollow noreferrer noopener" target="_blank">
               Anchor Positioningが全対応。HTML・CSSだけのポップオーバーが完全体に - Zenn
-            </a>
-          </li>
-          <li>
-            <a href="https://zenn.dev/ubie_dev/articles/anchor-positioning-popover" ref="nofollow noreferrer noopener" target="_blank">
-              Anchor Positioningでカードの背景をホバーで追従させる - 2024年6月にXに投稿したCSSテクニックのまとめ | TAKLOG
             </a>
           </li>
           <li>
