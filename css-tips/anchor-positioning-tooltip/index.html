@@ -145,6 +145,35 @@
         <summary><h2>概要</h2></summary>
 
         <div class="markdown_content">
+- 2026年1月13日、全モダンブラウザでAnchor Positioningが対応
+- HTML・CSSだけでポップオーバー表現をしつつ、好きな要素を基準に、ポップオーバーを表示できるようになった
+- Popover APIを使うと、JavaScriptを使わず、ポップオーバーの表示・非表示がHTML属性だけで実現可能
+  - `popovertarget` 属性で開閉ボタンを指定し、 `popover` 属性で要素をポップオーバーとして宣言する
+    - `popover` : 要素をポップオーバーとして宣言
+    - `popovertarget` : クリック時に開閉するポップオーバーのIDを指定
+    - `popovertargetaction` : 動作を指定（`toggle` / `show` / `hide`）
+  - `popovertarget` 属性はHTML仕様上、 `button` 要素と `input[type="button"]` でのみ使用でき、 `a` 要素では動作しない
+- `anchor-name` で、ポップオーバーの基準となる要素を指定
+- `position-anchor` で、ポップオーバーをアンカー要素と紐づける
+- `anchor()` 関数で、ポップオーバーの位置を指定する
+  - `calc()` 関数と組み合わせて、余白を調整することも可能
+  - `anchor()` 関数の引数に入る値
+    - `top` : アンカーの上端
+    - `bottom` : アンカーの下端
+    - `left` : アンカーの左端
+    - `right` : アンカーの右端
+    - `center` : アンカーの中央
+- `position-area` プロパティを使うと、アンカー周囲のエリアを指定して配置可能
+  - `block-start` : 上
+  - `block-end` : 下
+  - `inline-start` : 書字方向の開始位置（LTRなら左）
+  - `inline-end` : 書字方向の終了位置（LTRなら右）
+  - `block-start inline-end` : 右上
+  - `block-end inline-start` : 左下
+- `position-try-fallbacks` を使うと、はみ出す場合に自動で代替位置へ切り替わる
+  - `flip-block` : 上下を反転
+  - `flip-inline` : 左右を反転
+  - `flip-block flip-inline` : 両方を反転
         </div>
 
       </details>
@@ -212,12 +241,159 @@
         <details open>
           <summary><h3>CSS</h3></summary>
 
-<pre><code class="language-css">
+<pre><code class="language-css">:root {
+  --gap: 12px;      /* アンカーとツールチップの隙間 */
+  --pad: 12px;      /* 画面端の余白（最大幅計算に使う） */
+  --tip-max: 360px; /* ツールチップの最大幅 */
+}
 
+.board {
+  height: min(520px, calc(100vh - 2rem));
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 28px;
+  position: relative;
+  background: #cccccc99;
+}
+
+.anchor-btn {
+  position: absolute;
+  padding: .7rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.25);
+  background: #f5f5f5;
+  color: inherit;
+  cursor: pointer; /* クリックで開くので pointer に */
+  backdrop-filter: blur(8px);
+}
+.tl { top: 18px; left: 18px; }
+.tr { top: 18px; right: 18px; }
+.bl { bottom: 18px; left: 18px; }
+.br { bottom: 18px; right: 18px; }
+
+/* Popover は UA 既定で中央寄せ等が入るので、まずリセット */
+.tip[popover] {
+  inset: auto; /* ←重要：popover既定のinsetを無効化 */
+  border: 0;
+  padding: .9rem 1rem;
+  border-radius: 14px;
+  background-color: #666666ee;
+  color: #eaf0ff;
+  box-shadow: 0 18px 55px rgba(0,0,0,.55);
+  line-height: 1.45;
+  max-inline-size: min(var(--tip-max), calc(100vw - (var(--pad) * 2)));
+  overflow-wrap: anywhere;
+}
+
+@supports (anchor-name: --a) {
+  .tip[popover] {
+    position: fixed;
+    bottom: anchor(top);
+    justify-self: anchor-center;
+    margin-bottom: var(--gap);
+
+    /* 溢れたら順に試す（左右端対策→上下反転→さらに左右端） */
+    position-try:
+      --top-start,
+      --top-end,
+      --bottom-center,
+      --bottom-start,
+      --bottom-end;
+  }
+
+  /* 上：左寄せ */
+  @position-try --top-start {
+    bottom: anchor(top);
+    left: anchor(left);
+    margin-bottom: var(--gap);
+  }
+  /* 上：右寄せ */
+  @position-try --top-end {
+    bottom: anchor(top);
+    right: anchor(right);
+    margin-bottom: var(--gap);
+  }
+
+  /* 下：中央 */
+  @position-try --bottom-center {
+    top: anchor(bottom);
+    justify-self: anchor-center;
+    margin-top: var(--gap);
+  }
+  /* 下：左寄せ */
+  @position-try --bottom-start {
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-top: var(--gap);
+  }
+  /* 下：右寄せ */
+  @position-try --bottom-end {
+    top: anchor(bottom);
+    right: anchor(right);
+    margin-top: var(--gap);
+  }
+}
+
+/* 非対応ブラウザ用（最低限） */
+@supports not (anchor-name: --a) {
+  .tip[popover] { position: fixed; top: 12px; left: 12px; }
+}
 </code></pre>
 
         </details>
 
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;div class="board"&gt;
+  &lt;!-- anchors (click to toggle popover) --&gt;
+  &lt;button class="anchor-btn tl"
+          style="anchor-name: --tl"
+          aria-describedby="tip-tl"
+          popovertarget="tip-tl"&gt;
+    左上
+  &lt;/button&gt;
+
+  &lt;button class="anchor-btn tr"
+          style="anchor-name: --tr"
+          aria-describedby="tip-tr"
+          popovertarget="tip-tr"&gt;
+    右上
+  &lt;/button&gt;
+
+  &lt;button class="anchor-btn bl"
+          style="anchor-name: --bl"
+          aria-describedby="tip-bl"
+          popovertarget="tip-bl"&gt;
+    左下
+  &lt;/button&gt;
+
+  &lt;button class="anchor-btn br"
+          style="anchor-name: --br"
+          aria-describedby="tip-br"
+          popovertarget="tip-br"&gt;
+    右下
+  &lt;/button&gt;
+
+  &lt;!-- tooltips (popover) --&gt;
+  &lt;div id="tip-tl" class="tip" popover="auto" role="tooltip" style="position-anchor: --tl"&gt;
+    左上のツールチップ（狭い幅でも画面外に出ないように try します）
+  &lt;/div&gt;
+
+  &lt;div id="tip-tr" class="tip" popover="auto" role="tooltip" style="position-anchor: --tr"&gt;
+    右上のツールチップ（必要なら左右寄せ→上下反転で回避）
+  &lt;/div&gt;
+
+  &lt;div id="tip-bl" class="tip" popover="auto" role="tooltip" style="position-anchor: --bl"&gt;
+    左下のツールチップ（下端が足りない場合は上側へ）
+  &lt;/div&gt;
+
+  &lt;div id="tip-br" class="tip" popover="auto" role="tooltip" style="position-anchor: --br"&gt;
+    右下のツールチップ（端でもはみ出しにくい）
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+        </details>
       </details>
     </section>
 
@@ -227,14 +403,14 @@
 
         <ul>
           <li>
-            <a href="https://www.tak-dcxi.com/article/summary-of-css-techniques-posted-on-x-in-june-2024/#anchor-positioning%E3%81%A7%E3%82%AB%E3%83%BC%E3%83%89%E3%81%AE%E8%83%8C%E6%99%AF%E3%82%92%E3%83%9B%E3%83%90%E3%83%BC%E3%81%A7%E8%BF%BD%E5%BE%93%E3%81%95%E3%81%9B%E3%82%8B" ref="nofollow noreferrer noopener" target="_blank">
-              Anchor Positioningでカードの背景をホバーで追従させる - 2024年6月にXに投稿したCSSテクニックのまとめ | TAKLOG
+            <a href="https://zenn.dev/ubie_dev/articles/anchor-positioning-popover" ref="nofollow noreferrer noopener" target="_blank">
+              Anchor Positioningが全対応。HTML・CSSだけのポップオーバーが完全体に - Zenn
             </a>
           </li>
           <li>
             <a href="https://zenn.dev/ubie_dev/articles/anchor-positioning-popover" ref="nofollow noreferrer noopener" target="_blank">
-              anchor-name | MDN
-            </a>: Anchor Positioningが全対応。HTML・CSSだけのポップオーバーが完全体に - Zenn
+              Anchor Positioningでカードの背景をホバーで追従させる - 2024年6月にXに投稿したCSSテクニックのまとめ | TAKLOG
+            </a>
           </li>
           <li>
             <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/anchor-name" ref="nofollow noreferrer noopener" target="_blank">
