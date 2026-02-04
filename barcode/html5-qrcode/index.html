@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>html5-qrcode QR Reader</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 16px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    button, select { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: #fff; }
+    .status { margin-top: 10px; color: #555; }
+    #reader { width: min(420px, 100%); }
+    .result { margin-top: 12px; padding: 12px; border: 1px solid #ddd; border-radius: 12px; }
+    pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>html5-qrcode（QR読み取り）</h1>
+
+  <div class="row">
+    <button id="startBtn">開始</button>
+    <button id="stopBtn" disabled>停止</button>
+    <select id="cameraSelect"></select>
+  </div>
+
+  <div class="status" id="status">未開始</div>
+
+  <div style="margin-top:12px;">
+    <div id="reader"></div>
+  </div>
+
+  <div class="result">
+    <div><strong>読み取り結果</strong></div>
+    <pre id="resultText">（まだ読み取っていません）</pre>
+  </div>
+
+  <!-- html5-qrcode（UMDビルド） -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn  = document.getElementById("stopBtn");
+    const cameraSelect = document.getElementById("cameraSelect");
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("resultText");
+
+    let html5QrCode = null;
+    let running = false;
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    async function loadCameras() {
+      cameraSelect.innerHTML = "";
+      try {
+        const devices = await Html5Qrcode.getCameras(); // 権限未許可だとここで促されることあり
+        if (!devices || !devices.length) {
+          const opt = document.createElement("option");
+          opt.textContent = "カメラが見つかりません";
+          opt.value = "";
+          cameraSelect.appendChild(opt);
+          cameraSelect.disabled = true;
+          return;
+        }
+        cameraSelect.disabled = false;
+        for (const d of devices) {
+          const opt = document.createElement("option");
+          opt.value = d.id;
+          opt.textContent = d.label || `Camera ${cameraSelect.length + 1}`;
+          cameraSelect.appendChild(opt);
+        }
+      } catch (e) {
+        console.error(e);
+        setStatus("カメラ一覧の取得に失敗しました（権限/HTTPSを確認）");
+      }
+    }
+
+    async function startScan() {
+      if (running) return;
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+
+      const selectedId = cameraSelect.value || null;
+
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+      };
+
+      const onSuccess = (decodedText, decodedResult) => {
+        resultEl.textContent = decodedText;
+        setStatus("読み取り成功（継続中）");
+        // 1回読めたら止めたいなら↓を有効化
+        // stopScan();
+      };
+
+      const onFailure = (errorMessage) => {
+        // 読めないフレームは普通に起きるので無視でOK
+      };
+
+      try {
+        setStatus("開始中…");
+        startBtn.disabled = true;
+
+        // 推奨：cameraId（device.id）で開始
+        const cameraArg = selectedId
+          ? { deviceId: { exact: selectedId } }
+          : { facingMode: "environment" };
+
+        await html5QrCode.start(cameraArg, config, onSuccess, onFailure);
+
+        running = true;
+        stopBtn.disabled = false;
+        setStatus("読み取り中…");
+      } catch (e) {
+        console.error(e);
+        startBtn.disabled = false;
+        setStatus("開始に失敗しました（権限/HTTPS/カメラ選択を確認）");
+      }
+    }
+
+    async function stopScan() {
+      if (!html5QrCode || !running) return;
+
+      try {
+        await html5QrCode.stop();
+        await html5QrCode.clear(); // reader領域の後片付け
+      } catch (e) {
+        console.error(e);
+      } finally {
+        running = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        setStatus("停止しました");
+      }
+    }
+
+    startBtn.addEventListener("click", startScan);
+    stopBtn.addEventListener("click", stopScan);
+
+    cameraSelect.addEventListener("change", async () => {
+      if (running) {
+        await stopScan();
+        await startScan();
+      }
+    });
+
+    // 初期化（必要なら起動ボタン押下後に取得する運用でもOK）
+    loadCameras();
+  </script>
+</body>
+</html>

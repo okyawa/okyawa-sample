@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>zxing-wasm QR Reader</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 16px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    video { width: min(420px, 100%); border-radius: 12px; background:#111; }
+    button, select { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: #fff; }
+    .status { margin-top: 10px; color: #555; }
+    .result { margin-top: 12px; padding: 12px; border: 1px solid #ddd; border-radius: 12px; }
+    pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>zxing-wasm（QR読み取り）</h1>
+
+  <div class="row">
+    <button id="startBtn">開始</button>
+    <button id="stopBtn" disabled>停止</button>
+    <select id="cameraSelect"></select>
+  </div>
+
+  <div class="status" id="status">未開始</div>
+
+  <div style="margin-top:12px;">
+    <video id="video" playsinline muted></video>
+    <canvas id="canvas" hidden></canvas>
+  </div>
+
+  <div class="result">
+    <div><strong>読み取り結果</strong></div>
+    <pre id="resultText">（まだ読み取っていません）</pre>
+  </div>
+
+  <!-- zxing-wasm (IIFE / reader) -->
+  <script src="https://cdn.jsdelivr.net/npm/zxing-wasm@2.2.4/dist/iife/reader/index.js"></script>
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn  = document.getElementById("stopBtn");
+    const cameraSelect = document.getElementById("cameraSelect");
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("resultText");
+
+    let stream = null;
+    let timerId = null;
+    let decoding = false;
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    async function listCameras() {
+      cameraSelect.innerHTML = "";
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cams = devices.filter(d => d.kind === "videoinput");
+
+      if (!cams.length) {
+        const opt = document.createElement("option");
+        opt.textContent = "カメラが見つかりません";
+        opt.value = "";
+        cameraSelect.appendChild(opt);
+        cameraSelect.disabled = true;
+        return;
+      }
+      cameraSelect.disabled = false;
+
+      for (const d of cams) {
+        const opt = document.createElement("option");
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `Camera ${cameraSelect.length + 1}`;
+        cameraSelect.appendChild(opt);
+      }
+    }
+
+    async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        alert("このブラウザはカメラAPIに対応していません。");
+        return;
+      }
+      stopCamera();
+
+      const deviceId = cameraSelect.value || undefined;
+      const constraints = {
+        video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "environment" },
+        audio: false
+      };
+
+      try {
+        setStatus("カメラ起動中…");
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        await video.play();
+
+        // 権限取得後にラベルが埋まることが多いので再取得
+        await listCameras();
+
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+
+        setStatus("読み取り中…（初回はWASMの読み込みが入る場合があります）");
+        // 5fpsくらいで十分なことが多い（重い端末向け）
+        timerId = setInterval(scanOnce, 200);
+      } catch (e) {
+        console.error(e);
+        setStatus("エラー: カメラを起動できません");
+        alert("HTTPS/localhost で開いているか、カメラ権限が許可されているか確認してください。");
+      }
+    }
+
+    function stopCamera() {
+      if (timerId) clearInterval(timerId);
+      timerId = null;
+
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      setStatus("停止しました");
+      decoding = false;
+    }
+
+    async function scanOnce() {
+      if (!stream) return;
+      if (decoding) return;
+      if (!window.ZXingWASM?.readBarcodes) return;
+      if (video.readyState < 2) return;
+
+      const w = video.videoWidth;
+      const h = video.videoHeight;
+      if (!w || !h) return;
+
+      canvas.width = w;
+      canvas.height = h;
+      ctx.drawImage(video, 0, 0, w, h);
+
+      const imageData = ctx.getImageData(0, 0, w, h);
+
+      decoding = true;
+      try {
+        const results = await ZXingWASM.readBarcodes(imageData, {
+          formats: ["QRCode"],
+          tryHarder: true,
+          maxNumberOfSymbols: 1
+        });
+
+        if (results && results.length) {
+          // まずは確実な text のみ表示
+          resultEl.textContent = results[0].text || "";
+          setStatus("読み取り成功（継続中）");
+          // 1回読めたら止めたいなら↓を有効化
+          // stopCamera();
+        }
+      } catch (e) {
+        // 読めないフレームは普通に起きるので静かに無視
+      } finally {
+        decoding = false;
+      }
+    }
+
+    startBtn.addEventListener("click", startCamera);
+    stopBtn.addEventListener("click", stopCamera);
+
+    cameraSelect.addEventListener("change", () => {
+      if (stream) startCamera();
+    });
+
+    (async () => {
+      if (!navigator.mediaDevices?.enumerateDevices) return;
+      await listCameras();
+    })();
+  </script>
+</body>
+</html>
