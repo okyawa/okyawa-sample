@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Prompt APIのSample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="author" content="okyawa">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/res/css/presentation.css?v=4" />
+
+  <!-- ↓コードのシンタックスハイライト -->
+  <link rel="stylesheet" href="/res/js/highlight-js/styles/atom-one-light.min.css">
+  <script src="/res/js/highlight-js/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <!-- ↑コードのシンタックスハイライト -->
+
+  <!-- ↓Markdown形式の変換 -->
+  <script src="/res/js/marked-js/marked.min.js"></script>
+  <script src="/res/js/marked-js/setup-marked.js?v=1"></script>
+  <!-- ↑Markdown形式の変換 -->
+
+  <!-- ↓画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+  <script src="/res/js/viewport-responsive/viewport-responsive.js?v=1"></script>
+  <!-- ↑画面幅375px以下をViewportの表示倍率縮小によるレスポンシブ対応 -->
+
+  <script src="/res/js/presentation/presentation.js"></script>
+
+  <!-- ↓このHTML専用の指定 -->
+  <style>
+    fieldset {
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      min-height: 50px;
+      max-height: 200px;
+      field-sizing: content;
+      box-sizing: border-box;
+    }
+    #out pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .running #prompt {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .running #run {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .running .button_label {
+      display: none;
+    }
+    .running #run::after {
+      content: 'Running...';
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 0.9em;
+      color: #888;
+    }
+    .running {
+      position: relative;
+    }
+    .running::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      box-sizing: border-box;
+      width: 5px;
+      height: 5px;
+      display: inline-block;
+      border-radius: 50%;
+      box-shadow:
+        0 -10px 0 #eee,     /*  上  */
+        7px -7px 0 #ddd,  /* 右上 */
+        10px 0 0 #ccc,      /*  右  */
+        7px 7px 0 #bbb,   /* 右下 */
+        0 10px 0 #aaa,      /*  下  */
+        -7px 7px 0 #999,  /* 左下 */
+        -10px 0 0 #666,     /*  左  */
+        -7px -7px 0 #000; /* 左上 */
+      animation: circle_loading_rotate 1s steps(8) 0s infinite;
+    }
+    @keyframes circle_loading_rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  <!-- ↑このHTML専用の指定 -->
+
+</head>
+<body>
+  <div id="container">
+
+    <header>
+      <h1>Prompt API</h1>
+      <h2>ブラウザ内蔵のLLMを利用</h2>
+    </header>
+
+    <br />
+
+    <section>
+      <details open>
+        <summary><h2>概要</h2></summary>
+
+        <div class="markdown_content">
+- Prompt APIは、ブラウザ内蔵のLLM（大規模言語モデル）を利用するためのAPI
+  - Chromeの場合、ブラウザに内蔵されている Gemini Nano が利用される
+- 2026/02/16現在、ChromeでPrompt APIを利用するには、早期プレビュープログラム申し込みとChromeのフラグをONの手順が必要
+  - 早期プレビュープログラム申し込み: https://developer.chrome.com/docs/ai/prompt-api?hl=ja
+  - 申し込み後、下記2つのフラグをONにして、Chromeを再起動
+    - [chrome://flags/#optimization-guide-on-device-model](chrome://flags/#optimization-guide-on-device-model)
+    - [chrome://flags/#prompt-api-for-gemini-nano-multimodal-input](chrome://flags/#prompt-api-for-gemini-nano-multimodal-input)
+        </div>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>デモ</h2></summary>
+
+        <div id="demo">
+          <fieldset>
+            <textarea id="prompt" rows="4" cols="50">日本語で、3行で自己紹介して。</textarea>
+            <button id="run">
+              <span class="button_label">Run</span>
+            </button>
+          </fieldset>
+          <pre id="out"></pre>
+        </div>
+
+        <script type="module">
+          const wrapperElement = document.querySelector('#demo');
+          const prompt = wrapperElement.querySelector('#prompt');
+          const out = wrapperElement.querySelector('#out');
+
+          wrapperElement.querySelector('#run').addEventListener('click', async () => {
+            wrapperElement.classList.add('running');
+            const availability = await LanguageModel.availability();
+            out.textContent = `availability: ${availability}\n`;
+
+            const session = await LanguageModel.create({
+              monitor(m) {
+                m.addEventListener('downloadprogress', (e) => {
+                  out.textContent = `downloading: ${Math.round(e.loaded * 100)}%\n`;
+                });
+              },
+            });
+
+            const answer = await session.prompt([
+              { role: 'system', content: 'You are a helpful assistant.' },
+              { role: 'user', content: prompt.value },
+            ]);
+
+            out.textContent += `\n${answer}\n`;
+            wrapperElement.classList.remove('running');
+          });
+        </script>
+
+      </details>
+    </section>
+
+    <section>
+      <details>
+        <summary><h2>コード</h2></summary>
+
+        <details open>
+          <summary><h3>HTML</h3></summary>
+
+<pre><code class="language-html">&lt;!-- filepath: untitled:Untitled-1 --&gt;
+&lt;div id="demo"&gt;
+  &lt;fieldset&gt;
+    &lt;textarea id="prompt" rows="4" cols="50"&gt;日本語で、3行で自己紹介して。&lt;/textarea&gt;
+    &lt;button id="run"&gt;
+      &lt;span class="button_label"&gt;Run&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/fieldset&gt;
+  &lt;pre id="out"&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</code></pre>
+        </details>
+
+        <details open>
+          <summary><h3>JavaScript</h3></summary>
+
+<pre><code class="language-js">const wrapperElement = document.querySelector('#demo');
+const prompt = wrapperElement.querySelector('#prompt');
+const out = wrapperElement.querySelector('#out');
+
+wrapperElement.querySelector('#run').addEventListener('click', async () => {
+  wrapperElement.classList.add('running');
+  const availability = await LanguageModel.availability();
+  out.textContent = `availability: ${availability}\n`;
+
+  const session = await LanguageModel.create({
+    monitor(m) {
+      m.addEventListener('downloadprogress', (e) => {
+        out.textContent = `downloading: ${Math.round(e.loaded * 100)}%\n`;
+      });
+    },
+  });
+
+  const answer = await session.prompt([
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: prompt.value },
+  ]);
+
+  out.textContent += `\n${answer}\n`;
+  wrapperElement.classList.remove('running');
+});
+</code></pre>
+        </details>
+
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>参照</h2></summary>
+
+        <ul>
+          <li>
+            <a href="https://developer.chrome.com/docs/ai/prompt-api?hl=ja" ref="nofollow noreferrer noopener" target="_blank">
+              Prompt API | Chrome Developers
+            </a>
+          </li>
+        </ul>
+      </details>
+    </section>
+
+  </div>
+</body>
+</html>
